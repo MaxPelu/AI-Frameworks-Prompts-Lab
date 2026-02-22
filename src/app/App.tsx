@@ -1,8 +1,5 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './src/app/App.tsx';
-import './src/app/styles/index.css';
 import WorkflowPanel from '../components/workflow/WorkflowPanel.tsx';
 import KnowledgePanel from '../components/knowledge/KnowledgePanel.tsx';
 import ArenaModal from '../components/arena/ArenaModal.tsx';
