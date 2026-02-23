@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { GeminiModel, UploadedFile, PresetConfig, ModelConfig } from '../../types/index.ts';
-import { XCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, SparklesIcon, BeakerIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, ArrowPathIcon, Bars3BottomLeftIcon, TrashIcon, CheckIcon, KeyIcon, ScaleIcon, UsersIcon, GlobeAltIcon, PauseCircleIcon } from './Icons.tsx';
+import { GeminiModel, UploadedFile, PresetConfig, ModelConfig, AgentSkill } from '../../types/index.ts';
+import { XCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, SparklesIcon, BeakerIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, ArrowPathIcon, Bars3BottomLeftIcon, TrashIcon, CheckIcon, KeyIcon, ScaleIcon, UsersIcon, GlobeAltIcon, PauseCircleIcon, PlusIcon, PencilIcon } from './Icons.tsx';
 import FileUploader from '../workflow/FileUploader.tsx';
 
 interface ModelSettingsPanelProps {
@@ -69,6 +69,7 @@ interface ModelSettingsPanelProps {
     agentPlanningMode: boolean; setAgentPlanningMode: (v: boolean) => void;
     searchRecency: 'any'|'day'|'week'|'month'|'year'; setSearchRecency: (v: any) => void;
     groundingThreshold: number; setGroundingThreshold: (v: number) => void;
+    agentSkills: AgentSkill[]; setAgentSkills: (v: AgentSkill[]) => void;
 }
 
 const Tooltip: React.FC<{ text: string }> = ({ text }) => (
@@ -211,16 +212,21 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
         agentPlanningMode, setAgentPlanningMode,
         searchRecency, setSearchRecency,
         groundingThreshold, setGroundingThreshold,
+        agentSkills, setAgentSkills,
         
         ...settings
     } = props;
     
     const panelRef = useRef<HTMLDivElement>(null);
-    const [activeTab, setActiveTab] = useState<'params' | 'system' | 'tools' | 'audio' | 'advanced'>('params');
+    const [activeTab, setActiveTab] = useState<'params' | 'system' | 'tools' | 'skills' | 'audio' | 'advanced'>('params');
     const [currentStopSequence, setCurrentStopSequence] = useState('');
     const [presets, setPresets] = useState<PresetConfig[]>([]);
     const [newPresetName, setNewPresetName] = useState('');
     const [isSavingPreset, setIsSavingPreset] = useState(false);
+
+    // Skills State
+    const [editingSkill, setEditingSkill] = useState<Partial<AgentSkill> | null>(null);
+    const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     
     // --- ADVANCED SOTA STATE ---
     const [minP, setMinP] = useState(0.0);
@@ -442,7 +448,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
 
                 {/* --- NAVIGATION TABS --- */}
                 <div className="flex gap-1 p-1 bg-black/20 rounded-xl overflow-x-auto custom-scrollbar">
-                    {[{id: 'params', label: 'Sampling'}, {id: 'system', label: 'System & Safety'}, {id: 'tools', label: 'Tools & Agents'}, {id: 'audio', label: 'Audio & MM'}, {id: 'advanced', label: 'Advanced'}].map(tab => (
+                    {[{id: 'params', label: 'Sampling'}, {id: 'system', label: 'System & Safety'}, {id: 'tools', label: 'Tools & Agents'}, {id: 'skills', label: 'Skills'}, {id: 'audio', label: 'Audio & MM'}, {id: 'advanced', label: 'Advanced'}].map(tab => (
                         <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-teal-500 text-slate-900 shadow-lg' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>{tab.label}</button>
                     ))}
                 </div>
@@ -671,6 +677,160 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                                 </div>
                             </div>
                         </section>
+                    </div>
+                )}
+
+                {/* --- TAB: AGENT SKILLS --- */}
+                {activeTab === 'skills' && (
+                    <div className="space-y-6 animate-fade-in">
+                        <section className="bg-white/5 rounded-2xl p-5 border border-white/5 space-y-5">
+                            <div className="flex justify-between items-center">
+                                <SectionHeader title="Custom Agent Skills" icon={<KeyIcon className="w-4 h-4" />} />
+                                <button 
+                                    onClick={() => {
+                                        setEditingSkill({ id: crypto.randomUUID(), name: '', description: '', content: '', format: 'text', enabled: true });
+                                        setIsSkillModalOpen(true);
+                                    }}
+                                    className="flex items-center gap-1 bg-teal-500/20 text-teal-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-500/30 transition-all"
+                                >
+                                    <PlusIcon className="w-3 h-3" /> Add Skill
+                                </button>
+                            </div>
+
+                            {(!agentSkills || agentSkills.length === 0) && (
+                                <div className="text-center py-8 text-gray-500 text-xs">
+                                    No custom skills added yet. Add skills like "Gemini Antigravity", "Codex", or custom tool definitions.
+                                </div>
+                            )}
+
+                            <div className="space-y-3">
+                                {agentSkills?.map(skill => (
+                                    <div key={skill.id} className="bg-black/20 p-3 rounded-xl border border-white/5 hover:border-teal-500/30 transition-all group">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <Toggle 
+                                                    label="" 
+                                                    enabled={skill.enabled} 
+                                                    onToggle={(v) => {
+                                                        const updated = agentSkills.map(s => s.id === skill.id ? { ...s, enabled: v } : s);
+                                                        setAgentSkills(updated);
+                                                    }} 
+                                                    disabled={disabled} 
+                                                    tooltip="Enable/Disable Skill" 
+                                                />
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-gray-200">{skill.name}</h4>
+                                                    <span className="text-[10px] text-gray-500 uppercase tracking-wider bg-white/5 px-1.5 py-0.5 rounded">{skill.format}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button 
+                                                    onClick={() => {
+                                                        setEditingSkill(skill);
+                                                        setIsSkillModalOpen(true);
+                                                    }}
+                                                    className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-teal-300"
+                                                >
+                                                    <PencilIcon className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        setAgentSkills(agentSkills.filter(s => s.id !== skill.id));
+                                                    }}
+                                                    className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-red-400"
+                                                >
+                                                    <TrashIcon className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-400 line-clamp-2">{skill.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {/* SKILL EDITOR MODAL */}
+                {isSkillModalOpen && editingSkill && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+                        <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                                <h3 className="font-bold text-gray-200">Edit Skill</h3>
+                                <button onClick={() => setIsSkillModalOpen(false)} className="text-gray-500 hover:text-white"><XCircleIcon className="w-5 h-5" /></button>
+                            </div>
+                            <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 block mb-1">Skill Name</label>
+                                    <input 
+                                        type="text" 
+                                        value={editingSkill.name} 
+                                        onChange={e => setEditingSkill({...editingSkill, name: e.target.value})}
+                                        className="glass-input w-full p-2 rounded-lg text-sm text-white" 
+                                        placeholder="e.g. Python Data Analysis"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 block mb-1">Description</label>
+                                    <input 
+                                        type="text" 
+                                        value={editingSkill.description} 
+                                        onChange={e => setEditingSkill({...editingSkill, description: e.target.value})}
+                                        className="glass-input w-full p-2 rounded-lg text-sm text-white" 
+                                        placeholder="What does this skill do?"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 block mb-1">Format</label>
+                                    <select 
+                                        value={editingSkill.format} 
+                                        onChange={e => setEditingSkill({...editingSkill, format: e.target.value as any})}
+                                        className="glass-input w-full p-2 rounded-lg text-sm bg-black/50 text-white"
+                                    >
+                                        <option value="text">Plain Text / Instructions</option>
+                                        <option value="json">JSON Schema</option>
+                                        <option value="yaml">YAML Definition</option>
+                                        <option value="python">Python Code</option>
+                                        <option value="xml">XML / HTML</option>
+                                    </select>
+                                </div>
+                                <div className="flex-1 flex flex-col min-h-[200px]">
+                                    <label className="text-xs font-bold text-gray-400 block mb-1">Content / Definition</label>
+                                    <textarea 
+                                        value={editingSkill.content} 
+                                        onChange={e => setEditingSkill({...editingSkill, content: e.target.value})}
+                                        className="glass-input w-full flex-1 p-3 rounded-lg text-xs font-mono leading-relaxed resize-none text-teal-300 min-h-[200px]" 
+                                        placeholder="Paste skill definition here..."
+                                    />
+                                </div>
+                            </div>
+                            <div className="p-4 border-t border-white/10 bg-white/5 flex justify-end gap-2">
+                                <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 rounded-lg text-xs font-bold text-gray-400 hover:bg-white/5">Cancel</button>
+                                <button 
+                                    onClick={() => {
+                                        if (editingSkill.id && editingSkill.name) {
+                                            const newSkill = editingSkill as AgentSkill;
+                                            const existingIndex = agentSkills?.findIndex(s => s.id === newSkill.id);
+                                            
+                                            let updated;
+                                            if (existingIndex !== undefined && existingIndex >= 0) {
+                                                updated = [...(agentSkills || [])];
+                                                updated[existingIndex] = newSkill;
+                                            } else {
+                                                updated = [...(agentSkills || []), newSkill];
+                                            }
+                                            
+                                            setAgentSkills(updated);
+                                            setIsSkillModalOpen(false);
+                                        }
+                                    }} 
+                                    disabled={!editingSkill.name || !editingSkill.content}
+                                    className="px-4 py-2 rounded-lg text-xs font-bold bg-teal-500 text-slate-900 hover:bg-teal-400 disabled:opacity-50"
+                                >
+                                    Save Skill
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 

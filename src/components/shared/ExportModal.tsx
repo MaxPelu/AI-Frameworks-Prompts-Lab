@@ -75,7 +75,7 @@ const getMarkdownContent = (promptObj: SavedPrompt) => {
     return `# ${promptObj.name || promptObj.baseIdea}
 
 **Modelo:** ${latestVersion.model || 'gemini-2.5-flash'}
-**Fecha:** ${new Date(latestVersion.timestamp).toLocaleString()}
+**Fecha:** ${new Date(latestVersion.createdAt).toLocaleString()}
 
 ## Idea Original
 ${promptObj.baseIdea}

@@ -12,8 +12,9 @@ import BatchTestingModal from '../components/batch/BatchTestingModal.tsx';
 import TokenUsageDashboard from '../components/metrics/TokenUsageDashboard.tsx';
 import SessionNamingModal from '../components/shared/SessionNamingModal.tsx';
 import HistoryDashboard from '../components/history/HistoryDashboard.tsx';
+import AgentSkillsDashboard from '../components/skills/AgentSkillsDashboard.tsx';
 import { Toast, ToastType } from '../components/shared/Toast.tsx';
-import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, SafetySettings, ModelConfig, ArenaBattleConfig, TokenUsage } from '../types/index.ts';
+import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, SafetySettings, ModelConfig, ArenaBattleConfig, TokenUsage, AgentSkill } from '../types/index.ts';
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
 import { FRAMEWORKS } from '../config/constants.ts';
 import { CATEGORIES, CATEGORIZED_USE_CASES } from '../config/constants.ts';
@@ -125,6 +126,8 @@ const App: React.FC = () => {
     const [agentPlanningMode, setAgentPlanningMode] = useState(false);
     const [searchRecency, setSearchRecency] = useState<'any'|'day'|'week'|'month'|'year'>('any');
     const [groundingThreshold, setGroundingThreshold] = useState(0.5);
+    const [agentSkills, setAgentSkills] = useState<AgentSkill[]>([]);
+    const [isSkillsDashboardOpen, setIsSkillsDashboardOpen] = useState(false);
 
     // Safety Settings
     const [isSafetyModalOpen, setIsSafetyModalOpen] = useState(false);
@@ -667,6 +670,7 @@ const App: React.FC = () => {
         agentPlanningMode, setAgentPlanningMode,
         searchRecency, setSearchRecency,
         groundingThreshold, setGroundingThreshold,
+        agentSkills, setAgentSkills,
 
         onOpenSafetySettings: () => setIsSafetyModalOpen(true),
         onSaveSettings: handleSaveSettings,
@@ -780,6 +784,14 @@ const App: React.FC = () => {
                         >
                             <ChartBarIcon className="w-5 h-5" />
                             Métricas
+                        </button>
+                        <button
+                            onClick={() => setIsSkillsDashboardOpen(true)}
+                            className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                            title="Gestionar Agent Skills"
+                        >
+                            <SparklesIcon className="w-5 h-5" />
+                            Skills
                         </button>
                     </div>
 
@@ -933,6 +945,13 @@ const App: React.FC = () => {
                 onIteratePrompt={handleSetPromptToIterate}
                 onExportPrompt={handleExportPrompt}
                 onRenamePrompt={handleRenameSession}
+            />
+            <AgentSkillsDashboard
+                isOpen={isSkillsDashboardOpen}
+                onClose={() => setIsSkillsDashboardOpen(false)}
+                agentSkills={agentSkills}
+                setAgentSkills={setAgentSkills}
+                apiKey={process.env.API_KEY || null}
             />
         </div>
     );

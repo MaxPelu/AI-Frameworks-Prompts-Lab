@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Part, Type, HarmCategory, HarmBlockThreshold, ThinkingLevel } from "@google/genai";
-import { Framework, UploadedFile, CritiqueResult, GeminiModel, QualityAnalysisResult, SafetySettings, SafetySettingValue, TokenUsage, ConfigSnapshot } from '../types/index.ts';
+import { Framework, UploadedFile, CritiqueResult, GeminiModel, QualityAnalysisResult, SafetySettings, SafetySettingValue, TokenUsage, ConfigSnapshot, AgentSkill } from '../types/index.ts';
 import { USE_CASES, FRAMEWORKS } from '../config/constants.ts';
 import { CONTEXT_FRAMEWORKS } from '../config/contextConstants.ts';
 import { AGENT_FRAMEWORKS } from '../config/agentConstants.ts';
@@ -164,6 +164,22 @@ const constructSotaSystemInstruction = (settings: ModelSettings): string => {
         Strictly use Markdown. Use Headers (H1-H3), Tables, Code Blocks, and Bold text for readability.`);
     }
 
+    // 7. Agent Skills
+    if (settings.agentSkills && settings.agentSkills.length > 0) {
+        const enabledSkills = settings.agentSkills.filter(s => s.enabled);
+        if (enabledSkills.length > 0) {
+            const skillsText = enabledSkills.map(s => `
+            --- SKILL: ${s.name} ---
+            [Format: ${s.format}]
+            ${s.content}
+            ------------------------
+            `).join('\n');
+            parts.push(`### AGENT SKILLS & CAPABILITIES
+            You have been equipped with the following specialized skills. You MUST use them when relevant to the user's request.
+            ${skillsText}`);
+        }
+    }
+
     return parts.join('\n\n');
 };
 
@@ -211,6 +227,7 @@ export interface ModelSettings {
     speechConfig?: { voiceName: string };
     enableLogprobs?: boolean;
     topLogprobs?: number;
+    agentSkills?: AgentSkill[];
 }
 
 const buildConfig = (settings: ModelSettings, overrideJsonMode: boolean = false) => {

@@ -81,6 +81,15 @@ export interface PromptVersion {
     changeSummary: string;
 }
 
+export interface AgentSkill {
+    id: string;
+    name: string;
+    description: string;
+    content: string;
+    format: 'text' | 'json' | 'yaml' | 'xml' | 'python';
+    enabled: boolean;
+}
+
 export interface SavedPrompt {
     id: string;
     name?: string; // Nombre personalizado de la sesión
