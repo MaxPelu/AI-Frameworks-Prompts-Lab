@@ -108,8 +108,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ files, onFilesChange }) => 
                         Arrastra archivos, o <span className="text-teal-400 underline">navega</span>
                     </span>
                 </span>
-                 <p className="text-xs text-gray-600 mt-1">Soporta: Imágenes, txt, md, csv, json, pdf, xlsx</p>
-                <input id="file-upload" type="file" multiple className="hidden" onChange={handleFileSelect} accept="image/*,text/plain,.md,.csv,application/json,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
+                 <p className="text-xs text-gray-600 mt-1">Soporta: Imágenes (png, jpg, webp), txt, md, csv, json, pdf</p>
+                <input id="file-upload" type="file" multiple className="hidden" onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp,image/heic,image/heif,text/plain,.md,.csv,application/json,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
             </label>
             {files.length > 0 && (
                 <div className="flex flex-wrap gap-2 text-xs">

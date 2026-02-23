@@ -141,7 +141,11 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
           // Simple filter for custom ones (improved logic can be added based on user selection metadata)
           // For now, we append custom frameworks to the current tab if they seem generic or user didn't specify category well
           // In a real app, custom frameworks would have a specific 'type' field.
-          return [...customFrameworks, ...base];
+          const combined = [...customFrameworks, ...base];
+          const uniqueFrameworks = combined.filter((fw, index, self) => 
+              index === self.findIndex((t) => t.id === fw.id)
+          );
+          return uniqueFrameworks;
       }
       return base;
   }, [activeTab, customFrameworks]);

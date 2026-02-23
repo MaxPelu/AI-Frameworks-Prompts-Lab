@@ -456,10 +456,17 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                             <SectionHeader title="Model Selection" icon={<SparklesIcon className="w-4 h-4" />} />
                             
                             {/* GEMINI 3 SERIES */}
-                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 3.0 (Frontier)</div>
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 3.0 & 3.1 (Frontier)</div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                                <ModelButton id="gemini-3.1-pro-preview" label="3.1 Pro" sub="Reasoning SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-pro-preview-low" label="3.1 Pro (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-pro-preview-high" label="3.1 Pro (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-pro-preview" label="3 Pro" sub="Reasoning SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-pro-preview-low" label="3 Pro (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-pro-preview-high" label="3 Pro (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-flash-preview" label="3 Flash" sub="Speed SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-flash-preview-low" label="3 Flash (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-flash-preview-high" label="3 Flash (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-deep-think-preview" label="Deep Think" sub="Math/Code" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                             </div>
 

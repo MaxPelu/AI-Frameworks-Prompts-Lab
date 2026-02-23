@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SavedPrompt, GeminiModel } from '../../types';
-import { XMarkIcon, ClipboardIcon, CheckIcon } from './Icons.tsx';
+import { XMarkIcon, ClipboardIcon, CheckIcon, ArrowDownTrayIcon } from './Icons.tsx';
 // A simple syntax highlighter is needed for display. We'll use CSS classes for basic highlighting.
 // For a real app, a library like Prism.js or highlight.js would be better.
 
@@ -70,6 +70,23 @@ if __name__ == "__main__":
     run()
 `;
 
+const getMarkdownContent = (promptObj: SavedPrompt) => {
+    const latestVersion = promptObj.versions[0];
+    return `# ${promptObj.name || promptObj.baseIdea}
+
+**Modelo:** ${latestVersion.model || 'gemini-2.5-flash'}
+**Fecha:** ${new Date(latestVersion.timestamp).toLocaleString()}
+
+## Idea Original
+${promptObj.baseIdea}
+
+## Prompt Optimizado
+\`\`\`text
+${latestVersion.optimizedPrompt}
+\`\`\`
+`;
+};
+
 
 const CodeSnippet: React.FC<{ code: string }> = ({ code }) => {
     const [copied, setCopied] = useState(false);
@@ -115,7 +132,7 @@ interface ExportModalProps {
 }
 
 const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
-    const [activeTab, setActiveTab] = useState<'js' | 'py'>('js');
+    const [activeTab, setActiveTab] = useState<'js' | 'py' | 'md'>('js');
     
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
@@ -133,37 +150,64 @@ const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
     const latestPrompt = latestVersion.optimizedPrompt;
     const latestModel = latestVersion.model || 'gemini-2.5-flash';
 
+    const handleDownloadMarkdown = () => {
+        const content = getMarkdownContent(prompt);
+        const blob = new Blob([content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${prompt.name || 'prompt'}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col p-6">
                  <header className="flex justify-between items-center mb-4">
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-100">Exportar Prompt a Código</h2>
-                        <p className="text-slate-400 text-sm truncate max-w-md">Exportando prompt para: "{prompt.baseIdea}"</p>
+                        <h2 className="text-2xl font-bold text-slate-100">Exportar Prompt</h2>
+                        <p className="text-slate-400 text-sm truncate max-w-md">Exportando: "{prompt.name || prompt.baseIdea}"</p>
                     </div>
                     <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
                         <XMarkIcon className="w-8 h-8" />
                     </button>
                 </header>
 
-                <div className="flex border-b border-slate-700 mb-4">
-                    <button
-                        onClick={() => setActiveTab('js')}
-                        className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'js' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-gray-400 hover:text-gray-200'}`}
-                    >
-                        JavaScript
-                    </button>
-                     <button
-                        onClick={() => setActiveTab('py')}
-                        className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'py' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-gray-400 hover:text-gray-200'}`}
-                    >
-                        Python
-                    </button>
+                <div className="flex border-b border-slate-700 mb-4 justify-between items-center">
+                    <div className="flex">
+                        <button
+                            onClick={() => setActiveTab('js')}
+                            className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'js' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            JavaScript
+                        </button>
+                         <button
+                            onClick={() => setActiveTab('py')}
+                            className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'py' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            Python
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('md')}
+                            className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'md' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            Markdown
+                        </button>
+                    </div>
+                    {activeTab === 'md' && (
+                        <button onClick={handleDownloadMarkdown} className="text-teal-400 hover:text-teal-300 text-sm flex items-center gap-1 mb-1">
+                            <ArrowDownTrayIcon className="w-4 h-4" /> Descargar .md
+                        </button>
+                    )}
                 </div>
                 
                 <div className="flex-1 min-h-0">
                     {activeTab === 'js' && <CodeSnippet code={getJsCode(latestPrompt, latestModel)} />}
                     {activeTab === 'py' && <CodeSnippet code={getPythonCode(latestPrompt, latestModel)} />}
+                    {activeTab === 'md' && <CodeSnippet code={getMarkdownContent(prompt)} />}
                 </div>
 
                 <footer className="mt-6 text-center">

@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Part, Type, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { GoogleGenAI, Part, Type, HarmCategory, HarmBlockThreshold, ThinkingLevel } from "@google/genai";
 import { Framework, UploadedFile, CritiqueResult, GeminiModel, QualityAnalysisResult, SafetySettings, SafetySettingValue, TokenUsage, ConfigSnapshot } from '../types/index.ts';
 import { USE_CASES, FRAMEWORKS } from '../config/constants.ts';
 import { CONTEXT_FRAMEWORKS } from '../config/contextConstants.ts';
@@ -35,8 +35,15 @@ const resolveModel = (model: string): string => {
         'google-antigravity-engine': 'gemini-3-pro-preview',
         'gemini-3-deep-think-preview': 'gemini-3-pro-preview',
         'gemini-3-visual-layout': 'gemini-3-flash-preview',
+        'gemini-3.1-pro-preview': 'gemini-3.1-pro-preview',
+        'gemini-3.1-pro-preview-low': 'gemini-3.1-pro-preview',
+        'gemini-3.1-pro-preview-high': 'gemini-3.1-pro-preview',
         'gemini-3-pro-preview': 'gemini-3-pro-preview',
+        'gemini-3-pro-preview-low': 'gemini-3-pro-preview',
+        'gemini-3-pro-preview-high': 'gemini-3-pro-preview',
         'gemini-3-flash-preview': 'gemini-3-flash-preview',
+        'gemini-3-flash-preview-low': 'gemini-3-flash-preview',
+        'gemini-3-flash-preview-high': 'gemini-3-flash-preview',
         'gemini-2.5-pro-latest': 'gemini-2.5-pro-latest',
         'gemini-2.5-flash-latest': 'gemini-2.5-flash-latest',
         'gemini-2.5-flash-lite-latest': 'gemini-2.5-flash-lite-latest',
@@ -57,6 +64,43 @@ const fileToPart = (file: UploadedFile): Part => {
     return { inlineData: { mimeType: file.type, data: file.base64 } };
   }
   return {} as Part;
+};
+
+// --- RETRY WRAPPER ---
+const callGeminiWithRetry = async (params: any, retries = 3, delay = 1000): Promise<any> => {
+    if (!ai) throw new Error("API Key no disponible");
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await ai.models.generateContent(params);
+        } catch (error: any) {
+            const isRateLimit = error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('Rate exceeded');
+            if (isRateLimit && i < retries - 1) {
+                console.warn(`Rate limit exceeded. Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff
+            } else {
+                throw error;
+            }
+        }
+    }
+};
+
+const callGeminiStreamWithRetry = async (params: any, retries = 3, delay = 1000): Promise<any> => {
+    if (!ai) throw new Error("API Key no disponible");
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await ai.models.generateContentStream(params);
+        } catch (error: any) {
+            const isRateLimit = error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('Rate exceeded');
+            if (isRateLimit && i < retries - 1) {
+                console.warn(`Rate limit exceeded (Stream). Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff
+            } else {
+                throw error;
+            }
+        }
+    }
 };
 
 // --- SOTA CONTEXT INJECTOR ---
@@ -193,6 +237,10 @@ const buildConfig = (settings: ModelSettings, overrideJsonMode: boolean = false)
         if (config.maxOutputTokens && config.maxOutputTokens <= config.thinkingConfig.thinkingBudget) {
              config.maxOutputTokens = config.thinkingConfig.thinkingBudget + 2048; // Ensure buffer
         }
+    } else if (settings.selectedModel.endsWith('-low') || settings.selectedModel.endsWith('-high')) {
+        config.thinkingConfig = {
+            thinkingLevel: settings.selectedModel.endsWith('-low') ? ThinkingLevel.LOW : ThinkingLevel.HIGH
+        };
     }
 
     // Tools
@@ -302,7 +350,7 @@ export const generateSessionTitle = async (text: string, model: GeminiModel = 'g
     const prompt = `Tarea: Genera un TÍTULO corto (3-5 palabras) para este texto. Solo el título, sin comillas ni intro. Texto: "${text.substring(0, 500)}"`;
 
     try {
-        const response = await ai.models.generateContent({
+        const response = await callGeminiWithRetry({
             model: resolveModel(fastModel),
             contents: prompt,
             config: { temperature: 0.3, maxOutputTokens: 20 }
@@ -328,7 +376,7 @@ export const quickRefine = async (text: string, action: 'magic' | 'fix' | 'trans
     // Force override JSON mode to ensure we get text back
     const config = buildConfig(settings, true);
 
-    const response = await ai.models.generateContent({ 
+    const response = await callGeminiWithRetry({ 
         model: resolveModel(settings.selectedModel), 
         contents: prompt,
         config: config 
@@ -381,7 +429,7 @@ export const optimizePrompt = async (
   const config = buildConfig(settings, true);
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await callGeminiWithRetry({
       model: resolveModel(settings.selectedModel),
       contents: { parts: [textPart, ...fileParts] }, 
       config: config
@@ -450,7 +498,7 @@ export const expandIdea = async (
     const modelToUse = resolveModel(settings.selectedModel);
     
     try {
-        const response = await ai.models.generateContent({
+        const response = await callGeminiWithRetry({
             model: modelToUse, 
             contents: { parts: [textPart, ...files.map(fileToPart).filter(p => p.inlineData)] },
             config: config
@@ -494,7 +542,7 @@ export const evaluatePromptQuality = async (promptText: string, model: GeminiMod
   const prompt = `Analiza la calidad técnica del siguiente prompt para un LLM. Proporciona puntuaciones del 0 al 100 y feedback conciso.\n\nPrompt: "${promptText}"`;
 
   try {
-    const result = await ai.models.generateContent({
+    const result = await callGeminiWithRetry({
       model: resolveModel(model),
       contents: prompt, 
       config: { 
@@ -514,20 +562,20 @@ export const evaluatePromptQuality = async (promptText: string, model: GeminiMod
 export const suggestUseCase = async (idea: string, model: GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
     if (!ai) return { text: USE_CASES[0] };
     const prompt = `Basado en esta idea: "${idea}", sugiere la categoría de caso de uso más apropiada de esta lista: ${USE_CASES.join(', ')}. Responde solo con el nombre exacto de la categoría.`;
-    const response = await ai.models.generateContent({ model: resolveModel(model), contents: prompt });
+    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
     return { text: response.text?.trim() || USE_CASES[0], usage: extractUsage(response, model, 'analysis', undefined, idea) };
 };
 
 export const suggestFramework = async (idea: string, model: GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
     if (!ai) return { text: FRAMEWORKS[0].acronym };
     const prompt = `Basado en esta idea: "${idea}", sugiere el acrónimo del framework de prompting más adecuado de esta lista: ${ALL_FRAMEWORKS_LIST.map(f => f.acronym).join(', ')}. Responde solo con el acrónimo.`;
-    const response = await ai.models.generateContent({ model: resolveModel(model), contents: prompt });
+    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
     return { text: response.text?.trim() || FRAMEWORKS[0].acronym, usage: extractUsage(response, model, 'analysis', undefined, idea) };
 };
 
 export const generateContent = async (p: string, s: any): Promise<{text: string, thought?: string, usage?: TokenUsage}> => {
     if (!ai) return { text: "Error: API no configurada." };
-    const response = await ai.models.generateContent({ model: resolveModel(s.selectedModel), contents: p, config: buildConfig(s) });
+    const response = await callGeminiWithRetry({ model: resolveModel(s.selectedModel), contents: p, config: buildConfig(s) });
     
     let thought = "";
     const parts = response.candidates?.[0]?.content?.parts || [];
@@ -559,7 +607,7 @@ export const modifyContentLength = async (text: string, modifier: LengthModifier
     const instruction = modifierConfig ? modifierConfig.prompt : "Modifica el siguiente texto:";
     const prompt = `${instruction}\n\n"${text}"`;
 
-    const response = await ai.models.generateContent({ model: resolveModel(model), contents: prompt });
+    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
     return { text: response.text || text, usage: extractUsage(response, model, 'generation', undefined, text) };
 };
 
@@ -582,7 +630,7 @@ export const generateMetaFramework = async (nicheProblem: string, model: GeminiM
       }
     }`;
 
-    const response = await ai.models.generateContent({ 
+    const response = await callGeminiWithRetry({ 
         model: resolveModel(model), 
         contents: prompt, 
         config: { responseMimeType: "application/json" } 
@@ -603,42 +651,42 @@ export const formatText = async (text: string, format: FormatType, model: Gemini
         case 'json': instruction = "Convierte el contenido del siguiente texto a una estructura JSON válida:"; break;
     }
     const prompt = `${instruction}\n\n"${text}"`;
-    const response = await ai.models.generateContent({model: resolveModel(model), contents: prompt});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt});
     return { text: response.text || text, usage: extractUsage(response, model, 'generation', undefined, text) };
 }
 
 export const generateRandomIdea = async (model: GeminiModel) => {
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: 'Genera una idea creativa, única y específica para un prompt de IA útil. Solo la idea, sin introducción.'});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: 'Genera una idea creativa, única y específica para un prompt de IA útil. Solo la idea, sin introducción.'});
     return { text: response.text || '', usage: extractUsage(response, model, 'generation') };
 }
 
 export const evaluateIdeaQuality = async (idea: string, model: GeminiModel, maxTokens: number) => {
     const prompt = `Evalúa la siguiente idea para un prompt. Dame 3 puntos fuertes y 1 debilidad. Sé breve.\nIdea: "${idea}"`;
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
     return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
 }
 
 export const suggestRelatedIdeas = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
     const prompt = `Basado en la idea: "${idea}", sugiere 3 ideas alternativas o relacionadas que podrían ser interesantes de explorar.`;
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
     return { text: response.text || '', usage: extractUsage(response, model, 'generation', undefined, idea) };
 }
 
 export const extractKeyEntities = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
     const prompt = `Extrae las entidades clave (personas, lugares, conceptos técnicos) del siguiente texto en una lista separada por comas:\n"${idea}"`;
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
     return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
 }
 
 export const generateTitles = async (idea: string, model: GeminiModel, maxTokens: number) => {
     const prompt = `Genera 5 títulos atractivos y cortos para esta idea:\n"${idea}"`;
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
     return { text: response.text || '', usage: extractUsage(response, model, 'generation', undefined, idea) };
 }
 
 export const summarizeContext = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
     const prompt = `Resume el siguiente texto en un párrafo conciso:\n"${idea}"`;
-    const response = await ai!.models.generateContent({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
+    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
     return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
 }
 
@@ -649,7 +697,7 @@ export const performDeepResearch = async (model: GeminiModel): Promise<Framework
     Devuelve un JSON con una lista de objetos Framework:
     [{ "id": "...", "acronym": "...", "name": "...", "description": "...", "category": "Deep Research", "source": { "name": "...", "url": "..." } }]`;
 
-    const response = await ai.models.generateContent({ 
+    const response = await callGeminiWithRetry({ 
         model: resolveModel(model), 
         contents: prompt, 
         config: { 
@@ -674,7 +722,7 @@ export const evolvePrompt = async (currentPrompt: string, settings: ModelSetting
     "${currentPrompt}"`;
 
     const config = buildConfig(settings, true);
-    const response = await ai!.models.generateContent({ model: resolveModel(settings.selectedModel), contents: metaPrompt, config: config });
+    const response = await callGeminiWithRetry({ model: resolveModel(settings.selectedModel), contents: metaPrompt, config: config });
     return { text: (response.text || '').trim(), usage: extractUsage(response, settings.selectedModel, 'optimization', settings, currentPrompt) };
 }
 
@@ -686,7 +734,7 @@ export const critiqueResponse = async (p: string, r: string, model: GeminiModel)
     Evalúa del 1 al 10. Provee pros, contras y una sugerencia de mejora.
     Responde en JSON: { "score": number, "pros": string[], "cons": string[], "suggestion": string }`;
 
-    const response = await ai!.models.generateContent({ model: resolveModel(model), contents: prompt, config: { responseMimeType: "application/json" } });
+    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt, config: { responseMimeType: "application/json" } });
     const parsed = JSON.parse(response.text || '{}') as CritiqueResult;
     parsed.usage = extractUsage(response, model, 'analysis', undefined, p);
     return parsed;
@@ -696,7 +744,7 @@ export const summarizeChanges = async (prev: string, current: string, model: Gem
     const prompt = `Resume en una frase muy corta (max 10 palabras) qué cambió entre estas dos versiones del prompt.
     V1: "${prev}"
     V2: "${current}"`;
-    const response = await ai!.models.generateContent({ model: resolveModel(model), contents: prompt });
+    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
     return (response.text || '').trim();
 }
 
@@ -707,10 +755,10 @@ export const improvePromptBasedOnAnalysis = async (t: string, a: any, m: string)
     
     Aplica las mejoras sugeridas y devuelve SOLO el prompt mejorado.`;
 
-    const response = await ai!.models.generateContent({ model: resolveModel(m), contents: prompt });
+    const response = await callGeminiWithRetry({ model: resolveModel(m), contents: prompt });
     return { text: (response.text || '').trim(), usage: extractUsage(response, m, 'optimization', undefined, t) };
 }
 
 export const generateStream = async (p: string, s: any) => {
-    return await ai!.models.generateContentStream({ model: resolveModel(s.selectedModel), contents: p, config: buildConfig(s) });
+    return await callGeminiStreamWithRetry({ model: resolveModel(s.selectedModel), contents: p, config: buildConfig(s) });
 }

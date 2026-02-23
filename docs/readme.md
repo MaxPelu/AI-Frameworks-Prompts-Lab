@@ -1,56 +1,101 @@
 
-# Laboratorio de Prompts 2025 | Aurora Engineer Edition
+# Laboratorio de Prompts 2026 | Aurora Engineer Edition
 
 **El Entorno de Desarrollo Integrado (IDE) definitivo para la Ingeniería de Prompts Avanzada, Orquestación de Agentes y Arquitectura de Datos.**
 
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
-![IA](https://img.shields.io/badge/IA-Gemini%203.0%20%7C%202.5%20%7C%20Gemma%203-indigo)
+![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-3.5.0-purple)
+![Version](https://img.shields.io/badge/Version-4.0.0-purple)
 
 ## 🌟 Visión General
 
-**Laboratorio de Prompts 2025** evoluciona de una herramienta de redacción a una **plataforma de ingeniería**. Integra la potencia de los modelos **SOTA de Google** con una **Biblioteca de Conocimiento Masiva (+500 Frameworks)** que abarca desde la codificación de bajo nivel (DSPy, Unsloth) hasta la estrategia empresarial (Blue Ocean, Wardley Maps) y la orquestación de agentes (LangGraph, CrewAI).
+**Laboratorio de Prompts 2026** evoluciona de una herramienta de redacción a una **plataforma de ingeniería integral**. Integra la potencia de los modelos **SOTA de Google** con una **Biblioteca de Conocimiento Masiva (+500 Frameworks)** que abarca desde la codificación de bajo nivel (DSPy, Unsloth) hasta la estrategia empresarial (Blue Ocean, Wardley Maps) y la orquestación de agentes (LangGraph, CrewAI).
 
-## 🚀 Características SOTA v3.5.0
+Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
+
+## 🚀 Características SOTA v4.0.0
 
 ### 1. Biblioteca de Conocimiento Omni-Dominio 📚
-Acceso instantáneo a frameworks especializados clasificados en 6 pilares:
-*   **Prompting**: Estructuras clásicas y avanzadas (CoT, ToT).
-*   **Contexto & RAG**: Optimización de recuperación (HyDE, GraphRAG).
-*   **Agentes AI**: Arquitecturas multi-agente (AutoGen, LangGraph).
-*   **Codificación**: Patrones de ingeniería de software y LLM Ops (DSPy, Unsloth).
-*   **Negocios**: Estrategia corporativa y metodologías ágiles (OKR, Lean Startup).
-*   **Data & SOTA**: Ingeniería de datos moderna y stacks 2026 (Data Mesh, Iceberg).
+Acceso instantáneo a frameworks especializados clasificados en 6 pilares fundamentales:
+*   **Prompting**: Estructuras clásicas y avanzadas (CoT, ToT, GoT, ReAct).
+*   **Contexto & RAG**: Optimización de recuperación y memoria (HyDE, GraphRAG, Self-RAG).
+*   **Agentes AI**: Arquitecturas multi-agente y sistemas autónomos (AutoGen, LangGraph, CrewAI).
+*   **Codificación**: Patrones de ingeniería de software y LLM Ops (DSPy, Unsloth, vLLM).
+*   **Negocios**: Estrategia corporativa y metodologías ágiles (OKR, Lean Startup, Wardley Mapping).
+*   **Data & SOTA**: Ingeniería de datos moderna y stacks 2026 (Data Mesh, Iceberg, Delta Lake).
 
 ### 2. LLM Engineer Toolkit Integration 🛠️
 Implementación de lógica y estructuras derivadas del estado del arte en ingeniería de IA:
 *   **Optimización de Modelos**: Soporte conceptual para Unsloth, Torchtune y vLLM.
-*   **Ingeniería Programática**: Frameworks como DSPy e Instructor para prompts deterministas.
-*   **Evaluación**: Integración de conceptos de Ragas, TruLens y G-Eval.
+*   **Ingeniería Programática**: Frameworks como DSPy e Instructor para prompts deterministas y estructurados.
+*   **Evaluación y Métricas**: Integración de conceptos de Ragas, TruLens y G-Eval para medir la calidad de las respuestas.
 
 ### 3. Meta-Alquimia & Deep Research 🧪
-*   **Forja de Metodologías**: Inventa frameworks inexistentes adaptados a problemas de nicho.
-*   **Investigación Profunda**: Agentes autónomos que buscan en la web (simulado/conectado) nuevos papers de arXiv y repositorios de GitHub para mantener la biblioteca actualizada.
+*   **Forja de Metodologías (Meta-Alquimia)**: Inventa frameworks inexistentes adaptados a problemas de nicho específicos utilizando el poder de Gemini 3.1 Pro.
+*   **Investigación Profunda (Deep Research)**: Agentes autónomos que buscan en la web (conectado a Google Search) nuevos papers de arXiv y repositorios de GitHub para mantener tu biblioteca personal siempre actualizada con el Estado del Arte.
 
-### 4. Engine Room 2025 🧠
-Control total sobre la inferencia:
-*   **Gemini 3.0 Series**: Pro (Razonamiento), Flash (Velocidad), Deep Think (STEM).
-*   **Thinking Config**: Presupuesto de tokens de pensamiento (hasta 64k) para razonamiento complejo antes de la respuesta.
+### 4. Engine Room 2026 🧠
+Control total sobre la inferencia y el comportamiento del modelo:
+*   **Gemini 3.1 Series**: Pro (Razonamiento SOTA), Flash (Velocidad SOTA), Deep Think (Matemáticas/Código).
+*   **Thinking Config**: Presupuesto de tokens de pensamiento (Thinking Budget) para razonamiento complejo antes de la respuesta, permitiendo al modelo "pensar" antes de hablar.
+*   **Ajuste Fino de Parámetros**: Control granular sobre Temperatura, Top-P, Top-K, Penalización de Frecuencia y Presencia.
 
 ### 5. Generative UI (GenUI) ✨
-Renderizado visual en tiempo real:
-*   **Live Code**: Visualización de HTML/React/Tailwind.
-*   **Data Viz**: Gráficos interactivos automáticos (Chart.js) a partir de JSON.
-*   **Diagramas**: Renderizado de grafos Mermaid para arquitecturas de agentes.
+Renderizado visual en tiempo real de los resultados de la IA:
+*   **Live Code**: Visualización instantánea de HTML/React/Tailwind generado por el modelo.
+*   **Data Viz**: Gráficos interactivos automáticos (Chart.js) a partir de estructuras JSON.
+*   **Diagramas**: Renderizado de grafos Mermaid para arquitecturas de agentes, flujos de datos y mapas mentales.
+
+### 6. Tokenomics & Analytics 📊
+*   **Dashboard de Uso**: Monitoreo en tiempo real del consumo de tokens (Entrada, Salida, Pensamiento).
+*   **Estimación de Costos**: Cálculo aproximado del costo por sesión y por modelo.
+*   **Exportación de Datos**: Descarga de logs de uso en formatos JSON y CSV para análisis externo.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-*   **IA**: Google GenAI SDK (`@google/genai`) + Herramientas de Grounding.
-*   **UI**: React 19, Tailwind CSS (Neon Aurora System).
-*   **Estado**: Gestión local-first optimizada para grandes volúmenes de datos JSON.
-*   **Métricas**: Dashboard de Tokenomics para control de costes y latencia.
+*   **IA Backend**: Google GenAI SDK (`@google/genai`) + Herramientas de Grounding (Google Search).
+*   **Frontend**: React 19, TypeScript 5.8, Vite 6.
+*   **Estilos**: Tailwind CSS 4 (Neon Aurora System & Liquid Glass UI).
+*   **Estado**: Gestión local-first optimizada para grandes volúmenes de datos JSON (`localStorage`).
+*   **Visualización**: Chart.js, Mermaid.js, React Markdown.
 
+## 📦 Instalación y Uso Local
+
+1.  **Clonar el repositorio**:
+    ```bash
+    git clone https://github.com/tu-usuario/laboratorio-de-prompts.git
+    cd laboratorio-de-prompts
+    ```
+
+2.  **Instalar dependencias**:
+    ```bash
+    npm install
+    ```
+
+3.  **Configurar variables de entorno**:
+    Crea un archivo `.env` en la raíz del proyecto y añade tu API Key de Gemini:
+    ```env
+    VITE_GEMINI_API_KEY=tu_api_key_aqui
+    ```
+
+4.  **Iniciar el servidor de desarrollo**:
+    ```bash
+    npm run dev
+    ```
+
+5.  **Abrir en el navegador**:
+    Navega a `http://localhost:3000` (o el puerto indicado por Vite).
+
+## 🤝 Contribución
+
+¡Las contribuciones son bienvenidas! Por favor, lee nuestro [Código de Conducta](code_of_conduct.md) y la [Guía de Contribución](contributing.md) antes de enviar un Pull Request.
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
+---
 **Diseñando la inteligencia del mañana, hoy.**

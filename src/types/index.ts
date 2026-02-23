@@ -1,8 +1,14 @@
 
 export type GeminiModel = 
     | 'gemini-3.1-pro-preview'
+    | 'gemini-3.1-pro-preview-low'
+    | 'gemini-3.1-pro-preview-high'
     | 'gemini-3-pro-preview' 
+    | 'gemini-3-pro-preview-low'
+    | 'gemini-3-pro-preview-high'
     | 'gemini-3-flash-preview' 
+    | 'gemini-3-flash-preview-low'
+    | 'gemini-3-flash-preview-high'
     | 'gemini-3-deep-think-preview' 
     | 'gemini-3-visual-layout'
     | 'gemini-2.5-pro-latest'

@@ -86,7 +86,7 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                         rotation: 240,
                         cutout: '85%',
                         borderRadius: 20
-                    }]
+                    } as any]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
             });
@@ -145,7 +145,7 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                         rotation: 270,
                         cutout: '80%',
                         borderRadius: 10
-                    }]
+                    } as any]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
             });

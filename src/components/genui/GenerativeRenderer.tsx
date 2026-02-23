@@ -4,6 +4,23 @@ import LiveCodeWidget from './widgets/LiveCodeWidget.tsx';
 import SmartChartWidget from './widgets/SmartChartWidget.tsx';
 import MermaidWidget from './widgets/MermaidWidget.tsx';
 
+// Simple JSON Viewer component
+const JsonViewerWidget: React.FC<{ data: any }> = ({ data }) => {
+    return (
+        <div className="h-full w-full bg-slate-900 rounded-xl border border-slate-700 p-4 overflow-auto">
+            <h3 className="text-sm font-semibold text-teal-400 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+                Visor JSON Estructurado
+            </h3>
+            <pre className="text-xs font-mono text-gray-300 whitespace-pre-wrap">
+                {JSON.stringify(data, null, 2)}
+            </pre>
+        </div>
+    );
+};
+
 interface GenerativeRendererProps {
     content: string;
 }
@@ -28,6 +45,8 @@ const GenerativeRenderer: React.FC<GenerativeRendererProps> = ({ content }) => {
                 
                 if (isArrayData || isObjectData) {
                      return { type: 'chart', data: parsed };
+                } else {
+                     return { type: 'json', data: parsed };
                 }
             } catch (e) {
                 // Not valid JSON, ignore
@@ -61,6 +80,7 @@ const GenerativeRenderer: React.FC<GenerativeRendererProps> = ({ content }) => {
             {detectedContent.type === 'code' && <LiveCodeWidget code={detectedContent.data} />}
             {detectedContent.type === 'chart' && <SmartChartWidget data={detectedContent.data} />}
             {detectedContent.type === 'mermaid' && <MermaidWidget chart={detectedContent.data} />}
+            {detectedContent.type === 'json' && <JsonViewerWidget data={detectedContent.data} />}
         </div>
     );
 };
