@@ -67,15 +67,18 @@ const fileToPart = (file: UploadedFile): Part => {
 };
 
 // --- RETRY WRAPPER ---
-const callGeminiWithRetry = async (params: any, retries = 3, delay = 1000): Promise<any> => {
+const callGeminiWithRetry = async (params: any, retries = 3, initialDelay = 1000): Promise<any> => {
     if (!ai) throw new Error("API Key no disponible");
+    let delay = initialDelay;
     for (let i = 0; i < retries; i++) {
         try {
             return await ai.models.generateContent(params);
         } catch (error: any) {
             const isRateLimit = error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('Rate exceeded');
-            if (isRateLimit && i < retries - 1) {
-                console.warn(`Rate limit exceeded. Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
+            const isServerError = error?.status >= 500;
+            
+            if ((isRateLimit || isServerError) && i < retries - 1) {
+                console.warn(`API Error (${error?.status || 'Unknown'}). Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2; // Exponential backoff
             } else {
@@ -85,15 +88,18 @@ const callGeminiWithRetry = async (params: any, retries = 3, delay = 1000): Prom
     }
 };
 
-const callGeminiStreamWithRetry = async (params: any, retries = 3, delay = 1000): Promise<any> => {
+const callGeminiStreamWithRetry = async (params: any, retries = 3, initialDelay = 1000): Promise<any> => {
     if (!ai) throw new Error("API Key no disponible");
+    let delay = initialDelay;
     for (let i = 0; i < retries; i++) {
         try {
             return await ai.models.generateContentStream(params);
         } catch (error: any) {
             const isRateLimit = error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('Rate exceeded');
-            if (isRateLimit && i < retries - 1) {
-                console.warn(`Rate limit exceeded (Stream). Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
+            const isServerError = error?.status >= 500;
+            
+            if ((isRateLimit || isServerError) && i < retries - 1) {
+                console.warn(`API Error (Stream). Retrying in ${delay}ms... (Attempt ${i + 1} of ${retries})`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2; // Exponential backoff
             } else {
@@ -418,19 +424,10 @@ export const optimizePrompt = async (
   
   const base64Files = files.filter(f => f.base64);
   
-  let promptContent = `
+  const systemInstruction = `
   **TASK: PROMPT ENGINEERING OPTIMIZATION**
   
   Act as a World-Class Prompt Engineer. Apply the ${framework.name} (${framework.acronym}) framework to the user's idea.
-  
-  **INPUT DATA:**
-  - Original Idea: "${idea}"
-  - Use Case: ${useCase}
-  - Optimization Style: ${optimizationStyle}
-  ${targetAudience !== 'general' ? `- Target Audience: ${targetAudience}` : ''}
-  ${outputLanguage !== 'es' ? `- Output Language: ${outputLanguage}` : ''}
-  ${keyInfo ? `- Key Info to Include: ${keyInfo}` : ''}
-  ${negativeConstraints ? `- Negative Constraints: ${negativeConstraints}` : ''}
   
   **FRAMEWORK INSTRUCTION:**
   ${framework.description}
@@ -439,11 +436,23 @@ export const optimizePrompt = async (
   Generate ONLY the optimized prompt. No preamble. Ensure the result is ready to use.
   `;
 
+  let promptContent = `
+  **INPUT DATA:**
+  - Original Idea: "${idea}"
+  - Use Case: ${useCase}
+  - Optimization Style: ${optimizationStyle}
+  ${targetAudience !== 'general' ? `- Target Audience: ${targetAudience}` : ''}
+  ${outputLanguage !== 'es' ? `- Output Language: ${outputLanguage}` : ''}
+  ${keyInfo ? `- Key Info to Include: ${keyInfo}` : ''}
+  ${negativeConstraints ? `- Negative Constraints: ${negativeConstraints}` : ''}
+  `;
+
   const textPart = { text: promptContent };
   const fileParts = base64Files.map(fileToPart).filter(p => p.inlineData);
   
   // Force override JSON mode
   const config = buildConfig(settings, true);
+  config.systemInstruction = config.systemInstruction ? `${config.systemInstruction}\n\n${systemInstruction}` : systemInstruction;
 
   try {
     const response = await callGeminiWithRetry({
@@ -483,17 +492,11 @@ export const expandIdea = async (
     const textBasedFiles = files.filter(f => f.textContent);
     const contextFromFiles = textBasedFiles.map(f => `[CONTEXT FILE: ${f.name}]\n${f.textContent?.substring(0, 8000)}`).join('\n\n');
 
-    const textPart = {
-      text: `
+    const systemInstruction = `
         **TASK: CONTENT EXPANSION & ENRICHMENT**
         
         You are a Master Content Architect. Your goal is to take a seed idea and expand it into a fully realized, detailed, and professional artifact.
         
-        **SEED IDEA:**
-        "${idea}"
-        
-        ${contextFromFiles ? `**CONTEXT FILES:**\n${contextFromFiles}` : ''}
-
         **METHODOLOGY:**
         1. **Intent Analysis**: Understand the user's core goal.
         2. **Gap Filling**: Identify missing information and intelligently infer it based on best practices.
@@ -506,11 +509,20 @@ export const expandIdea = async (
 
         **OUTPUT:**
         Produce the FINAL expanded content. Ensure high density and value.
+    `;
+
+    const textPart = {
+      text: `
+        **SEED IDEA:**
+        "${idea}"
+        
+        ${contextFromFiles ? `**CONTEXT FILES:**\n${contextFromFiles}` : ''}
       `
     };
     
     // Force override JSON mode
     const config = buildConfig(settings, true);
+    config.systemInstruction = config.systemInstruction ? `${config.systemInstruction}\n\n${systemInstruction}` : systemInstruction;
     
     const modelToUse = resolveModel(settings.selectedModel);
     
@@ -556,13 +568,15 @@ export const evaluatePromptQuality = async (promptText: string, model: GeminiMod
     }
   };
 
-  const prompt = `Analiza la calidad técnica del siguiente prompt para un LLM. Proporciona puntuaciones del 0 al 100 y feedback conciso.\n\nPrompt: "${promptText}"`;
+  const systemInstruction = "Analiza la calidad técnica del siguiente prompt para un LLM. Proporciona puntuaciones del 0 al 100 y feedback conciso.";
+  const prompt = `Prompt: "${promptText}"`;
 
   try {
     const result = await callGeminiWithRetry({
       model: resolveModel(model),
       contents: prompt, 
       config: { 
+          systemInstruction: systemInstruction,
           responseMimeType: "application/json",
           responseSchema: qualitySchema
       }
@@ -632,25 +646,35 @@ export const generateMetaFramework = async (nicheProblem: string, model: GeminiM
     if (!ai) throw new Error("API Key no disponible");
     
     const prompt = `Inventa un framework de Prompt Engineering ÚNICO y NUEVO diseñado específicamente para resolver este problema de nicho: "${nicheProblem}".
-    El framework debe tener un acrónimo memorable (4-6 letras).
-    
-    Responde en JSON con este esquema:
-    {
-      "id": "slug-unico",
-      "acronym": "ACRONIMO",
-      "name": "Nombre Completo del Framework",
-      "description": "Descripción teórica breve",
-      "category": "Meta-Framework",
-      "example": {
-        "title": "Ejemplo de uso",
-        "prompt": "Un prompt de ejemplo aplicando este framework..."
-      }
-    }`;
+    El framework debe tener un acrónimo memorable (4-6 letras).`;
+
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            id: { type: Type.STRING },
+            acronym: { type: Type.STRING },
+            name: { type: Type.STRING },
+            description: { type: Type.STRING },
+            category: { type: Type.STRING },
+            example: {
+                type: Type.OBJECT,
+                properties: {
+                    title: { type: Type.STRING },
+                    prompt: { type: Type.STRING }
+                },
+                required: ["title", "prompt"]
+            }
+        },
+        required: ["id", "acronym", "name", "description", "category", "example"]
+    };
 
     const response = await callGeminiWithRetry({ 
         model: resolveModel(model), 
         contents: prompt, 
-        config: { responseMimeType: "application/json" } 
+        config: { 
+            responseMimeType: "application/json",
+            responseSchema: schema
+        } 
     });
     const result = JSON.parse(response.text || '{}') as Framework;
     result.usage = extractUsage(response, model, 'generation', undefined, nicheProblem);
@@ -710,15 +734,37 @@ export const summarizeContext = async (idea: string, files: any[], model: Gemini
 export const performDeepResearch = async (model: GeminiModel): Promise<Framework[]> => {
     if (!ai) return [];
     
-    const prompt = `Busca en la web (simulado) los 3 frameworks de Prompt Engineering o Agentes de IA más novedosos y técnicos publicados en 2024 o 2025 (papers de arXiv, posts de ingeniería).
-    Devuelve un JSON con una lista de objetos Framework:
-    [{ "id": "...", "acronym": "...", "name": "...", "description": "...", "category": "Deep Research", "source": { "name": "...", "url": "..." } }]`;
+    const prompt = `Busca en la web (simulado) los 3 frameworks de Prompt Engineering o Agentes de IA más novedosos y técnicos publicados en 2024 o 2025 (papers de arXiv, posts de ingeniería).`;
+
+    const schema = {
+        type: Type.ARRAY,
+        items: {
+            type: Type.OBJECT,
+            properties: {
+                id: { type: Type.STRING },
+                acronym: { type: Type.STRING },
+                name: { type: Type.STRING },
+                description: { type: Type.STRING },
+                category: { type: Type.STRING },
+                source: {
+                    type: Type.OBJECT,
+                    properties: {
+                        name: { type: Type.STRING },
+                        url: { type: Type.STRING }
+                    },
+                    required: ["name", "url"]
+                }
+            },
+            required: ["id", "acronym", "name", "description", "category"]
+        }
+    };
 
     const response = await callGeminiWithRetry({ 
         model: resolveModel(model), 
         contents: prompt, 
         config: { 
             responseMimeType: "application/json", 
+            responseSchema: schema,
             tools: [{googleSearch: {}}] 
         } 
     });
@@ -748,10 +794,27 @@ export const critiqueResponse = async (p: string, r: string, model: GeminiModel)
     Prompt: "${p}"
     Respuesta: "${r}"
     
-    Evalúa del 1 al 10. Provee pros, contras y una sugerencia de mejora.
-    Responde en JSON: { "score": number, "pros": string[], "cons": string[], "suggestion": string }`;
+    Evalúa del 1 al 10. Provee pros, contras y una sugerencia de mejora.`;
 
-    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt, config: { responseMimeType: "application/json" } });
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            score: { type: Type.NUMBER },
+            pros: { type: Type.ARRAY, items: { type: Type.STRING } },
+            cons: { type: Type.ARRAY, items: { type: Type.STRING } },
+            suggestion: { type: Type.STRING }
+        },
+        required: ["score", "pros", "cons", "suggestion"]
+    };
+
+    const response = await callGeminiWithRetry({ 
+        model: resolveModel(model), 
+        contents: prompt, 
+        config: { 
+            responseMimeType: "application/json",
+            responseSchema: schema
+        } 
+    });
     const parsed = JSON.parse(response.text || '{}') as CritiqueResult;
     parsed.usage = extractUsage(response, model, 'analysis', undefined, p);
     return parsed;

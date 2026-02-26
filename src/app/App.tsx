@@ -13,6 +13,7 @@ import TokenUsageDashboard from '../components/metrics/TokenUsageDashboard.tsx';
 import SessionNamingModal from '../components/shared/SessionNamingModal.tsx';
 import HistoryDashboard from '../components/history/HistoryDashboard.tsx';
 import AgentSkillsDashboard from '../components/skills/AgentSkillsDashboard.tsx';
+import ActionDashboardModal, { DashboardActionType } from '../components/workflow/ActionDashboardModal.tsx';
 import { Toast, ToastType } from '../components/shared/Toast.tsx';
 import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, SafetySettings, ModelConfig, ArenaBattleConfig, TokenUsage, AgentSkill } from '../types/index.ts';
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
@@ -141,6 +142,12 @@ const App: React.FC = () => {
     // Refs for U interaction
     const settingsButtonRef = useRef<HTMLButtonElement>(null);
     const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Process Dashboard State for Header Actions
+    const [processDashboardState, setProcessDashboardState] = useState<{
+        isOpen: boolean;
+        actionType: DashboardActionType;
+    }>({ isOpen: false, actionType: 'save' });
 
 
     useEffect(() => {
@@ -751,14 +758,14 @@ const App: React.FC = () => {
                     
                     <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                         <button
-                            onClick={handleCreateSession}
+                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'create_session' })}
                             className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-200 hover:bg-sky-500/30 hover:text-white hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 active:scale-95"
                             title="Guarda la sesión actual y abre un lienzo nuevo."
                         >
                             <SparklesIcon className="w-5 h-5" /> Crear Sesión
                         </button>
                         <button
-                            onClick={() => handleGlobalSave(false)}
+                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'save' })}
                             disabled={isSaveDisabled}
                             className={`flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ${saveButtonStyle}`}
                         >
@@ -766,7 +773,7 @@ const App: React.FC = () => {
                             {saveButtonLabel}
                         </button>
                         <button
-                            onClick={toggleAutoSave}
+                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'auto_save' })}
                             className={`flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ${
                                 isAutoSaveEnabled
                                 ? 'bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
@@ -952,6 +959,23 @@ const App: React.FC = () => {
                 agentSkills={agentSkills}
                 setAgentSkills={setAgentSkills}
                 apiKey={process.env.API_KEY || null}
+            />
+            <ActionDashboardModal
+                isOpen={processDashboardState.isOpen}
+                onClose={() => setProcessDashboardState({ ...processDashboardState, isOpen: false })}
+                actionType={processDashboardState.actionType}
+                ideaText={ideaText}
+                modelSettings={allModelSettings}
+                onComplete={() => {}}
+                localAction={() => {
+                    if (processDashboardState.actionType === 'create_session') {
+                        handleCreateSession();
+                    } else if (processDashboardState.actionType === 'save') {
+                        handleGlobalSave(false);
+                    } else if (processDashboardState.actionType === 'auto_save') {
+                        toggleAutoSave();
+                    }
+                }}
             />
         </div>
     );

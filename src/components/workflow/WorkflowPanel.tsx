@@ -14,6 +14,7 @@ import CanvasModal from '../shared/CanvasModal.tsx';
 import QualityAnalysisModal from '../shared/QualityAnalysisModal.tsx';
 import LengthModifierDropdown from '../shared/LengthModifierDropdown.tsx';
 import ThoughtVisualizer from '../genui/ThoughtVisualizer.tsx';
+import ActionDashboardModal, { DashboardActionType } from './ActionDashboardModal.tsx';
 
 
 interface WorkflowPanelProps {
@@ -312,6 +313,12 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     const [activeStep, setActiveStep] = useState(1);
     const [isIdeaCanvasOpen, setIsIdeaCanvasOpen] = useState(false);
     const [isResultCanvasOpen, setIsResultCanvasOpen] = useState(false);
+    
+    // Process Dashboard State
+    const [processDashboardState, setProcessDashboardState] = useState<{
+        isOpen: boolean;
+        actionType: DashboardActionType;
+    }>({ isOpen: false, actionType: 'optimize' });
 
     // Quality Analysis State
     const [qualityAnalysisState, setQualityAnalysisState] = useState<{
@@ -495,110 +502,15 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             setError("Por favor, introduce una idea para el prompt.");
             return;
         }
-        setIsLoading(true);
         setError('');
-        setGeneratedSources([]);
-        setGeneratedPrompt('');
-        setGeneratedThought(undefined);
-
-        try {
-            const selectedFramework = allFrameworks.find(f => f.acronym === selectedFrameworkAcronym);
-            if (!selectedFramework) {
-                throw new Error("Framework seleccionado no válido.");
-            }
-            
-            // Construct full settings for optimizePrompt too
-            const currentSettings = {
-                selectedModel: modelSettings.selectedModel,
-                temperature: modelSettings.temperature,
-                topP: modelSettings.topP,
-                topK: modelSettings.topK,
-                frequencyPenalty: modelSettings.frequencyPenalty,
-                presencePenalty: modelSettings.presencePenalty,
-                maxOutputTokens: modelSettings.maxOutputTokens,
-                systemInstruction: modelSettings.systemInstruction,
-                systemInstructionFiles: modelSettings.systemInstructionFiles,
-                stopSequences: modelSettings.stopSequences,
-                seed: modelSettings.seed,
-                thinkingBudget: modelSettings.thinkingBudget,
-                isThinkingMode: modelSettings.isThinkingMode,
-                useGoogleSearch: modelSettings.useGoogleSearch,
-                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
-                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
-                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
-                safetySettings: modelSettings.safetySettings,
-                toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
-            };
-
-            const result = await optimizePrompt(
-                ideaText, 
-                useCase, 
-                selectedFramework, 
-                files, 
-                optimizationStyle, 
-                targetAudience,
-                outputLanguage,
-                keyInfo,
-                negativeConstraints,
-                currentSettings
-            );
-            setGeneratedPrompt(result.text);
-            setGeneratedThought(result.thought);
-            setGeneratedSources(result.sources);
-            if (result.usage && onTokenUsageReceived) {
-                onTokenUsageReceived(result.usage);
-            }
-        } catch (err: any) {
-            setError(err.message || "Ocurrió un error al generar el prompt.");
-            setGeneratedPrompt('');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [ideaText, useCase, selectedFrameworkAcronym, files, optimizationStyle, targetAudience, outputLanguage, keyInfo, negativeConstraints, modelSettings, toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop, setGeneratedPrompt, setGeneratedSources, onTokenUsageReceived]);
+        setProcessDashboardState({ isOpen: true, actionType: 'optimize' });
+    }, [ideaText]);
 
     const handleExpandIdea = useCallback(async () => {
         if (!ideaText.trim()) return;
-        setIsExpanding(true);
         setError('');
-        try {
-            const selectedFramework = expansionFrameworkAcronym === 'auto'
-                ? null
-                : allFrameworks.find(f => f.acronym === expansionFrameworkAcronym) || null;
-
-            // Construct full settings
-            const currentSettings = {
-                selectedModel: modelSettings.selectedModel,
-                temperature: modelSettings.temperature,
-                topP: modelSettings.topP,
-                topK: modelSettings.topK,
-                frequencyPenalty: modelSettings.frequencyPenalty, 
-                presencePenalty: modelSettings.presencePenalty,
-                maxOutputTokens: modelSettings.maxOutputTokens,
-                systemInstruction: modelSettings.systemInstruction,
-                systemInstructionFiles: modelSettings.systemInstructionFiles,
-                stopSequences: modelSettings.stopSequences,
-                seed: modelSettings.seed,
-                thinkingBudget: modelSettings.thinkingBudget,
-                isThinkingMode: modelSettings.isThinkingMode,
-                useGoogleSearch: modelSettings.useGoogleSearch,
-                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
-                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
-                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
-                safetySettings: modelSettings.safetySettings,
-                toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
-            };
-
-            const expanded = await expandIdea(ideaText, files, selectedFramework, currentSettings);
-            onIdeaChange(expanded.text);
-            if (expanded.usage && onTokenUsageReceived) {
-                onTokenUsageReceived(expanded.usage);
-            }
-        } catch (err: any) {
-            setError(err.message || "Ocurrió un error al expandir la idea.");
-        } finally {
-            setIsExpanding(false);
-        }
-    }, [ideaText, files, onIdeaChange, expansionFrameworkAcronym, modelSettings, toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop, onTokenUsageReceived]);
+        setProcessDashboardState({ isOpen: true, actionType: 'expand' });
+    }, [ideaText]);
     
     // ... [Other Handlers remain the same] ...
     const handleSuggest = useCallback(async (type: 'useCase' | 'framework') => {
@@ -1173,7 +1085,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                             {/* Tools moved next to Title */}
                             <div className="flex items-center gap-3 p-1">
                                 <button
-                                    onClick={handleSaveDraftStep1}
+                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'save' })}
                                     disabled={!ideaText.trim() || isDraftSaving}
                                     className={`${headerToolButtonClass} ${isDraftSaving ? 'text-orange-400 border-orange-400/30' : ''}`}
                                     title="Guardar borrador actual en la biblioteca"
@@ -1184,7 +1096,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 
                                 {/* 4 NEW BUTTONS - Ensured Visibility - WITH PROGRESS */}
                                 <ProgressButton
-                                    onClick={() => handleQuickRefine('magic')}
+                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'magic' })}
                                     disabled={!ideaText.trim() || anyLoading}
                                     isLoading={isRefining}
                                     progress={refineProgress}
@@ -1193,7 +1105,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     className={headerToolButtonClass}
                                 />
                                 <ProgressButton
-                                    onClick={() => handleQuickRefine('fix')}
+                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'fix' })}
                                     disabled={!ideaText.trim() || anyLoading}
                                     isLoading={isRefining}
                                     progress={refineProgress}
@@ -1202,7 +1114,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     className={headerToolButtonClass}
                                 />
                                 <ProgressButton
-                                    onClick={() => handleQuickRefine('translate')}
+                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'translate' })}
                                     disabled={!ideaText.trim() || anyLoading}
                                     isLoading={isRefining}
                                     progress={refineProgress}
@@ -1211,7 +1123,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     className={headerToolButtonClass}
                                 />
                                 <ProgressButton
-                                    onClick={() => handleModifyIdeaLength('simple')}
+                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'simplify' })}
                                     disabled={!ideaText.trim() || anyLoading}
                                     isLoading={isModifyingIdeaLength}
                                     progress={refineProgress}
@@ -1220,7 +1132,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     className={headerToolButtonClass}
                                 />
 
-                                <button onClick={handleCopyIdea} title="Copiar texto de la idea" className={headerToolButtonClass}>
+                                <button onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'copy' })} title="Copiar texto de la idea" className={headerToolButtonClass}>
                                     {isIdeaCopied ? <CheckIcon className="w-5 h-5 text-teal-400" /> : <ClipboardIcon className="w-5 h-5" />}
                                     <span>Copiar</span>
                                 </button>
@@ -1322,7 +1234,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     <button 
                                         onClick={handleExpandIdea} 
                                         disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
-                                        className="glass-button flex items-center justify-center gap-2 text-gray-200 hover:text-teal-300 px-5 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="glass-button flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 border border-indigo-400 text-white hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                                         title="Amplía tu idea breve en un borrador más detallado usando IA."
                                     >
                                         {isExpanding ? (
@@ -1747,7 +1659,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                          <button 
                             onClick={handleEvolvePrompt} 
                             disabled={anyLoading || isSaving || !generatedPrompt.trim() || !IS_API_KEY_AVAILABLE} 
-                            className="glass-btn-magic flex items-center justify-center gap-2 font-semibold px-4 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/80 to-teal-500/80 border border-emerald-400 text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] font-semibold px-4 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                             title="Inicia un ciclo de auto-mejora donde la IA critica y refina el prompt automáticamente."
                         >
                             <HelixIcon className="w-5 h-5"/>
@@ -1794,6 +1706,77 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                     </div>
                 </div>
             </div>
+
+            <ActionDashboardModal
+                isOpen={processDashboardState.isOpen}
+                onClose={() => setProcessDashboardState({ ...processDashboardState, isOpen: false })}
+                actionType={processDashboardState.actionType}
+                ideaText={ideaText}
+                useCase={useCase}
+                framework={
+                    processDashboardState.actionType === 'optimize' 
+                        ? allFrameworks.find(f => f.acronym === selectedFrameworkAcronym) || null
+                        : expansionFrameworkAcronym === 'auto' ? null : allFrameworks.find(f => f.acronym === expansionFrameworkAcronym) || null
+                }
+                files={files}
+                optimizationStyle={optimizationStyle}
+                targetAudience={targetAudience}
+                outputLanguage={outputLanguage}
+                keyInfo={keyInfo}
+                negativeConstraints={negativeConstraints}
+                modelSettings={{
+                    selectedModel: modelSettings.selectedModel,
+                    temperature: modelSettings.temperature,
+                    topP: modelSettings.topP,
+                    topK: modelSettings.topK,
+                    frequencyPenalty: modelSettings.frequencyPenalty,
+                    presencePenalty: modelSettings.presencePenalty,
+                    maxOutputTokens: modelSettings.maxOutputTokens,
+                    systemInstruction: modelSettings.systemInstruction,
+                    systemInstructionFiles: modelSettings.systemInstructionFiles,
+                    stopSequences: modelSettings.stopSequences,
+                    seed: modelSettings.seed,
+                    thinkingBudget: modelSettings.thinkingBudget,
+                    isThinkingMode: modelSettings.isThinkingMode,
+                    useGoogleSearch: modelSettings.useGoogleSearch,
+                    isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                    isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
+                    isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
+                    safetySettings: modelSettings.safetySettings,
+                    toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
+                }}
+                onComplete={(resultText, usage) => {
+                    if (['expand', 'magic', 'fix', 'translate', 'simplify'].includes(processDashboardState.actionType)) {
+                        onIdeaChange(resultText);
+                    } else if (processDashboardState.actionType === 'optimize') {
+                        setGeneratedPrompt(resultText);
+                    }
+                    if (usage && onTokenUsageReceived) {
+                        onTokenUsageReceived(usage);
+                    }
+                }}
+                onRunAutoFlow={(resultText) => {
+                    setProcessDashboardState({ ...processDashboardState, isOpen: false });
+                    if (processDashboardState.actionType === 'expand') {
+                        onIdeaChange(resultText);
+                        // Automatically trigger optimize
+                        setTimeout(() => {
+                            setProcessDashboardState({ isOpen: true, actionType: 'optimize' });
+                        }, 500);
+                    } else if (processDashboardState.actionType === 'optimize') {
+                        setGeneratedPrompt(resultText);
+                        // Automatically jump to step 3 (Arena)
+                        setActiveStep(3);
+                    }
+                }}
+                localAction={() => {
+                    if (processDashboardState.actionType === 'save') {
+                        handleSaveDraftStep1();
+                    } else if (processDashboardState.actionType === 'copy') {
+                        handleCopyIdea();
+                    }
+                }}
+            />
         </div>
     );
 };
