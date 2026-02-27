@@ -631,15 +631,24 @@ export const LENGTH_MODIFIERS_CONFIG = {
 
 export type LengthModifier = keyof typeof LENGTH_MODIFIERS_CONFIG;
 
-export const modifyContentLength = async (text: string, modifier: LengthModifier, model: GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
+export const modifyContentLength = async (text: string, modifier: LengthModifier, settingsOrModel: ModelSettings | GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
     if (!ai) throw new Error("API Key no disponible");
+    
+    const settings = typeof settingsOrModel === 'string' ? { selectedModel: settingsOrModel } as ModelSettings : settingsOrModel;
+    const model = settings.selectedModel;
     
     const modifierConfig = LENGTH_MODIFIERS_CONFIG[modifier];
     const instruction = modifierConfig ? modifierConfig.prompt : "Modifica el siguiente texto:";
     const prompt = `${instruction}\n\n"${text}"`;
 
-    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
-    return { text: response.text || text, usage: extractUsage(response, model, 'generation', undefined, text) };
+    const config = buildConfig(settings, true);
+    const response = await callGeminiWithRetry({ 
+        model: resolveModel(model), 
+        contents: prompt,
+        config: config
+    });
+    
+    return { text: response.text || text, usage: extractUsage(response, model, 'generation', settings, text) };
 };
 
 export const generateMetaFramework = async (nicheProblem: string, model: GeminiModel): Promise<Framework> => {

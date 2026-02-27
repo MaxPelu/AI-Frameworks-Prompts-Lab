@@ -258,7 +258,6 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     
     // Internal State
     const [isLoading, setIsLoading] = useState(false);
-    const [isExpanding, setIsExpanding] = useState(false);
     const [isSuggesting, setIsSuggesting] = useState(false);
     const [isEvolving, setIsEvolving] = useState(false);
     const [isAutoRunningWorkflow, setIsAutoRunningWorkflow] = useState(false);
@@ -272,16 +271,10 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     const [isFormatting, setIsFormatting] = useState<'idea' | 'result' | null>(null);
     const [isGeneratingIdea, setIsGeneratingIdea] = useState(false);
     const [isModifyingLength, setIsModifyingLength] = useState(false);
-    const [isModifyingIdeaLength, setIsModifyingIdeaLength] = useState(false); // NEW STATE
     const [isDraftSaving, setIsDraftSaving] = useState(false);
     
-    // NEW: Quick Refine State
-    const [isRefining, setIsRefining] = useState(false);
-    
     // Progress Hooks
-    const refineProgress = useSimulatedProgress(isRefining || isModifyingIdeaLength);
     const optimizationProgress = useSimulatedProgress(isLoading);
-    const expandProgress = useSimulatedProgress(isExpanding);
     
     // NEW: Voice & Privacy State
     const [isRecording, setIsRecording] = useState(false);
@@ -439,49 +432,6 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setTimeout(() => setIsScrubbing(false), 600);
     }, [ideaText, onIdeaChange]);
 
-    // --- QUICK REFINE LOGIC (New Feature) ---
-    const handleQuickRefine = useCallback(async (action: 'magic' | 'fix' | 'translate') => {
-        if (!ideaText.trim()) return;
-        setIsRefining(true);
-        try {
-            // STRICT ALIGNMENT: Construct the full ModelSettings object from all props
-            const currentSettings = {
-                selectedModel: modelSettings.selectedModel,
-                temperature: modelSettings.temperature,
-                topP: modelSettings.topP,
-                topK: modelSettings.topK,
-                frequencyPenalty: modelSettings.frequencyPenalty,
-                presencePenalty: modelSettings.presencePenalty,
-                maxOutputTokens: modelSettings.maxOutputTokens, // CRITICAL
-                systemInstruction: modelSettings.systemInstruction,
-                systemInstructionFiles: modelSettings.systemInstructionFiles,
-                stopSequences: modelSettings.stopSequences,
-                seed: modelSettings.seed,
-                thinkingBudget: modelSettings.thinkingBudget,
-                isThinkingMode: modelSettings.isThinkingMode,
-                useGoogleSearch: modelSettings.useGoogleSearch,
-                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
-                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
-                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
-                safetySettings: modelSettings.safetySettings,
-                // New SOTA Props
-                toneShift,
-                outputVerbosity,
-                draftMode,
-                promptAutoRefine,
-                verificationLoop
-            };
-
-            const refined = await quickRefine(ideaText, action, currentSettings);
-            onIdeaChange(refined.text);
-            if (refined.usage && onTokenUsageReceived) onTokenUsageReceived(refined.usage);
-        } catch (e: any) {
-            setError(e.message || "Error al refinar texto.");
-        } finally {
-            setIsRefining(false);
-        }
-    }, [ideaText, modelSettings, toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop, onIdeaChange, onTokenUsageReceived]);
-
     const promptToIterate = useMemo(() => {
         if (!promptToIterateId) return null;
         return savedPrompts.find(p => p.id === promptToIterateId) || null;
@@ -504,12 +454,6 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         }
         setError('');
         setProcessDashboardState({ isOpen: true, actionType: 'optimize' });
-    }, [ideaText]);
-
-    const handleExpandIdea = useCallback(async () => {
-        if (!ideaText.trim()) return;
-        setError('');
-        setProcessDashboardState({ isOpen: true, actionType: 'expand' });
     }, [ideaText]);
     
     // ... [Other Handlers remain the same] ...
@@ -801,21 +745,6 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         }
     }, [generatedPrompt, modelSettings.selectedModel, setGeneratedPrompt, onTokenUsageReceived]);
 
-    const handleModifyIdeaLength = useCallback(async (modifier: LengthModifier) => {
-        if (!ideaText.trim()) return;
-        setIsModifyingIdeaLength(true);
-        setError('');
-        try {
-            const result = await modifyContentLength(ideaText, modifier, modelSettings.selectedModel);
-            onIdeaChange(result.text);
-            if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
-        } catch (err: any) {
-             setError(err.message || 'Error al modificar la longitud.');
-        } finally {
-            setIsModifyingIdeaLength(false);
-        }
-    }, [ideaText, modelSettings.selectedModel, onIdeaChange, onTokenUsageReceived]);
-
     const handleGenerateIdea = useCallback(async () => {
         setIsGeneratingIdea(true);
         setError('');
@@ -881,7 +810,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         });
     };
     
-    const anyLoading = isLoading || isExpanding || isSuggesting || isEvolving || isAutoRunningWorkflow || isSuggestingIdeas || isExtracting || isGeneratingTitles || isSummarizing || !!isFormatting || isGeneratingIdea || isGettingIdeaFeedback || isModifyingLength || isModifyingIdeaLength || isScrubbing || isRefining;
+    const anyLoading = isLoading || isSuggesting || isEvolving || isAutoRunningWorkflow || isSuggestingIdeas || isExtracting || isGeneratingTitles || isSummarizing || !!isFormatting || isGeneratingIdea || isGettingIdeaFeedback || isModifyingLength || isScrubbing;
     
     const recommendedFramework = useMemo(() => {
         const category = CATEGORIZED_USE_CASES.find(cat => cat.useCases.includes(useCase))?.category || 'Default';
@@ -1098,8 +1027,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 <ProgressButton
                                     onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'magic' })}
                                     disabled={!ideaText.trim() || anyLoading}
-                                    isLoading={isRefining}
-                                    progress={refineProgress}
+                                    isLoading={false}
+                                    progress={0}
                                     label="Mejorar"
                                     icon={<SparklesIcon className="w-5 h-5 text-purple-400" />}
                                     className={headerToolButtonClass}
@@ -1107,8 +1036,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 <ProgressButton
                                     onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'fix' })}
                                     disabled={!ideaText.trim() || anyLoading}
-                                    isLoading={isRefining}
-                                    progress={refineProgress}
+                                    isLoading={false}
+                                    progress={0}
                                     label="Corregir"
                                     icon={<WrenchScrewdriverIcon className="w-5 h-5 text-blue-400" />}
                                     className={headerToolButtonClass}
@@ -1116,8 +1045,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 <ProgressButton
                                     onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'translate' })}
                                     disabled={!ideaText.trim() || anyLoading}
-                                    isLoading={isRefining}
-                                    progress={refineProgress}
+                                    isLoading={false}
+                                    progress={0}
                                     label="Traducir"
                                     icon={<GlobeAltIcon className="w-5 h-5 text-green-400" />}
                                     className={headerToolButtonClass}
@@ -1125,8 +1054,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 <ProgressButton
                                     onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'simplify' })}
                                     disabled={!ideaText.trim() || anyLoading}
-                                    isLoading={isModifyingIdeaLength}
-                                    progress={refineProgress}
+                                    isLoading={false}
+                                    progress={0}
                                     label="Simplificar"
                                     icon={<TableCellsIcon className="w-5 h-5 text-yellow-400" />}
                                     className={headerToolButtonClass}
@@ -1232,22 +1161,13 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                         ))}
                                     </select>
                                     <button 
-                                        onClick={handleExpandIdea} 
+                                        onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'expand' })} 
                                         disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
                                         className="glass-button flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 border border-indigo-400 text-white hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                                         title="Amplía tu idea breve en un borrador más detallado usando IA."
                                     >
-                                        {isExpanding ? (
-                                            <div className="flex items-center gap-2">
-                                                <ClockIcon className="w-4 h-4 animate-pulse text-teal-400" />
-                                                <span className="font-mono text-xs">{expandProgress}%</span>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <LightBulbIcon className="w-5 h-5" /> 
-                                                Expandir
-                                            </>
-                                        )}
+                                        <LightBulbIcon className="w-5 h-5" /> 
+                                        Expandir
                                     </button>
                                 </div>
                             </div>

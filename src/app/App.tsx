@@ -14,6 +14,7 @@ import SessionNamingModal from '../components/shared/SessionNamingModal.tsx';
 import HistoryDashboard from '../components/history/HistoryDashboard.tsx';
 import AgentSkillsDashboard from '../components/skills/AgentSkillsDashboard.tsx';
 import ActionDashboardModal, { DashboardActionType } from '../components/workflow/ActionDashboardModal.tsx';
+import CreateSessionDashboardModal, { SessionTemplate } from '../components/workflow/CreateSessionDashboardModal.tsx';
 import { Toast, ToastType } from '../components/shared/Toast.tsx';
 import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, SafetySettings, ModelConfig, ArenaBattleConfig, TokenUsage, AgentSkill } from '../types/index.ts';
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
@@ -148,6 +149,9 @@ const App: React.FC = () => {
         isOpen: boolean;
         actionType: DashboardActionType;
     }>({ isOpen: false, actionType: 'save' });
+
+    const [isCreateSessionModalOpen, setIsCreateSessionModalOpen] = useState(false);
+    const [pendingSessionTemplate, setPendingSessionTemplate] = useState<SessionTemplate | null>(null);
 
 
     useEffect(() => {
@@ -493,7 +497,14 @@ const App: React.FC = () => {
 
     // --- SESSION NAMING LOGIC ---
 
-    const handleCreateSession = async () => {
+    const handleCreateSession = () => {
+        setIsCreateSessionModalOpen(true);
+    };
+
+    const confirmCreateSession = async (template: SessionTemplate) => {
+        setIsCreateSessionModalOpen(false);
+        setPendingSessionTemplate(template);
+
         // If there is content, trigger the naming flow instead of immediately resetting
         if (ideaText.trim() || generatedPrompt.trim()) {
             setSessionNamingState({
@@ -503,12 +514,15 @@ const App: React.FC = () => {
             });
         } else {
             // Nothing to save, just reset
-            performReset();
+            performReset(template);
         }
     };
 
-    const performReset = () => {
-        setIdeaText('');
+    const performReset = (template?: SessionTemplate) => {
+        const tpl = template || pendingSessionTemplate;
+        
+        setIdeaText(tpl?.ideaText || '');
+        setSystemInstruction(tpl?.systemInstruction || '');
         setGeneratedPrompt('');
         setGeneratedSources([]);
         setSelectedFrameworkAcronym(FRAMEWORKS[0].acronym);
@@ -516,10 +530,11 @@ const App: React.FC = () => {
         setFiles([]);
         setPromptToIterateId(null);
         setResetKey(k => k + 1);
+        setPendingSessionTemplate(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
         setTimeout(() => {
-             showNotification("✨ Lienzo limpio. Nueva sesión iniciada.", 'info');
+             showNotification(tpl?.id === 'empty' ? "✨ Lienzo limpio. Nueva sesión iniciada." : `✨ Sesión iniciada con plantilla: ${tpl?.title}`, 'info');
         }, 500);
     };
 
@@ -758,7 +773,7 @@ const App: React.FC = () => {
                     
                     <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                         <button
-                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'create_session' })}
+                            onClick={handleCreateSession}
                             className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-200 hover:bg-sky-500/30 hover:text-white hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 active:scale-95"
                             title="Guarda la sesión actual y abre un lienzo nuevo."
                         >
@@ -773,7 +788,7 @@ const App: React.FC = () => {
                             {saveButtonLabel}
                         </button>
                         <button
-                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'auto_save' })}
+                            onClick={toggleAutoSave}
                             className={`flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ${
                                 isAutoSaveEnabled
                                 ? 'bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
@@ -960,6 +975,11 @@ const App: React.FC = () => {
                 setAgentSkills={setAgentSkills}
                 apiKey={process.env.API_KEY || null}
             />
+            <CreateSessionDashboardModal
+                isOpen={isCreateSessionModalOpen}
+                onClose={() => setIsCreateSessionModalOpen(false)}
+                onCreateSession={confirmCreateSession}
+            />
             <ActionDashboardModal
                 isOpen={processDashboardState.isOpen}
                 onClose={() => setProcessDashboardState({ ...processDashboardState, isOpen: false })}
@@ -969,11 +989,11 @@ const App: React.FC = () => {
                 onComplete={() => {}}
                 localAction={() => {
                     if (processDashboardState.actionType === 'create_session') {
+                        // This is now handled directly by the button opening the CreateSessionDashboardModal
+                        // But we keep it here just in case
                         handleCreateSession();
                     } else if (processDashboardState.actionType === 'save') {
                         handleGlobalSave(false);
-                    } else if (processDashboardState.actionType === 'auto_save') {
-                        toggleAutoSave();
                     }
                 }}
             />

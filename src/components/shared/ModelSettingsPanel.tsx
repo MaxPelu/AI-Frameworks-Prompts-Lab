@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { GeminiModel, UploadedFile, PresetConfig, ModelConfig, AgentSkill } from '../../types/index.ts';
-import { XCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, SparklesIcon, BeakerIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, ArrowPathIcon, Bars3BottomLeftIcon, TrashIcon, CheckIcon, KeyIcon, ScaleIcon, UsersIcon, GlobeAltIcon, PauseCircleIcon, PlusIcon, PencilIcon } from './Icons.tsx';
+import { XCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, SparklesIcon, BeakerIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, ArrowPathIcon, Bars3BottomLeftIcon, TrashIcon, CheckIcon, KeyIcon, ScaleIcon, UsersIcon, GlobeAltIcon, PauseCircleIcon, PlusIcon, PencilIcon, WrenchScrewdriverIcon } from './Icons.tsx';
 import FileUploader from '../workflow/FileUploader.tsx';
 
 interface ModelSettingsPanelProps {
@@ -406,55 +406,94 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
     const isNativeAudioSupported = settings.selectedModel === 'gemini-2.5-flash-native-audio-preview-09-2025';
 
     return (
-        <div ref={panelRef} className="absolute top-24 right-4 w-full max-w-3xl glass-panel rounded-[2rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] z-50 animate-fade-in overflow-hidden border border-white/10 ring-1 ring-white/5">
-            {/* --- HEADER & PRESETS --- */}
-            <div className="p-6 border-b border-white/10 bg-white/5 backdrop-blur-3xl">
-                <div className="flex justify-between items-center mb-5">
-                     <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse shadow-[0_0_15px_#a855f7]"></div>
-                        <h3 className="font-black text-xl text-gray-100 tracking-tight">Engine Room <span className="text-teal-400 font-medium text-sm ml-2">SOTA v5.0</span></h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+            <div ref={panelRef} className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-[3rem] border border-white/10 shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-white/5">
+                {/* --- HEADER & PRESETS --- */}
+                <div className="p-8 border-b border-white/10 bg-white/5 backdrop-blur-3xl flex justify-between items-center">
+                     <div className="flex items-center gap-4">
+                        <div className="p-3 bg-purple-500/20 rounded-2xl text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+                            <WrenchScrewdriverIcon className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="font-black text-3xl text-gray-100 tracking-tight">Panel de Control <span className="text-teal-400 font-medium text-sm ml-2">SOTA v5.0</span></h3>
+                            <p className="text-gray-400 text-sm font-medium mt-1">Configuración Maestra de Motores de IA</p>
+                        </div>
                      </div>
-                     <button onClick={handleReset} disabled={disabled} className="group flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-teal-400 disabled:opacity-50 transition-all">
-                        <ArrowPathIcon className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" /> Reiniciar
-                     </button>
+                     
+                     <div className="flex items-center gap-4">
+                        <button onClick={handleReset} disabled={disabled} className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-teal-400 hover:border-teal-500/30 transition-all">
+                            <ArrowPathIcon className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" /> Reiniciar Global
+                        </button>
+                        <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all">
+                            <XCircleIcon className="w-8 h-8" />
+                        </button>
+                     </div>
                 </div>
-                
-                {/* PRESET MANAGER */}
-                <div className="bg-black/20 p-3 rounded-xl border border-white/5 mb-4">
-                    <div className="flex gap-2">
-                        <div className="relative flex-1 group">
-                            <button className="w-full flex items-center justify-between bg-white/5 px-4 py-2 rounded-lg text-xs font-bold text-gray-300 hover:bg-white/10 transition-all">
-                                <span>Cargar Preset ({presets.length})</span> <ChevronDownIcon className="w-4 h-4" />
-                            </button>
-                            <div className="absolute top-full left-0 w-full mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-20 overflow-hidden max-h-48 overflow-y-auto">
-                                {presets.length === 0 && <div className="p-4 text-xs text-gray-500 text-center">No hay presets guardados</div>}
-                                {presets.map(p => (
-                                    <div key={p.id} className="flex justify-between items-center px-4 py-3 hover:bg-white/5 border-b border-white/5 last:border-0">
-                                        <button onClick={() => handleLoadPreset(p)} className="text-left text-xs font-medium text-gray-200 hover:text-teal-400 flex-1">{p.name}</button>
-                                        <button onClick={() => handleDeletePreset(p.id)} className="text-gray-600 hover:text-red-400"><TrashIcon className="w-3 h-3" /></button>
-                                    </div>
+
+                <div className="flex-1 flex overflow-hidden">
+                    {/* Sidebar Navigation */}
+                    <div className="w-72 border-r border-white/10 bg-black/20 flex flex-col p-6 gap-2">
+                        <div className="mb-6">
+                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 px-2">Categorías</h4>
+                            <nav className="space-y-1">
+                                {[
+                                    {id: 'params', label: 'Muestreo (Sampling)', icon: <Bars3BottomLeftIcon className="w-4 h-4" />},
+                                    {id: 'system', label: 'Sistema y Seguridad', icon: <ShieldCheckIcon className="w-4 h-4" />},
+                                    {id: 'tools', label: 'Herramientas y Agentes', icon: <BeakerIcon className="w-4 h-4" />},
+                                    {id: 'skills', label: 'Habilidades (Skills)', icon: <SparklesIcon className="w-4 h-4" />},
+                                    {id: 'audio', label: 'Audio y Multimodal', icon: <UsersIcon className="w-4 h-4" />},
+                                    {id: 'advanced', label: 'Avanzado', icon: <GlobeAltIcon className="w-4 h-4" />}
+                                ].map(tab => (
+                                    <button 
+                                        key={tab.id} 
+                                        onClick={() => setActiveTab(tab.id as any)} 
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-teal-500 text-slate-900 shadow-lg shadow-teal-500/20' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'}`}
+                                    >
+                                        {tab.icon}
+                                        {tab.label}
+                                    </button>
                                 ))}
+                            </nav>
+                        </div>
+
+                        <div className="mt-auto">
+                            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 px-2">Presets Rápidos</h4>
+                            <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
+                                <div className="flex gap-2 mb-3">
+                                    <div className="relative flex-1 group">
+                                        <button className="w-full flex items-center justify-between bg-white/5 px-3 py-2 rounded-xl text-[10px] font-bold text-gray-300 hover:bg-white/10 transition-all">
+                                            <span>{presets.length > 0 ? `Cargar (${presets.length})` : 'Sin Presets'}</span> <ChevronDownIcon className="w-3 h-3" />
+                                        </button>
+                                        {presets.length > 0 && (
+                                            <div className="absolute bottom-full left-0 w-full mb-2 bg-slate-800 border border-white/10 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-20 overflow-hidden max-h-48 overflow-y-auto">
+                                                {presets.map(p => (
+                                                    <div key={p.id} className="flex justify-between items-center px-3 py-2 hover:bg-white/5 border-b border-white/5 last:border-0">
+                                                        <button onClick={() => handleLoadPreset(p)} className="text-left text-[10px] font-medium text-gray-200 hover:text-teal-400 flex-1 truncate">{p.name}</button>
+                                                        <button onClick={() => handleDeletePreset(p.id)} className="text-gray-600 hover:text-red-400 ml-2"><TrashIcon className="w-3 h-3" /></button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button onClick={() => setIsSavingPreset(!isSavingPreset)} className="bg-teal-500/10 text-teal-400 border border-teal-500/30 p-2 rounded-xl hover:bg-teal-500/20 transition-all"><ArrowDownTrayIcon className="w-4 h-4" /></button>
+                                </div>
+                                {isSavingPreset && (
+                                    <div className="space-y-2 animate-fade-in">
+                                        <input type="text" value={newPresetName} onChange={(e) => setNewPresetName(e.target.value)} placeholder="Nombre..." className="bg-black/40 border border-white/10 w-full text-[10px] p-2 rounded-lg text-white focus:outline-none focus:border-teal-500/50" />
+                                        <button onClick={handleSavePreset} disabled={!newPresetName} className="w-full bg-teal-500 text-slate-900 py-2 rounded-lg text-[10px] font-black hover:bg-teal-400 disabled:opacity-50">GUARDAR ACTUAL</button>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <button onClick={() => setIsSavingPreset(!isSavingPreset)} className="bg-teal-500/10 text-teal-400 border border-teal-500/30 px-3 py-2 rounded-lg hover:bg-teal-500/20 transition-all"><ArrowDownTrayIcon className="w-4 h-4" /></button>
                     </div>
-                    {isSavingPreset && (
-                        <div className="mt-2 flex gap-2 animate-fade-in">
-                            <input type="text" value={newPresetName} onChange={(e) => setNewPresetName(e.target.value)} placeholder="Nombre del preset..." className="glass-input flex-1 text-xs p-2 rounded-lg" />
-                            <button onClick={handleSavePreset} disabled={!newPresetName} className="bg-teal-500 text-slate-900 px-3 py-2 rounded-lg text-xs font-bold hover:bg-teal-400 disabled:opacity-50">Guardar</button>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 overflow-y-auto p-10 custom-scrollbar bg-slate-900/50 relative">
+                        {/* Model Capability Badge */}
+                        <div className="absolute top-6 right-10 flex items-center gap-3 bg-teal-500/10 border border-teal-500/20 px-4 py-2 rounded-2xl animate-fade-in">
+                            <div className="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></div>
+                            <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest">Motor Activo: {settings.selectedModel}</span>
                         </div>
-                    )}
-                </div>
-
-                {/* --- NAVIGATION TABS --- */}
-                <div className="flex gap-1 p-1 bg-black/20 rounded-xl overflow-x-auto custom-scrollbar">
-                    {[{id: 'params', label: 'Sampling'}, {id: 'system', label: 'System & Safety'}, {id: 'tools', label: 'Tools & Agents'}, {id: 'skills', label: 'Skills'}, {id: 'audio', label: 'Audio & MM'}, {id: 'advanced', label: 'Advanced'}].map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-teal-500 text-slate-900 shadow-lg' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>{tab.label}</button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="max-h-[65vh] overflow-y-auto px-6 py-6 custom-scrollbar scroll-smooth">
                 {/* --- TAB: SAMPLING PARAMETERS --- */}
                 {activeTab === 'params' && (
                     <div className="space-y-6 animate-fade-in">
@@ -906,7 +945,9 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                 )}
             </div>
         </div>
-    );
+    </div>
+</div>
+);
 };
 
 export default ModelSettingsPanel;
