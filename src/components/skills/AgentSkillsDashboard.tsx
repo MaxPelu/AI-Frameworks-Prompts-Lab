@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { AgentSkill, GeminiModel } from '../../types/index.ts';
+import { createPortal } from 'react-dom';
+import { AgentSkill, GeminiModel, ALL_GEMINI_MODELS } from '../../types/index.ts';
 import { XCircleIcon, PlusIcon, PencilIcon, TrashIcon, SparklesIcon, DocumentTextIcon, KeyIcon, ArrowDownTrayIcon, SearchIcon } from '../shared/Icons.tsx';
 import { GoogleGenAI } from '@google/genai';
 
@@ -148,7 +149,7 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
         URL.revokeObjectURL(url);
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
             <div className="bg-slate-900 w-full max-w-5xl h-[85vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
@@ -343,18 +344,9 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
                                             className="bg-slate-800 text-white text-xs rounded-lg px-2 py-1 border border-white/10 focus:ring-1 focus:ring-teal-500/50 outline-none"
                                             disabled={isGenerating}
                                         >
-                                            <option value="gemini-2.5-flash-latest">Gemini 2.5 Flash</option>
-                                            <option value="gemini-2.5-pro-latest">Gemini 2.5 Pro</option>
-                                            <option value="gemini-3-flash-preview">Gemini 3.0 Flash</option>
-                                            <option value="gemini-3-flash-preview-low">Gemini 3.0 Flash (Low)</option>
-                                            <option value="gemini-3-flash-preview-high">Gemini 3.0 Flash (High)</option>
-                                            <option value="gemini-3-pro-preview">Gemini 3.0 Pro</option>
-                                            <option value="gemini-3-pro-preview-low">Gemini 3.0 Pro (Low)</option>
-                                            <option value="gemini-3-pro-preview-high">Gemini 3.0 Pro (High)</option>
-                                            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
-                                            <option value="gemini-3.1-pro-preview-low">Gemini 3.1 Pro (Low)</option>
-                                            <option value="gemini-3.1-pro-preview-high">Gemini 3.1 Pro (High)</option>
-                                            <option value="gemma-3-27b-it">Gemma 3 27B</option>
+                                            {ALL_GEMINI_MODELS.map(model => (
+                                                <option key={model} value={model}>{model}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="flex items-center">
@@ -385,7 +377,8 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

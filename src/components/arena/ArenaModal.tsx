@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, SparklesIcon } from '../shared/Icons.tsx';
 import { Framework, GeminiModel, SafetySettings, UploadedFile, ArenaBattleConfig } from '../../types/index.ts';
 import ArenaPanel from './ArenaPanel.tsx';
@@ -24,6 +25,10 @@ interface ArenaModalProps {
     onTopPChange: (topP: number) => void;
     topK: number;
     onTopKChange: (k: number) => void;
+    frequencyPenalty: number;
+    onFrequencyPenaltyChange: (penalty: number) => void;
+    presencePenalty: number;
+    onPresencePenaltyChange: (penalty: number) => void;
     maxOutputTokens: number;
     onMaxOutputTokensChange: (tokens: number) => void;
     systemInstruction: string;
@@ -42,6 +47,8 @@ interface ArenaModalProps {
     onUseGoogleSearchChange: (use: boolean) => void;
     isStructuredOutputEnabled: boolean;
     onIsStructuredOutputEnabledChange: (enabled: boolean) => void;
+    responseSchema: string;
+    onResponseSchemaChange: (schema: string) => void;
     isCodeExecutionEnabled: boolean;
     onIsCodeExecutionEnabledChange: (enabled: boolean) => void;
     isFunctionCallingEnabled: boolean;
@@ -61,7 +68,7 @@ const ArenaModal: React.FC<ArenaModalProps> = ({
     const isComparisonMode = !!compareConfig && compareConfig.frameworks.length > 0;
     const isBattleMode = !!battleConfig && battleConfig.models.length > 0;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
             <div className="bg-slate-900 border border-white/10 rounded-[3rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] w-full max-w-[95vw] h-[92vh] flex flex-col p-6 overflow-hidden ring-1 ring-white/5">
                 <header className="flex justify-between items-center mb-6 flex-shrink-0 px-4">
@@ -126,7 +133,8 @@ const ArenaModal: React.FC<ArenaModalProps> = ({
                      <p className="text-[9px] font-mono text-gray-600 uppercase tracking-widest">© Prompt Lab Battle System // SOTA Pipeline Dec 2025</p>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

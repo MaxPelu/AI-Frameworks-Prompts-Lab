@@ -2,26 +2,111 @@
 export type GeminiModel = 
     | 'gemini-3.1-pro-preview'
     | 'gemini-3.1-pro-preview-low'
+    | 'gemini-3.1-pro-preview-medium'
     | 'gemini-3.1-pro-preview-high'
+    | 'gemini-3.1-pro-preview-super-high'
     | 'gemini-3-pro-preview' 
     | 'gemini-3-pro-preview-low'
+    | 'gemini-3-pro-preview-medium'
     | 'gemini-3-pro-preview-high'
+    | 'gemini-3-pro-preview-super-high'
     | 'gemini-3-flash-preview' 
     | 'gemini-3-flash-preview-low'
+    | 'gemini-3-flash-preview-medium'
     | 'gemini-3-flash-preview-high'
+    | 'gemini-3-flash-preview-super-high'
+    | 'gemini-3.1-flash-lite-preview'
+    | 'gemini-3.1-flash-lite-preview-low'
+    | 'gemini-3.1-flash-lite-preview-medium'
+    | 'gemini-3.1-flash-lite-preview-high'
+    | 'gemini-3.1-flash-lite-preview-super-high'
     | 'gemini-3-deep-think-preview' 
     | 'gemini-3-visual-layout'
     | 'gemini-2.5-pro-latest'
     | 'gemini-2.5-flash-latest'
     | 'gemini-2.5-flash-lite-latest'
     | 'gemini-2.5-flash-native-audio-preview-09-2025'
+    | 'gemini-2.5-pro'
+    | 'gemini-2.5-flash'
+    | 'gemini-2.5-flash-8b'
+    | 'gemini-2.0-pro-exp-02-05'
+    | 'gemini-2.0-flash'
+    | 'gemini-2.0-flash-lite-preview-02-05'
+    | 'gemini-2.0-flash-thinking-exp-01-21'
+    | 'gemini-1.5-pro'
+    | 'gemini-1.5-flash'
+    | 'gemini-1.5-flash-8b'
+    | 'gemini-1.0-pro'
+    | 'gemini-2.5-flash-image'
+    | 'gemini-3.1-flash-image-preview'
+    | 'gemini-3-pro-image-preview'
+    | 'gemini-2.5-flash-native-audio-preview-12-2025'
+    | 'gemini-2.5-flash-preview-tts'
+    | 'veo-3.1-fast-generate-preview'
+    | 'veo-3.1-generate-preview'
+    | 'imagen-4.0-generate-001'
+    | 'gemini-flash-latest'
+    | 'gemini-flash-lite-latest'
     | 'gemma-3-27b-it'
     | 'gemma-3-12b-it'
     | 'gemma-3-4b-it'
     | 'gemini-agent'
-    | 'google-antigravity-engine'
-    | 'veo-3.1-generate-preview'
-    | 'imagen-4.0-generate-001';
+    | 'google-antigravity-engine';
+
+export const ALL_GEMINI_MODELS: GeminiModel[] = [
+    'gemini-3.1-pro-preview',
+    'gemini-3.1-pro-preview-low',
+    'gemini-3.1-pro-preview-medium',
+    'gemini-3.1-pro-preview-high',
+    'gemini-3.1-pro-preview-super-high',
+    'gemini-3-pro-preview',
+    'gemini-3-pro-preview-low',
+    'gemini-3-pro-preview-medium',
+    'gemini-3-pro-preview-high',
+    'gemini-3-pro-preview-super-high',
+    'gemini-3-flash-preview',
+    'gemini-3-flash-preview-low',
+    'gemini-3-flash-preview-medium',
+    'gemini-3-flash-preview-high',
+    'gemini-3-flash-preview-super-high',
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3.1-flash-lite-preview-low',
+    'gemini-3.1-flash-lite-preview-medium',
+    'gemini-3.1-flash-lite-preview-high',
+    'gemini-3.1-flash-lite-preview-super-high',
+    'gemini-3-deep-think-preview',
+    'gemini-3-visual-layout',
+    'gemini-2.5-pro-latest',
+    'gemini-2.5-flash-latest',
+    'gemini-2.5-flash-lite-latest',
+    'gemini-2.5-flash-native-audio-preview-09-2025',
+    'gemini-2.5-pro',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-8b',
+    'gemini-2.0-pro-exp-02-05',
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite-preview-02-05',
+    'gemini-2.0-flash-thinking-exp-01-21',
+    'gemini-1.5-pro',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-8b',
+    'gemini-1.0-pro',
+    'gemini-2.5-flash-image',
+    'gemini-3.1-flash-image-preview',
+    'gemini-3-pro-image-preview',
+    'gemini-2.5-flash-native-audio-preview-12-2025',
+    'gemini-2.5-flash-preview-tts',
+    'veo-3.1-fast-generate-preview',
+    'veo-3.1-generate-preview',
+    'imagen-4.0-generate-001',
+    'gemini-flash-latest',
+    'gemini-flash-lite-latest',
+    'gemma-3-27b-it',
+    'gemma-3-12b-it',
+    'gemma-3-4b-it',
+    'gemini-agent',
+    'google-antigravity-engine'
+];
 
 export interface ConfigSnapshot {
     temperature: number;
@@ -79,6 +164,7 @@ export interface PromptVersion {
     model: GeminiModel;
     createdAt: string;
     changeSummary: string;
+    isDraft?: boolean;
 }
 
 export interface AgentSkill {

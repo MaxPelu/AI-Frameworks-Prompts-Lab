@@ -1,5 +1,5 @@
 
-# Documento de Requisitos del Producto (PRD): v4.0.0
+# Documento de Requisitos del Producto (PRD): v4.2.0
 
 ## 1. Visión del Producto
 Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería de IA** completa y definitiva para 2026. El objetivo ya no es solo escribir prompts, sino arquitecturar sistemas de IA complejos, diseñar flujos de datos, evaluar el rendimiento de los modelos y definir estrategias de negocio asistidas por modelos SOTA (State of the Art) de Google.
@@ -11,7 +11,9 @@ Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería
 *   **Búsqueda Semántica Local**: Capacidad de filtrar frameworks por acrónimo, nombre, descripción o categoría en tiempo real sin latencia perceptible.
 *   **Niveles de Dificultad**: Clasificación visual de frameworks desde "Fundamentos" hasta "Frontier/SOTA", permitiendo a los usuarios escalar su aprendizaje.
 
-### 2.2 Integración LLM Engineer Toolkit
+### 2.2 Agent Skills Hub & Toolkit
+*   **Repositorio de Habilidades**: Sistema para gestionar capacidades de agentes, permitiendo guardar, editar y organizar instrucciones complejas y herramientas.
+*   **Generador de Skills**: Integración con Gemini para crear nuevas habilidades a partir de descripciones de alto nivel.
 *   **Soporte de Conceptos Técnicos**: El sistema debe reconocer y sugerir estructuras para herramientas de ingeniería modernas como DSPy, LangGraph, Unsloth, vLLM y LlamaIndex.
 *   **Meta-Docs Generator**: Capacidad de generar archivos de documentación estándar para agentes y sistemas de IA (`AGENT.md`, `CONTEXT.md`, `MEMORY.md`, `SYSTEM_PROMPT.txt`).
 *   **Evaluación de Calidad**: Integración de un módulo de "Quality Analysis" que evalúe los prompts generados basándose en métricas como Claridad, Especificidad, Robustez y Riesgo Ético.
@@ -21,8 +23,8 @@ Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería
 *   **Agente de Investigación (Deep Research)**: Uso de la herramienta `googleSearch` de Gemini para buscar papers recientes (2025-2026), repositorios y artículos técnicos, y convertirlos automáticamente en tarjetas de framework usables en la biblioteca.
 
 ### 2.4 Engine Room & Tokenomics
-*   **Soporte Gemini 3.1 Series**: Configuración nativa para aprovechar las capacidades de razonamiento profundo de `gemini-3.1-pro-preview` y la velocidad de `gemini-3-flash-preview`.
-*   **Thinking Budget Control**: Interfaz de usuario para ajustar el presupuesto de tokens de pensamiento (Thinking Tokens), permitiendo al usuario decidir cuánta "reflexión" debe hacer el modelo antes de responder.
+*   **Soporte Gemini 3.1 Series**: Configuración nativa para aprovechar las capacidades de razonamiento profundo de `gemini-3.1-pro-preview`, la velocidad de `gemini-3-flash-preview` y la eficiencia de `gemini-3.1-flash-lite-preview`.
+*   **Thinking Budget Control**: Interfaz de usuario para ajustar el presupuesto de tokens de pensamiento (Thinking Tokens) con niveles preestablecidos (Low, Medium, High, Super High), permitiendo al usuario decidir cuánta "reflexión" debe hacer el modelo antes de responder.
 *   **Contabilidad de Tokens y Costos**: Dashboard detallado que diferencie entre tokens de entrada, salida, caché y pensamiento, calculando un costo estimado por sesión.
 
 ### 2.5 Generative UI (GenUI) y Visualización

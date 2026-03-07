@@ -1,4 +1,4 @@
-# Guía de Contribución: v4.0.0
+# Guía de Contribución: v4.2.0
 
 ¡Gracias por tu interés en contribuir al **Laboratorio de Prompts 2026**! Estamos construyendo el estándar de facto para la Ingeniería de IA Multimodal, Orquestación de Agentes y Alquimia de Metodologías. Tu ayuda es fundamental para mantener este proyecto a la vanguardia.
 
@@ -23,7 +23,7 @@ Buscamos expandir la capacidad visual del motor de renderizado. Puedes añadir w
 *   Reproductores de audio/video generados por IA.
 
 ### 3. Optimizadores de IA (Core Engine)
-Mejora las instrucciones de sistema (System Prompts) en `src/lib/geminiService.ts` para que la expansión, optimización y análisis de prompts sea aún más precisa, aprovechando las nuevas capacidades de razonamiento de los modelos Gemini 3.1 Pro.
+Mejora las instrucciones de sistema (System Prompts) en `src/lib/geminiService.ts` para que la expansión, optimización y análisis de prompts sea aún más precisa, aprovechando las nuevas capacidades de razonamiento de los modelos Gemini 3.1 Pro y Flash Lite.
 
 ### 4. Reporte de Bugs y Mejoras de UI/UX
 Si encuentras un error o tienes una idea para mejorar la interfaz "Liquid Glass", abre un Issue detallando el problema o la propuesta.

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, TableCellsIcon, CheckIcon, ArrowPathIcon } from '../shared/Icons.tsx';
 import { BatchResult, BatchRow, GeminiModel, SafetySettings, UploadedFile } from '../../types/index.ts';
 import { parseCSV, extractVariables, interpolatePrompt, exportToCSV } from '../../lib/batchUtils.ts';
@@ -131,7 +132,7 @@ const BatchTestingModal: React.FC<BatchTestingModalProps> = ({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-7xl h-[90vh] flex flex-col overflow-hidden">
                 
@@ -275,7 +276,8 @@ const BatchTestingModal: React.FC<BatchTestingModalProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

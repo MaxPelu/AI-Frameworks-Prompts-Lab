@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, SparklesIcon, DiceIcon, CheckIcon } from '../shared/Icons.tsx';
 import { Framework, GeminiModel, TokenUsage } from '../../types/index.ts';
 import { generateMetaFramework } from '../../lib/geminiService.ts';
@@ -47,7 +48,7 @@ const MetaFrameworkModal: React.FC<MetaFrameworkModalProps> = ({ isOpen, onClose
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto animate-fade-in" aria-modal="true">
             <div className="bg-slate-900 border border-white/10 rounded-[3rem] shadow-[0_0_100px_rgba(114,9,183,0.3)] w-full max-w-4xl min-h-[50vh] flex flex-col overflow-hidden relative mb-12">
                 
@@ -166,7 +167,8 @@ const MetaFrameworkModal: React.FC<MetaFrameworkModalProps> = ({ isOpen, onClose
                      <p className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">© Meta-Framework Engine // Deep Forge Dec 2025</p>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

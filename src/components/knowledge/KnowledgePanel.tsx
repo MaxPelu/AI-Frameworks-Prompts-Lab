@@ -6,13 +6,18 @@ import { AGENT_CATEGORIES, AGENT_FRAMEWORKS } from '../../config/agentConstants.
 import { CODING_CATEGORIES, CODING_FRAMEWORKS } from '../../config/codingConstants.ts';
 import { BUSINESS_CATEGORIES, BUSINESS_FRAMEWORKS } from '../../config/businessConstants.ts';
 import { DATA_CATEGORIES, DATA_FRAMEWORKS } from '../../config/dataConstants.ts';
+import { CYBERSECURITY_FRAMEWORKS } from '../../config/cybersecurityConstants.ts';
+import { CONTEXT_ENGINEERING_FRAMEWORKS } from '../../config/contextEngineeringConstants.ts';
+import { AI_OPS_FRAMEWORKS } from '../../config/aiOpsConstants.ts';
+import { MARKETING_FRAMEWORKS } from '../../config/marketingConstants.ts';
+import { EDUCATION_FRAMEWORKS } from '../../config/educationConstants.ts';
 import { Framework, SavedPrompt, GeminiModel, TokenUsage } from '../../types/index.ts';
 import FrameworkCard from './FrameworkCard.tsx';
 import DeepResearchModal from './DeepResearchModal.tsx';
 import MetaFrameworkModal from './MetaFrameworkModal.tsx';
 import { SearchIcon, ChevronDownIcon, GlobeAltIcon, AcademicCapIcon, SparklesIcon, BeakerIcon, LightBulbIcon, DiceIcon } from '../shared/Icons.tsx';
 
-type ActiveTab = 'promptFrameworks' | 'contextFrameworks' | 'agentFrameworks' | 'codingFrameworks' | 'businessFrameworks' | 'dataFrameworks';
+type ActiveTab = 'promptFrameworks' | 'contextFrameworks' | 'agentFrameworks' | 'codingFrameworks' | 'businessFrameworks' | 'dataFrameworks' | 'cybersecurityFrameworks' | 'contextEngineeringFrameworks' | 'aiOpsFrameworks' | 'marketingFrameworks' | 'educationFrameworks';
 
 interface KnowledgePanelProps {
     activeTab: ActiveTab;
@@ -136,6 +141,11 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
       else if (activeTab === 'codingFrameworks') base = CODING_FRAMEWORKS;
       else if (activeTab === 'businessFrameworks') base = BUSINESS_FRAMEWORKS;
       else if (activeTab === 'dataFrameworks') base = DATA_FRAMEWORKS;
+      else if (activeTab === 'cybersecurityFrameworks') base = CYBERSECURITY_FRAMEWORKS;
+      else if (activeTab === 'contextEngineeringFrameworks') base = CONTEXT_ENGINEERING_FRAMEWORKS;
+      else if (activeTab === 'aiOpsFrameworks') base = AI_OPS_FRAMEWORKS;
+      else if (activeTab === 'marketingFrameworks') base = MARKETING_FRAMEWORKS;
+      else if (activeTab === 'educationFrameworks') base = EDUCATION_FRAMEWORKS;
 
       if (customFrameworks.length > 0) {
           // Simple filter for custom ones (improved logic can be added based on user selection metadata)
@@ -171,6 +181,11 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
         case 'codingFrameworks': return CODING_CATEGORIES;
         case 'businessFrameworks': return BUSINESS_CATEGORIES;
         case 'dataFrameworks': return DATA_CATEGORIES;
+        case 'cybersecurityFrameworks': return ['Ciberseguridad'];
+        case 'contextEngineeringFrameworks': return ['Ingeniería de Contexto'];
+        case 'aiOpsFrameworks': return ['Operaciones de IA'];
+        case 'marketingFrameworks': return ['Marketing y Growth'];
+        case 'educationFrameworks': return ['Educación y Aprendizaje'];
         default: return [];
     }
   }
@@ -261,7 +276,7 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
   };
 
   return (
-    <div className="glass-panel rounded-3xl p-6 flex-1 flex flex-col h-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border-t border-white/20">
+    <div className="glass-panel rounded-3xl p-4 md:p-6 flex-1 flex flex-col h-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative border-t border-white/20">
       <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
         <div>
             <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-3">
@@ -326,6 +341,36 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
           className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'dataFrameworks' ? 'text-green-400 border-b-2 border-green-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
         >
           Data/Sota
+        </button>
+        <button 
+          onClick={() => onTabChange('cybersecurityFrameworks')}
+          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'cybersecurityFrameworks' ? 'text-red-400 border-b-2 border-red-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          Ciberseguridad
+        </button>
+        <button 
+          onClick={() => onTabChange('contextEngineeringFrameworks')}
+          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'contextEngineeringFrameworks' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          Ing. Contexto
+        </button>
+        <button 
+          onClick={() => onTabChange('aiOpsFrameworks')}
+          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'aiOpsFrameworks' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          AI Ops
+        </button>
+        <button 
+          onClick={() => onTabChange('marketingFrameworks')}
+          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'marketingFrameworks' ? 'text-orange-400 border-b-2 border-orange-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          Marketing
+        </button>
+        <button 
+          onClick={() => onTabChange('educationFrameworks')}
+          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'educationFrameworks' ? 'text-emerald-400 border-b-2 border-emerald-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+        >
+          Educación
         </button>
       </div>
 

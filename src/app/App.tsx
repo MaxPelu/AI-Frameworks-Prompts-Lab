@@ -1,5 +1,8 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+// Extreme Tuning v5.0
+import { motion, AnimatePresence } from 'motion/react';
+import Sidebar from '../components/shared/Sidebar.tsx';
 import WorkflowPanel from '../components/workflow/WorkflowPanel.tsx';
 import KnowledgePanel from '../components/knowledge/KnowledgePanel.tsx';
 import ArenaModal from '../components/arena/ArenaModal.tsx';
@@ -20,9 +23,12 @@ import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, Safet
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
 import { FRAMEWORKS } from '../config/constants.ts';
 import { CATEGORIES, CATEGORIZED_USE_CASES } from '../config/constants.ts';
-import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon } from '../components/shared/Icons.tsx';
+import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon } from '../components/shared/Icons.tsx';
 
 const App: React.FC = () => {
+    // Workspace View State
+    const [currentView, setCurrentView] = useState<'home' | 'arena' | 'batch' | 'metrics' | 'history' | 'skills'>('home');
+    
     // Global App State
     const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
     const [customFrameworks, setCustomFrameworks] = useState<Framework[]>([]);
@@ -65,7 +71,7 @@ const App: React.FC = () => {
     const [resetKey, setResetKey] = useState(0);
     
     // Knowledge Panel & History Interaction State
-    const [activeTab, setActiveTab] = useState<'promptFrameworks' | 'contextFrameworks' | 'agentFrameworks'>('promptFrameworks');
+    const [activeTab, setActiveTab] = useState<'promptFrameworks' | 'contextFrameworks' | 'agentFrameworks' | 'codingFrameworks' | 'businessFrameworks' | 'dataFrameworks' | 'cybersecurityFrameworks' | 'contextEngineeringFrameworks' | 'aiOpsFrameworks' | 'marketingFrameworks' | 'educationFrameworks'>('promptFrameworks');
     const [frameworksToCompare, setFrameworksToCompare] = useState<Framework[]>([]);
     const [builderCanvasState, setBuilderCanvasState] = useState<{ isOpen: boolean; framework: Framework | null }>({ isOpen: false, framework: null });
     const [exportModalState, setExportModalState] = useState<{ isOpen: boolean; prompt: SavedPrompt | null }>({ isOpen: false, prompt: null });
@@ -153,6 +159,23 @@ const App: React.FC = () => {
     const [isCreateSessionModalOpen, setIsCreateSessionModalOpen] = useState(false);
     const [pendingSessionTemplate, setPendingSessionTemplate] = useState<SessionTemplate | null>(null);
 
+    // Command Palette State
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+    const [commandSearch, setCommandSearch] = useState('');
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsCommandPaletteOpen(prev => !prev);
+            }
+            if (e.key === 'Escape') {
+                setIsCommandPaletteOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     useEffect(() => {
         try {
@@ -200,29 +223,28 @@ const App: React.FC = () => {
     const handleSavePrompt = useCallback(async (
         promptData: Omit<PromptVersion, 'versionId' | 'createdAt' | 'changeSummary'>,
         isAutoSave: boolean = false,
-        sessionName?: string
+        sessionName?: string,
+        forceDraft: boolean = false
     ) => {
         setIsSaving(true);
         let updatedPrompts = [...savedPrompts];
         let successMessage = "";
 
-        // Determine if it's a draft (no generated prompt yet, but user wants to save idea)
-        const isDraft = !promptData.optimizedPrompt && !!promptData.idea;
-        const finalOptimizedPrompt = promptData.optimizedPrompt || promptData.idea; // Use idea as prompt if draft
-        const finalFramework = promptData.frameworkAcronym || 'BORRADOR';
+        // Determine if it's a draft
+        const isDraft = forceDraft || (!promptData.optimizedPrompt && !!promptData.idea);
+        const finalOptimizedPrompt = promptData.optimizedPrompt || promptData.idea; 
+        const finalFramework = isDraft ? 'BORRADOR' : (promptData.frameworkAcronym || 'GENERAL');
 
         if (promptToIterateId) {
             const collectionIndex = savedPrompts.findIndex(p => p.id === promptToIterateId);
             if (collectionIndex > -1) {
                 const collection = { ...savedPrompts[collectionIndex] };
                 
-                // Update Name if provided
                 if (sessionName) {
                     collection.name = sessionName;
                 }
 
                 if (isAutoSave) {
-                    // AUTO-SAVE: Update the LATEST version in place to avoid spamming history
                     collection.versions[0] = {
                         ...collection.versions[0],
                         idea: promptData.idea,
@@ -230,15 +252,14 @@ const App: React.FC = () => {
                         frameworkAcronym: finalFramework,
                         optimizedPrompt: finalOptimizedPrompt,
                         model: promptData.model,
+                        isDraft: isDraft
                     };
-                    // Update base info
                     collection.baseIdea = promptData.idea;
                     updatedPrompts[collectionIndex] = collection;
                 } else {
-                    // MANUAL SAVE: Create a NEW version (Checkpoint)
                     const previousPrompt = collection.versions[0]?.optimizedPrompt || "";
-                    let changeSummary = "Actualización manual.";
-                    if (!isDraft && previousPrompt) {
+                    let changeSummary = isDraft ? "Borrador actualizado." : "Actualización manual.";
+                    if (!isDraft && previousPrompt && previousPrompt !== finalOptimizedPrompt) {
                          changeSummary = await summarizeChanges(previousPrompt, finalOptimizedPrompt, promptData.model);
                     }
 
@@ -248,35 +269,33 @@ const App: React.FC = () => {
                         frameworkAcronym: finalFramework,
                         versionId: crypto.randomUUID(), 
                         createdAt: new Date().toISOString(), 
-                        changeSummary 
+                        changeSummary,
+                        isDraft: isDraft
                     };
                     collection.versions.unshift(newVersion);
                     updatedPrompts[collectionIndex] = collection;
-                    successMessage = "¡Nueva versión guardada!";
+                    successMessage = isDraft ? "¡Borrador guardado!" : "¡Nueva versión guardada!";
                 }
             }
         } else {
-            // NEW SESSION (First Save)
             const newVersion: PromptVersion = { 
                 ...promptData, 
                 optimizedPrompt: finalOptimizedPrompt,
                 frameworkAcronym: finalFramework,
                 versionId: crypto.randomUUID(), 
                 createdAt: new Date().toISOString(), 
-                changeSummary: isDraft ? "Borrador inicial." : "Versión inicial." 
+                changeSummary: isDraft ? "Borrador inicial." : "Versión inicial.",
+                isDraft: isDraft
             };
             const newCollection: SavedPrompt = { 
                 id: crypto.randomUUID(), 
-                name: sessionName, // Save custom name
+                name: sessionName, 
                 baseIdea: promptData.idea, 
                 createdAt: newVersion.createdAt, 
                 versions: [newVersion] 
             };
             updatedPrompts.unshift(newCollection);
-            
-            // Immediately set this as the active iteration ID so subsequent auto-saves update this one
             setPromptToIterateId(newCollection.id);
-            
             successMessage = isDraft ? "¡Borrador guardado!" : "¡Nueva sesión guardada!";
         }
 
@@ -293,7 +312,7 @@ const App: React.FC = () => {
 
     }, [savedPrompts, promptToIterateId]);
 
-    const handleGlobalSave = useCallback(async (isAutoSave: boolean = false, name?: string) => {
+    const handleGlobalSave = useCallback(async (isAutoSave: boolean = false, name?: string, forceDraft: boolean = false) => {
         if (!ideaText && !generatedPrompt) return;
         
         let sessionName = name;
@@ -321,7 +340,7 @@ const App: React.FC = () => {
             model: selectedModel,
         };
         
-        await handleSavePrompt(promptData, isAutoSave, sessionName);
+        await handleSavePrompt(promptData, isAutoSave, sessionName, forceDraft);
     }, [generatedPrompt, ideaText, useCase, selectedFrameworkAcronym, selectedModel, handleSavePrompt, promptToIterateId]);
 
     // --- AUTO-SAVE EFFECT ---
@@ -404,19 +423,19 @@ const App: React.FC = () => {
         setArenaBattleConfig(undefined);
         setArenaTestPrompt(prompt);
         setFrameworksToCompare([]);
-        setIsArenaOpen(true);
+        setCurrentView('arena');
     };
 
     const handleStartModelBattle = (config: ArenaBattleConfig) => {
         setArenaTestPrompt('');
         setFrameworksToCompare([]);
         setArenaBattleConfig(config);
-        setIsArenaOpen(true);
+        setCurrentView('arena');
     };
 
     const handleOpenBatchTesting = (prompt: string) => {
         setBatchInitialPrompt(prompt);
-        setIsBatchModalOpen(true);
+        setCurrentView('batch');
     };
 
     const handleExportPrompt = (prompt: SavedPrompt) => {
@@ -483,12 +502,12 @@ const App: React.FC = () => {
     const handleOpenArenaForCompare = () => {
         if (frameworksToCompare.length > 0) {
             setArenaBattleConfig(undefined);
-            setIsArenaOpen(true);
+            setCurrentView('arena');
         }
     };
 
     const closeArena = () => {
-        setIsArenaOpen(false);
+        setCurrentView('home');
         setArenaBattleConfig(undefined);
         if (frameworksToCompare.length > 0) {
             setFrameworksToCompare([]);
@@ -575,6 +594,21 @@ const App: React.FC = () => {
     const handleOpenHistory = () => {
         setIsHistoryDashboardOpen(true);
     };
+
+    const commandActions = useMemo(() => [
+        { id: 'new', label: 'Nueva Sesión', description: 'Inicia un lienzo limpio o usa una plantilla', icon: <SparklesIcon className="w-5 h-5" />, color: 'sky', onRun: handleCreateSession },
+        { id: 'history', label: 'Historial', description: 'Ver biblioteca de prompts guardados', icon: <BookOpenIcon className="w-5 h-5" />, color: 'purple', onRun: handleOpenHistory },
+        { id: 'metrics', label: 'Métricas', description: 'Dashboard de consumo de tokens', icon: <ChartBarIcon className="w-5 h-5" />, color: 'emerald', onRun: () => setIsMetricsDashboardOpen(true) },
+        { id: 'skills', label: 'Agent Skills', description: 'Gestionar habilidades del agente', icon: <SparklesIcon className="w-5 h-5" />, color: 'indigo', onRun: () => setIsSkillsDashboardOpen(true) },
+        { id: 'batch', label: 'Batch Testing', description: 'Pruebas masivas con CSV', icon: <TableCellsIcon className="w-5 h-5" />, color: 'orange', onRun: () => setIsBatchModalOpen(true) },
+        { id: 'arena', label: 'Model Arena', description: 'Comparar modelos en tiempo real', icon: <BeakerIcon className="w-5 h-5" />, color: 'rose', onRun: () => setIsArenaOpen(true) },
+        { id: 'settings', label: 'Ajustes de Modelo', description: 'Configurar parámetros de la IA', icon: <WrenchScrewdriverIcon className="w-5 h-5" />, color: 'slate', onRun: () => setIsSettingsOpen(true) },
+    ], [handleCreateSession, handleOpenHistory]);
+
+    const filteredCommands = commandActions.filter(a => 
+        a.label.toLowerCase().includes(commandSearch.toLowerCase()) || 
+        a.description.toLowerCase().includes(commandSearch.toLowerCase())
+    );
 
     // Config Persistence Handlers
     const handleSaveSettings = () => {
@@ -732,172 +766,264 @@ const App: React.FC = () => {
     }
 
     return (
-        <div className="aurora-background min-h-screen text-gray-300 p-4 sm:p-6 lg:p-8 font-sans">
-            <Toast 
-                message={notification.message} 
-                type={notification.type} 
-                isVisible={notification.isVisible} 
-                onClose={hideNotification} 
+        <div className="min-h-screen text-gray-100 font-sans selection:bg-teal-500/30 selection:text-teal-200 aurora-background overflow-x-hidden">
+            <Sidebar 
+                currentView={currentView} 
+                setCurrentView={setCurrentView} 
+                onNewSession={handleCreateSession}
+                onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+                tokenHistory={tokenUsageHistory}
+                selectedModel={selectedModel}
+                isMetricsOpen={isMetricsDashboardOpen}
+                setIsMetricsOpen={setIsMetricsDashboardOpen}
             />
-            
-            <div className="max-w-screen-2xl mx-auto">
-                
-                <div className="mb-8 text-center sm:text-left pl-2">
-                    <h1 className="text-5xl font-black title-gradient mb-2 tracking-tight">
-                        Laboratorio de Prompts
-                    </h1>
-                    <p className="text-gray-400 text-sm font-medium tracking-widest uppercase opacity-80 flex items-center gap-2 justify-center sm:justify-start">
-                        <span className="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
-                        Liquid Glass Edition // Gemini 3.0
-                    </p>
-                </div>
 
-                <header className="glass-panel flex flex-wrap items-center justify-between mb-10 p-4 rounded-3xl z-20 relative gap-4 transition-all duration-500 ease-out">
-                    <div className="flex items-center gap-6 text-sm px-4">
-                        <div className="flex items-center gap-2" title="Número total de sesiones de prompts guardadas">
-                            <ChevronDownIcon className="w-5 h-5 -rotate-90 text-cyan-400" />
-                            <span className="font-bold text-white text-lg drop-shadow-lg">{savedPrompts.length}</span>
-                            <span className="text-gray-400 font-medium tracking-wide">SESIONES</span>
-                        </div>
-                        <div className="flex items-center gap-2" title="Número total de versiones de prompts generadas">
-                            <CodeBracketIcon className="w-5 h-5 text-pink-400" />
-                            <span className="font-bold text-white text-lg drop-shadow-lg">{totalResults}</span>
-                            <span className="text-gray-400 font-medium tracking-wide">RESULTADOS</span>
-                        </div>
-                        <div className="flex items-center gap-2" title="Número total de peticiones a la API">
-                            <ChartBarIcon className="w-5 h-5 text-emerald-400" />
-                            <span className="font-bold text-white text-lg drop-shadow-lg">{tokenUsageHistory.length}</span>
-                            <span className="text-gray-400 font-medium tracking-wide">API REQS</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-                        <button
-                            onClick={handleCreateSession}
-                            className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-200 hover:bg-sky-500/30 hover:text-white hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 active:scale-95"
-                            title="Guarda la sesión actual y abre un lienzo nuevo."
+            {/* Main Content Area */}
+            <div className="lg:ml-64 pt-16 lg:pt-0 transition-all duration-300">
+                <AnimatePresence>
+                {isCommandPaletteOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="command-palette-overlay" 
+                        onClick={() => setIsCommandPaletteOpen(false)}
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.95, opacity: 0, y: -20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: -20 }}
+                            className="command-palette-content" 
+                            onClick={e => e.stopPropagation()}
                         >
-                            <SparklesIcon className="w-5 h-5" /> Crear Sesión
-                        </button>
-                        <button
-                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'save' })}
-                            disabled={isSaveDisabled}
-                            className={`flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ${saveButtonStyle}`}
-                        >
-                            {saveButtonIcon}
-                            {saveButtonLabel}
-                        </button>
-                        <button
-                            onClick={toggleAutoSave}
-                            className={`flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ${
-                                isAutoSaveEnabled
-                                ? 'bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
-                                : 'bg-white/5 border border-white/10 text-gray-500 hover:text-gray-300'
-                            }`}
-                            title={isAutoSaveEnabled ? "Auto-guardado activo (clic para pausar)" : "Auto-guardado pausado (clic para activar)"}
-                        >
-                            {isAutoSaveEnabled ? <CloudArrowUpIcon className="w-5 h-5" /> : <PauseCircleIcon className="w-5 h-5" />}
-                            {isAutoSaveEnabled ? "Auto-Save ON" : "Auto-Save OFF"}
-                        </button>
-                        <button
-                            onClick={() => setIsMetricsDashboardOpen(true)}
-                            className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                            title="Ver dashboard de métricas de tokens"
-                        >
-                            <ChartBarIcon className="w-5 h-5" />
-                            Métricas
-                        </button>
-                        <button
-                            onClick={() => setIsSkillsDashboardOpen(true)}
-                            className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]"
-                            title="Gestionar Agent Skills"
-                        >
-                            <SparklesIcon className="w-5 h-5" />
-                            Skills
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <button onClick={handleOpenHistory} className="glass-button flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl" title="Ver tu biblioteca de prompts guardados.">
-                            <BookOpenIcon className="w-4 h-4" />
-                            Historial
-                        </button>
-                        <button
-                            ref={settingsButtonRef}
-                            onClick={() => setIsSettingsOpen(prev => !prev)}
-                            className={`glass-button flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl ${isSettingsOpen ? 'border-purple-400/50 text-purple-200 shadow-[0_0_15px_rgba(192,132,252,0.3)]' : ''}`}
-                            title="Configura el modelo de IA."
-                        >
-                            <WrenchScrewdriverIcon className="w-4 h-4" />
-                            Ajustes
-                        </button>
-                    </div>
-                </header>
-
-                {isSettingsOpen && (
-                    <ModelSettingsPanel
-                        isOpen={isSettingsOpen}
-                        onClose={() => setIsSettingsOpen(false)}
-                        anchorRef={settingsButtonRef}
-                        disabled={isSaving}
-                        {...allModelSettings}
-                    />
+                            <div className="p-5 border-b border-white/10 flex items-center gap-4">
+                                <SearchIcon className="w-6 h-6 text-teal-400" />
+                                <input 
+                                    autoFocus
+                                    placeholder="¿Qué quieres hacer hoy? Busca comandos..."
+                                    className="bg-transparent border-none outline-none text-white w-full text-xl placeholder:text-gray-600"
+                                    value={commandSearch}
+                                    onChange={e => setCommandSearch(e.target.value)}
+                                />
+                                <div className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] text-gray-500 font-mono">
+                                    <span className="text-xs">⌘</span>K
+                                </div>
+                            </div>
+                            <div className="max-h-[60vh] overflow-y-auto p-3 space-y-1">
+                                {filteredCommands.map((action) => (
+                                    <button 
+                                        key={action.id}
+                                        onClick={() => { action.onRun(); setIsCommandPaletteOpen(false); }}
+                                        className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all group text-left border border-transparent hover:border-white/5"
+                                    >
+                                        <div className={`p-3 rounded-xl bg-${action.color}-500/10 text-${action.color}-400 border border-${action.color}-500/20 group-hover:scale-110 transition-transform shadow-lg`}>
+                                            {action.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-base font-bold text-gray-200">{action.label}</div>
+                                            <div className="text-xs text-gray-500">{action.description}</div>
+                                        </div>
+                                        <div className="text-[10px] text-gray-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                            <span className="text-xs">↵</span> ENTER
+                                        </div>
+                                    </button>
+                                ))}
+                                {filteredCommands.length === 0 && (
+                                    <div className="p-12 text-center">
+                                        <SparklesIcon className="w-12 h-12 text-gray-700 mx-auto mb-4 animate-pulse" />
+                                        <div className="text-gray-500 text-sm">No se encontraron comandos para "{commandSearch}"</div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="p-4 bg-black/20 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                                <span>Laboratorio de Prompts v5.0</span>
+                                <div className="flex gap-4">
+                                    <span>↑↓ Navegar</span>
+                                    <span>↵ Ejecutar</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
                 )}
+                </AnimatePresence>
 
-                <main className="flex flex-col gap-10">
-                    <div className="w-full">
-                        <WorkflowPanel
-                            key={resetKey}
-                            ideaText={ideaText}
-                            onIdeaChange={setIdeaText}
-                            useCase={useCase}
-                            onUseCaseChange={setUseCase}
-                            files={files}
-                            onFilesChange={setFiles}
-                            
-                            generatedPrompt={generatedPrompt}
-                            setGeneratedPrompt={setGeneratedPrompt}
-                            selectedFrameworkAcronym={selectedFrameworkAcronym}
-                            setSelectedFrameworkAcronym={setSelectedFrameworkAcronym}
-                            generatedSources={generatedSources}
-                            setGeneratedSources={setGeneratedSources}
+                <div className="max-w-[1920px] mx-auto px-4 py-6 md:px-8 md:py-8">
+                    <main className="animate-fade-in min-h-[90vh]">
+                        <AnimatePresence mode="wait">
+                            {currentView === 'home' && (
+                                <motion.div 
+                                    key="home"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8"
+                                >
+                                    {/* Left Column: Workflow (Idea, Use Case, Files) */}
+                                    <div className="xl:col-span-7 space-y-6 md:space-y-8">
+                                        <WorkflowPanel
+                                            key={resetKey}
+                                            ideaText={ideaText}
+                                            onIdeaChange={setIdeaText}
+                                            useCase={useCase}
+                                            onUseCaseChange={setUseCase}
+                                            files={files}
+                                            onFilesChange={setFiles}
+                                            
+                                            generatedPrompt={generatedPrompt}
+                                            setGeneratedPrompt={setGeneratedPrompt}
+                                            selectedFrameworkAcronym={selectedFrameworkAcronym}
+                                            setSelectedFrameworkAcronym={setSelectedFrameworkAcronym}
+                                            generatedSources={generatedSources}
+                                            setGeneratedSources={setGeneratedSources}
 
-                            onSavePrompt={(data) => handleSavePrompt(data, false)} 
-                            onTestInArena={handleTestInArena}
-                            onBatchTest={handleOpenBatchTesting}
-                            onModelBattle={handleStartModelBattle}
-                            isSaving={isSaving}
-                            promptToIterateId={promptToIterateId}
-                            savedPrompts={savedPrompts}
-                            onCancelIteration={handleCancelIteration}
-                            // Metrics handler
-                            onTokenUsageReceived={handleTokenUsage}
-                            {...allModelSettings}
-                            onRenameSession={handleRenameSession}
-                            onDeleteSession={handleDeletePrompt}
-                         />
-                    </div>
-                    <div className="w-full">
-                         <KnowledgePanel 
-                            activeTab={activeTab} 
-                            onTabChange={setActiveTab} 
-                            savedPrompts={savedPrompts}
-                            customFrameworks={customFrameworks}
-                            onAddCustomFramework={handleAddCustomFramework}
-                            onDeletePrompt={handleDeletePrompt}
-                            onDeleteVersion={handleDeleteVersion}
-                            onIteratePrompt={handleSetPromptToIterate}
-                            onSelectFrameworkForBuild={handleSelectFrameworkForBuild}
-                            onToggleFrameworkForCompare={handleToggleFrameworkForCompare}
-                            frameworksInCompareList={frameworksToCompare.map(f => f.id)}
-                            onExportPrompt={handleExportPrompt}
-                            currentModel={selectedModel}
-                            onTokenUsageReceived={handleTokenUsage}
-                            onRenamePrompt={handleRenameSession}
-                         />
-                    </div>
+                                            onSavePrompt={(data, forceDraft) => handleSavePrompt(data, false, undefined, forceDraft)} 
+                                            onTestInArena={handleTestInArena}
+                                            onBatchTest={handleOpenBatchTesting}
+                                            onModelBattle={handleStartModelBattle}
+                                            isSaving={isSaving}
+                                            promptToIterateId={promptToIterateId}
+                                            savedPrompts={savedPrompts}
+                                            onCancelIteration={handleCancelIteration}
+                                            onRenameSession={handleRenameSession}
+                                            onDeleteSession={handleDeletePrompt}
+                                            onTokenUsageReceived={handleTokenUsage}
+                                            {...allModelSettings}
+                                        />
+                                    </div>
+
+                                    {/* Right Column: Knowledge & History */}
+                                    <div className="xl:col-span-5 space-y-6 md:space-y-8">
+                                        <KnowledgePanel 
+                                            activeTab={activeTab} 
+                                            onTabChange={setActiveTab} 
+                                            savedPrompts={savedPrompts}
+                                            customFrameworks={customFrameworks}
+                                            onAddCustomFramework={handleAddCustomFramework}
+                                            onDeletePrompt={handleDeletePrompt}
+                                            onDeleteVersion={handleDeleteVersion}
+                                            onIteratePrompt={handleSetPromptToIterate}
+                                            onSelectFrameworkForBuild={handleSelectFrameworkForBuild}
+                                            onToggleFrameworkForCompare={handleToggleFrameworkForCompare}
+                                            frameworksInCompareList={frameworksToCompare.map(f => f.id)}
+                                            onExportPrompt={handleExportPrompt}
+                                            currentModel={selectedModel}
+                                            onTokenUsageReceived={handleTokenUsage}
+                                            onRenamePrompt={handleRenameSession}
+                                        />
+                                    </div>
+                                </motion.div>
+                            )}
+
+                        {currentView === 'arena' && (
+                            <motion.div 
+                                key="arena"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <ArenaModal 
+                                    onClose={() => setCurrentView('home')}
+                                    testConfig={!arenaBattleConfig && frameworksToCompare.length === 0 ? { prompt: arenaTestPrompt } : undefined}
+                                    compareConfig={!arenaBattleConfig && frameworksToCompare.length > 0 ? { frameworks: frameworksToCompare, idea: ideaText, useCase: useCase } : undefined}
+                                    battleConfig={arenaBattleConfig}
+                                    onTokenUsageReceived={handleTokenUsage}
+                                    inlineMode={true}
+                                    {...allModelSettings}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'batch' && (
+                            <motion.div 
+                                key="batch"
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -50 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <BatchTestingModal
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    initialPrompt={batchInitialPrompt}
+                                    inlineMode={true}
+                                    {...allModelSettings}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'metrics' && (
+                            <motion.div 
+                                key="metrics"
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 50 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <TokenUsageDashboard 
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    history={tokenUsageHistory}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'history' && (
+                            <motion.div 
+                                key="history"
+                                initial={{ opacity: 0, filter: 'blur(10px)' }}
+                                animate={{ opacity: 1, filter: 'blur(0px)' }}
+                                exit={{ opacity: 0, filter: 'blur(10px)' }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <HistoryDashboard
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    savedPrompts={savedPrompts}
+                                    onDeletePrompt={handleDeletePrompt}
+                                    onDeleteVersion={handleDeleteVersion}
+                                    onIteratePrompt={(p) => { handleSetPromptToIterate(p); setCurrentView('home'); }}
+                                    onExportPrompt={handleExportPrompt}
+                                    onRenamePrompt={handleRenameSession}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'skills' && (
+                            <motion.div 
+                                key="skills"
+                                initial={{ opacity: 0, rotateX: 45 }}
+                                animate={{ opacity: 1, rotateX: 0 }}
+                                exit={{ opacity: 0, rotateX: -45 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <AgentSkillsDashboard
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    agentSkills={agentSkills}
+                                    setAgentSkills={setAgentSkills}
+                                    apiKey={process.env.GEMINI_API_KEY || null}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </main>
             </div>
+
+            {/* Modals & Overlays */}
+            {isSettingsOpen && (
+                <ModelSettingsPanel
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                    anchorRef={settingsButtonRef}
+                    disabled={isSaving}
+                    {...allModelSettings}
+                />
+            )}
+
             {frameworksToCompare.length > 0 && (
                 <ComparisonTray 
                     frameworks={frameworksToCompare}
@@ -906,6 +1032,7 @@ const App: React.FC = () => {
                     onClear={handleClearCompare}
                 />
             )}
+
             {isArenaOpen && (
                 <ArenaModal 
                     onClose={closeArena}
@@ -916,7 +1043,8 @@ const App: React.FC = () => {
                     {...allModelSettings}
                 />
             )}
-             {isBatchModalOpen && (
+
+            {isBatchModalOpen && (
                 <BatchTestingModal
                     isOpen={isBatchModalOpen}
                     onClose={() => setIsBatchModalOpen(false)}
@@ -924,6 +1052,7 @@ const App: React.FC = () => {
                     {...allModelSettings}
                 />
             )}
+
             {builderCanvasState.isOpen && builderCanvasState.framework && (
                 <BuilderCanvas
                     framework={builderCanvasState.framework}
@@ -931,12 +1060,14 @@ const App: React.FC = () => {
                     onSendToWorkflow={handleBuildCompleteInCanvas}
                 />
             )}
-             {exportModalState.isOpen && exportModalState.prompt && (
+
+            {exportModalState.isOpen && exportModalState.prompt && (
                 <ExportModal
                     prompt={exportModalState.prompt}
                     onClose={() => setExportModalState({ isOpen: false, prompt: null })}
                 />
             )}
+
             {isSafetyModalOpen && (
                 <SafetySettingsModal
                     isOpen={isSafetyModalOpen}
@@ -945,11 +1076,13 @@ const App: React.FC = () => {
                     onSettingsChange={setSafetySettings}
                 />
             )}
+
             <TokenUsageDashboard 
                 isOpen={isMetricsDashboardOpen}
                 onClose={() => setIsMetricsDashboardOpen(false)}
                 history={tokenUsageHistory}
             />
+
             <SessionNamingModal
                 isOpen={sessionNamingState.isOpen}
                 onClose={() => setSessionNamingState(prev => ({ ...prev, isOpen: false }))}
@@ -958,6 +1091,7 @@ const App: React.FC = () => {
                 initialName={sessionNamingState.initialName}
                 isRenameMode={sessionNamingState.isRenameMode}
             />
+
             <HistoryDashboard
                 isOpen={isHistoryDashboardOpen}
                 onClose={() => setIsHistoryDashboardOpen(false)}
@@ -968,18 +1102,21 @@ const App: React.FC = () => {
                 onExportPrompt={handleExportPrompt}
                 onRenamePrompt={handleRenameSession}
             />
+
             <AgentSkillsDashboard
                 isOpen={isSkillsDashboardOpen}
                 onClose={() => setIsSkillsDashboardOpen(false)}
                 agentSkills={agentSkills}
                 setAgentSkills={setAgentSkills}
-                apiKey={process.env.API_KEY || null}
+                apiKey={process.env.GEMINI_API_KEY || null}
             />
+
             <CreateSessionDashboardModal
                 isOpen={isCreateSessionModalOpen}
                 onClose={() => setIsCreateSessionModalOpen(false)}
                 onCreateSession={confirmCreateSession}
             />
+
             <ActionDashboardModal
                 isOpen={processDashboardState.isOpen}
                 onClose={() => setProcessDashboardState({ ...processDashboardState, isOpen: false })}
@@ -989,15 +1126,25 @@ const App: React.FC = () => {
                 onComplete={() => {}}
                 localAction={() => {
                     if (processDashboardState.actionType === 'create_session') {
-                        // This is now handled directly by the button opening the CreateSessionDashboardModal
-                        // But we keep it here just in case
                         handleCreateSession();
                     } else if (processDashboardState.actionType === 'save') {
-                        handleGlobalSave(false);
+                        const isDraft = !generatedPrompt;
+                        handleGlobalSave(false, undefined, isDraft);
                     }
                 }}
             />
+
+            <AnimatePresence>
+                {notification.isVisible && (
+                    <Toast
+                        message={notification.message}
+                        type={notification.type}
+                        onClose={hideNotification}
+                    />
+                )}
+            </AnimatePresence>
         </div>
+    </div>
     );
 };
 

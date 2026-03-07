@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Framework } from '../../types';
 import { XMarkIcon, ChevronDownIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from './Icons';
 import { FRAMEWORKS } from '../../config/constants';
@@ -94,7 +95,7 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
         onSendToWorkflow(promptText);
     };
 
-    return (
+    return createPortal(
         <div 
             ref={canvasRef}
             className="fixed inset-0 bg-slate-900 z-50 flex animate-fade-in" 
@@ -173,7 +174,8 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
                     </button>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

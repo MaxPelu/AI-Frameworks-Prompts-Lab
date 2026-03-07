@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, ClipboardIcon, CheckIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from './Icons';
 
 interface CanvasModalProps {
@@ -59,7 +60,7 @@ const CanvasModal: React.FC<CanvasModalProps> = ({ title, content, isEditable, o
         setTimeout(() => setCopied(false), 2000);
     };
 
-    return (
+    return createPortal(
         <div 
             ref={modalRef}
             className="fixed inset-0 bg-slate-900 z-50 flex animate-fade-in" 
@@ -107,7 +108,8 @@ const CanvasModal: React.FC<CanvasModalProps> = ({ title, content, isEditable, o
                     )}
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

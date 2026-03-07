@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { SavedPrompt, GeminiModel } from '../../types';
 import { XMarkIcon, ClipboardIcon, CheckIcon, ArrowDownTrayIcon } from './Icons.tsx';
 // A simple syntax highlighter is needed for display. We'll use CSS classes for basic highlighting.
@@ -17,10 +18,10 @@ const escapeStringForPythonTripleQuote = (str: string) => {
 const getJsCode = (prompt: string, model: GeminiModel) => `
 import { GoogleGenAI } from "@google/genai";
 
-// Asegúrate de que process.env.API_KEY esté disponible
-const API_KEY = process.env.API_KEY;
+// Asegúrate de que process.env.GEMINI_API_KEY esté disponible
+const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
-  throw new Error("API_KEY no encontrada en las variables de entorno");
+  throw new Error("GEMINI_API_KEY no encontrada en las variables de entorno");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -47,10 +48,10 @@ const getPythonCode = (prompt: string, model: GeminiModel) => `
 import os
 import google.generativeai as genai
 
-# Asegúrate de que la variable de entorno API_KEY esté configurada
-api_key = os.environ.get("API_KEY")
+# Asegúrate de que la variable de entorno GEMINI_API_KEY esté configurada
+api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
-    raise ValueError("La variable de entorno API_KEY no está configurada.")
+    raise ValueError("La variable de entorno GEMINI_API_KEY no está configurada.")
 
 genai.configure(api_key=api_key)
 
@@ -163,7 +164,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
         URL.revokeObjectURL(url);
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col p-6">
                  <header className="flex justify-between items-center mb-4">
@@ -219,7 +220,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
                     </button>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

@@ -1,4 +1,4 @@
-# Código de Conducta para Contribuyentes (v4.0.0)
+# Código de Conducta para Contribuyentes (v4.2.0)
 
 ## Nuestro Compromiso
 

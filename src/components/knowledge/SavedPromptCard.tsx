@@ -52,6 +52,9 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
               <span className="font-semibold text-teal-400 drop-shadow-sm">{latestVersion.frameworkAcronym}</span>
               <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
               <span className="font-semibold text-indigo-300 drop-shadow-sm">{latestVersion.model}</span>
+              {latestVersion.isDraft && (
+                  <span className="ml-2 px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-md text-[10px] font-black uppercase tracking-tighter">Borrador</span>
+              )}
               {prompt.versions.length > 1 && (
                    <span className="ml-2 px-1.5 py-0.5 bg-white/10 rounded-md text-[10px] text-gray-300 border border-white/5">{prompt.versions.length} versiones</span>
               )}
@@ -127,6 +130,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
                     <div className="flex items-center gap-2">
                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${isLatest ? 'bg-teal-500/20 border-teal-500/40 text-teal-300' : 'bg-white/5 border-white/10 text-gray-400'}`}>v{versionNumber}</span>
                          <span className="text-xs text-gray-500">{new Date(version.createdAt).toLocaleTimeString()}</span>
+                         {version.isDraft && <span className="text-[10px] bg-orange-500/10 text-orange-400 border border-orange-500/20 px-1.5 rounded ml-1">BORRADOR</span>}
                          {isLatest && <span className="text-[10px] text-teal-500 font-medium ml-1 tracking-wide">ACTUAL</span>}
                     </div>
                     <div className="flex items-center gap-1 opacity-60 group-hover/version:opacity-100 transition-opacity">

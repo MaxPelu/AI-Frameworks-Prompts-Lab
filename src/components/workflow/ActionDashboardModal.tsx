@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Framework, GeminiModel, UploadedFile, TokenUsage } from '../../types/index.ts';
+import { createPortal } from 'react-dom';
+import { Framework, GeminiModel, UploadedFile, TokenUsage, ALL_GEMINI_MODELS } from '../../types/index.ts';
 import { XCircleIcon, SparklesIcon, CheckCircleIcon, ArrowPathIcon, DocumentTextIcon, CpuChipIcon, ListBulletIcon, PlayIcon, ArrowsPointingOutIcon, WrenchScrewdriverIcon, GlobeAltIcon, TableCellsIcon, SaveDiskIcon, ClipboardIcon, CloudArrowUpIcon, BookOpenIcon, ArrowDownTrayIcon, ArrowsRightLeftIcon, ClockIcon, AdjustmentsHorizontalIcon, BeakerIcon } from '../shared/Icons.tsx';
 import { optimizePrompt, expandIdea, ModelSettings, quickRefine, modifyContentLength } from '../../lib/geminiService.ts';
 
@@ -81,7 +82,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
         { id: 'technical', name: 'Técnico', prompt: 'Sé preciso, técnico y directo al grano.' }
     ];
 
-    const MODELS: GeminiModel[] = ['gemini-3-pro-preview', 'gemini-3-flash-preview', 'gemini-2.5-flash-latest', 'gemma-3-27b-it'];
+    const MODELS: GeminiModel[] = ALL_GEMINI_MODELS;
 
     const addLog = (message: string, type: LogEntry['type'] = 'info') => {
         setLogs(prev => [...prev, { timestamp: new Date(), message, type }]);
@@ -107,7 +108,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
             case 'fix': return { title: 'Corrección Ortográfica', icon: <WrenchScrewdriverIcon className="w-6 h-6" />, color: 'blue' };
             case 'translate': return { title: 'Traducción', icon: <GlobeAltIcon className="w-6 h-6" />, color: 'green' };
             case 'simplify': return { title: 'Simplificación', icon: <TableCellsIcon className="w-6 h-6" />, color: 'yellow' };
-            case 'save': return { title: 'Guardado de Sesión', icon: <SaveDiskIcon className="w-6 h-6" />, color: 'orange' };
+            case 'save': return { title: 'Gestión de Guardado', icon: <SaveDiskIcon className="w-6 h-6" />, color: 'orange' };
             case 'copy': return { title: 'Copiado al Portapapeles', icon: <ClipboardIcon className="w-6 h-6" />, color: 'teal' };
             case 'create_session': return { title: 'Nueva Sesión', icon: <SparklesIcon className="w-6 h-6" />, color: 'sky' };
             default: return { title: 'Procesando...', icon: <CpuChipIcon className="w-6 h-6" />, color: 'gray' };
@@ -159,6 +160,14 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
             } else if (actionType === 'simplify') {
                 addLog('Simplificando el contenido...', 'info');
                 response = await modifyContentLength(ideaText, 'simple', modifiedSettings);
+            } else if (actionType === 'save') {
+                addLog('Preparando guardado de sesión...', 'info');
+                if (localAction) {
+                    localAction();
+                    addLog('Sesión procesada correctamente.', 'success');
+                }
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                response = { text: 'Tu trabajo ha sido guardado exitosamente en el historial. Puedes acceder a él desde la biblioteca en cualquier momento.', usage: undefined };
             } else {
                 // Local actions
                 addLog('Ejecutando acción local...', 'info');
@@ -218,7 +227,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
 
     const details = getActionDetails();
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
             <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
@@ -512,7 +521,8 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -11,7 +11,12 @@ export const CATEGORIES: string[] = [
   "Ética, Seguridad y Fiabilidad",
   "Arquitecturas Cognitivas y Memoria",
   "Programación, Matemáticas y Análisis de Datos",
-  "Educación, Creatividad y Dominios Especializados"
+  "Educación, Creatividad y Dominios Especializados",
+  "Ciberseguridad",
+  "Ingeniería de Contexto",
+  "Operaciones de IA",
+  "Marketing y Growth",
+  "Educación y Aprendizaje"
 ];
 
 export const ROMAN_NUMERALS: string[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -118,7 +123,12 @@ export const CATEGORIZED_USE_CASES: UseCaseCategory[] = [
             "Generar ejemplos prácticos para un concepto matemático",
             "Crear un resumen de un capítulo de un libro de texto",
             "Proporcionar retroalimentación constructiva sobre un escrito",
-            "Traducir un poema conservando su significado y estilo"
+            "Traducir un poema conservando su significado y estilo",
+            "Diseñar un plan de estudios basado en la Taxonomía de Bloom",
+            "Crear actividades de aprendizaje activo para una clase",
+            "Redactar rúbricas de evaluación para un proyecto",
+            "Generar analogías para explicar conceptos complejos",
+            "Estructurar un módulo de microlearning interactivo"
         ]
     },
     {
@@ -162,7 +172,48 @@ export const CATEGORIZED_USE_CASES: UseCaseCategory[] = [
             "Redactar un mensaje para resolver un conflicto personal",
             "Sugerir actividades para reducir el estrés"
         ]
-    }
+    },
+    {
+        category: "Ciberseguridad",
+        useCases: [
+            "Analizar un reporte de vulnerabilidades y sugerir mitigaciones",
+            "Redactar una política de seguridad de la información",
+            "Simular un escenario de phishing para entrenamiento",
+            "Generar un plan de respuesta a incidentes cibernéticos",
+            "Evaluar la arquitectura de red para identificar riesgos"
+        ]
+    },
+    {
+        category: "Ingeniería de Contexto",
+        useCases: [
+            "Diseñar una estrategia de chunking para documentos largos",
+            "Optimizar un prompt para mejorar la recuperación en RAG",
+            "Generar preguntas hipotéticas para mejorar embeddings (HyDE)",
+            "Crear un flujo de evaluación para un sistema RAG",
+            "Estructurar metadatos para mejorar la búsqueda semántica"
+        ]
+    },
+    {
+        category: "Operaciones de IA",
+        useCases: [
+            "Diseñar un pipeline de evaluación continua para LLMs",
+            "Crear un plan de monitoreo de métricas de calidad de IA",
+            "Redactar un playbook para el despliegue de modelos en producción",
+            "Generar casos de prueba automatizados para un chatbot",
+            "Estructurar un sistema de feedback loop para mejorar el modelo"
+        ]
+    },
+    {
+        category: "Marketing y Growth",
+        useCases: [
+            "Diseñar un embudo de conversión para un nuevo producto",
+            "Crear una estrategia de retención de usuarios (AARRR)",
+            "Redactar copy persuasivo usando el framework PAS",
+            "Generar ideas para un programa de referidos",
+            "Estructurar una campaña de email marketing automatizada"
+        ]
+    },
+
 ];
 
 export const USE_CASES: string[] = CATEGORIZED_USE_CASES.flatMap(cat => cat.useCases);
@@ -177,6 +228,10 @@ export const FRAMEWORK_RECOMMENDATIONS_BY_CATEGORY: { [key: string]: string } = 
   "Análisis de Datos": "stats",
   "Diseño y Creatividad": "spark",
   "Vida Personal y Bienestar": "guide",
+  "Ciberseguridad": "NIST-CSF",
+  "Ingeniería de Contexto": "RAG-Fusion",
+  "Operaciones de IA": "RAGAS",
+  "Marketing y Growth": "AIDA",
   "Default": "race" 
 };
 

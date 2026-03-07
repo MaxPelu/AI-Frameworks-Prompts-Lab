@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { QualityAnalysisResult } from '../../types';
 import { XMarkIcon, SparklesIcon, ShieldCheckIcon, BeakerIcon, LightBulbIcon, ScaleIcon, AcademicCapIcon, CheckIcon } from './Icons.tsx';
 import { Chart, registerables } from 'chart.js';
@@ -155,7 +156,7 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
             <div className="bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)] w-full max-w-6xl h-[92vh] flex flex-col overflow-hidden ring-1 ring-white/5">
                 
@@ -308,7 +309,8 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                     </div>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

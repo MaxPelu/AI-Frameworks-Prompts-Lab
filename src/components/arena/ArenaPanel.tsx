@@ -25,6 +25,10 @@ interface ArenaPanelProps {
     onTopPChange: (topP: number) => void;
     topK: number;
     onTopKChange: (k: number) => void;
+    frequencyPenalty: number;
+    onFrequencyPenaltyChange: (penalty: number) => void;
+    presencePenalty: number;
+    onPresencePenaltyChange: (penalty: number) => void;
     maxOutputTokens: number;
     onMaxOutputTokensChange: (tokens: number) => void;
     systemInstruction: string;
@@ -43,6 +47,8 @@ interface ArenaPanelProps {
     onUseGoogleSearchChange: (use: boolean) => void;
     isStructuredOutputEnabled: boolean;
     onIsStructuredOutputEnabledChange: (enabled: boolean) => void;
+    responseSchema: string;
+    onResponseSchemaChange: (schema: string) => void;
     isCodeExecutionEnabled: boolean;
     onIsCodeExecutionEnabledChange: (enabled: boolean) => void;
     isFunctionCallingEnabled: boolean;
@@ -128,6 +134,8 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         temperature: modelSettings.temperature,
         topP: modelSettings.topP,
         topK: modelSettings.topK,
+        frequencyPenalty: modelSettings.frequencyPenalty,
+        presencePenalty: modelSettings.presencePenalty,
         maxOutputTokens: modelSettings.maxOutputTokens,
         systemInstruction: modelSettings.systemInstruction,
         systemInstructionFiles: modelSettings.systemInstructionFiles,
@@ -136,6 +144,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         thinkingBudget: modelSettings.thinkingBudget,
         useGoogleSearch: modelSettings.useGoogleSearch,
         isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+        responseSchema: modelSettings.responseSchema,
         isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
         isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
         safetySettings: modelSettings.safetySettings,

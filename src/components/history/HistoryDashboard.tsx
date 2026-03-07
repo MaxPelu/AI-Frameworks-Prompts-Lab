@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { SavedPrompt, GeminiModel } from '../../types/index.ts';
 import SavedPromptCard from '../knowledge/SavedPromptCard.tsx';
 import { XMarkIcon, SearchIcon, BookOpenIcon, TrashIcon } from '../shared/Icons.tsx';
@@ -38,7 +39,7 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex flex-col animate-fade-in">
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/50">
@@ -107,7 +108,8 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

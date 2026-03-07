@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { XCircleIcon, SparklesIcon, DocumentTextIcon, UserIcon, CodeBracketIcon, ShieldCheckIcon, ChartBarIcon, BriefcaseIcon, WrenchScrewdriverIcon, PencilSquareIcon, ServerIcon, MagnifyingGlassIcon, PaintBrushIcon, PresentationChartLineIcon, ComputerDesktopIcon, CommandLineIcon, BugAntIcon, ClockIcon, MegaphoneIcon, BookOpenIcon, LightBulbIcon, CpuChipIcon, CircleStackIcon, PhoneIcon } from '../shared/Icons.tsx';
 
 export interface SessionTemplate {
@@ -207,7 +208,7 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
         onCreateSession(template);
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
             <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
@@ -338,7 +339,8 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

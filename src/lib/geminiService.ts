@@ -8,14 +8,14 @@ import { CODING_FRAMEWORKS } from '../config/codingConstants.ts';
 import { BUSINESS_FRAMEWORKS } from '../config/businessConstants.ts';
 import { DATA_FRAMEWORKS } from '../config/dataConstants.ts';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 export const IS_API_KEY_AVAILABLE = !!API_KEY;
 
 const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 if (!ai) {
-  console.warn("API_KEY environment variable not set. Gemini features will not work.");
+  console.warn("GEMINI_API_KEY environment variable not set. Gemini features will not work.");
 }
 
 const ALL_FRAMEWORKS_LIST = [
@@ -37,13 +37,24 @@ const resolveModel = (model: string): string => {
         'gemini-3-visual-layout': 'gemini-3-flash-preview',
         'gemini-3.1-pro-preview': 'gemini-3.1-pro-preview',
         'gemini-3.1-pro-preview-low': 'gemini-3.1-pro-preview',
+        'gemini-3.1-pro-preview-medium': 'gemini-3.1-pro-preview',
         'gemini-3.1-pro-preview-high': 'gemini-3.1-pro-preview',
+        'gemini-3.1-pro-preview-super-high': 'gemini-3.1-pro-preview',
         'gemini-3-pro-preview': 'gemini-3-pro-preview',
         'gemini-3-pro-preview-low': 'gemini-3-pro-preview',
+        'gemini-3-pro-preview-medium': 'gemini-3-pro-preview',
         'gemini-3-pro-preview-high': 'gemini-3-pro-preview',
+        'gemini-3-pro-preview-super-high': 'gemini-3-pro-preview',
         'gemini-3-flash-preview': 'gemini-3-flash-preview',
         'gemini-3-flash-preview-low': 'gemini-3-flash-preview',
+        'gemini-3-flash-preview-medium': 'gemini-3-flash-preview',
         'gemini-3-flash-preview-high': 'gemini-3-flash-preview',
+        'gemini-3-flash-preview-super-high': 'gemini-3-flash-preview',
+        'gemini-3.1-flash-lite-preview': 'gemini-3.1-flash-lite-preview',
+        'gemini-3.1-flash-lite-preview-low': 'gemini-3.1-flash-lite-preview',
+        'gemini-3.1-flash-lite-preview-medium': 'gemini-3.1-flash-lite-preview',
+        'gemini-3.1-flash-lite-preview-high': 'gemini-3.1-flash-lite-preview',
+        'gemini-3.1-flash-lite-preview-super-high': 'gemini-3.1-flash-lite-preview',
         'gemini-2.5-pro-latest': 'gemini-2.5-pro-latest',
         'gemini-2.5-flash-latest': 'gemini-2.5-flash-latest',
         'gemini-2.5-flash-lite-latest': 'gemini-2.5-flash-lite-latest',
@@ -260,7 +271,7 @@ const buildConfig = (settings: ModelSettings, overrideJsonMode: boolean = false)
         if (config.maxOutputTokens && config.maxOutputTokens <= config.thinkingConfig.thinkingBudget) {
              config.maxOutputTokens = config.thinkingConfig.thinkingBudget + 2048; // Ensure buffer
         }
-    } else if (settings.selectedModel.endsWith('-low') || settings.selectedModel.endsWith('-high')) {
+    } else if (settings.selectedModel.match(/-(low|medium|high|super-high)$/)) {
         config.thinkingConfig = {
             thinkingLevel: settings.selectedModel.endsWith('-low') ? ThinkingLevel.LOW : ThinkingLevel.HIGH
         };

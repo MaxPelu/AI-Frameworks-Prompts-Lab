@@ -1,5 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { GeminiModel, UploadedFile, PresetConfig, ModelConfig, AgentSkill } from '../../types/index.ts';
 import { XCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, SparklesIcon, BeakerIcon, ShieldCheckIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, ArrowPathIcon, Bars3BottomLeftIcon, TrashIcon, CheckIcon, KeyIcon, ScaleIcon, UsersIcon, GlobeAltIcon, PauseCircleIcon, PlusIcon, PencilIcon, WrenchScrewdriverIcon } from './Icons.tsx';
 import FileUploader from '../workflow/FileUploader.tsx';
@@ -405,7 +406,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
     const isThinkingSupported = settings.selectedModel.includes('gemini-2.5') || settings.selectedModel.includes('gemini-3') || settings.selectedModel === 'gemini-2.5-flash-lite-latest' || settings.selectedModel === 'gemini-agent' || settings.selectedModel === 'google-antigravity-engine';
     const isNativeAudioSupported = settings.selectedModel === 'gemini-2.5-flash-native-audio-preview-09-2025';
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
             <div ref={panelRef} className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-[3rem] border border-white/10 shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-white/5">
                 {/* --- HEADER & PRESETS --- */}
@@ -500,28 +501,89 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                         <section>
                             <SectionHeader title="Model Selection" icon={<SparklesIcon className="w-4 h-4" />} />
                             
-                            {/* GEMINI 3 SERIES */}
-                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 3.0 & 3.1 (Frontier)</div>
+                            {/* GEMINI 3.1 SERIES */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 3.1 (New Frontier)</div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
                                 <ModelButton id="gemini-3.1-pro-preview" label="3.1 Pro" sub="Reasoning SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3.1-pro-preview-low" label="3.1 Pro (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-pro-preview-medium" label="3.1 Pro (Med)" sub="Med Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3.1-pro-preview-high" label="3.1 Pro (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-pro-preview-super-high" label="3.1 Pro (Super)" sub="Max Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                
+                                <ModelButton id="gemini-3.1-flash-lite-preview" label="3.1 Flash Lite" sub="Speed/Cost" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-flash-lite-preview-low" label="3.1 Lite (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-flash-lite-preview-medium" label="3.1 Lite (Med)" sub="Med Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-flash-lite-preview-high" label="3.1 Lite (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-flash-lite-preview-super-high" label="3.1 Lite (Super)" sub="Max Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                            </div>
+
+                            {/* GEMINI 3.0 SERIES */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 3.0 (Frontier)</div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
                                 <ModelButton id="gemini-3-pro-preview" label="3 Pro" sub="Reasoning SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-pro-preview-low" label="3 Pro (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-pro-preview-medium" label="3 Pro (Med)" sub="Med Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-pro-preview-high" label="3 Pro (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-pro-preview-super-high" label="3 Pro (Super)" sub="Max Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+
                                 <ModelButton id="gemini-3-flash-preview" label="3 Flash" sub="Speed SOTA" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-flash-preview-low" label="3 Flash (Low)" sub="Low Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-flash-preview-medium" label="3 Flash (Med)" sub="Med Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-3-flash-preview-high" label="3 Flash (High)" sub="High Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-flash-preview-super-high" label="3 Flash (Super)" sub="Max Thinking" highlight current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                
                                 <ModelButton id="gemini-3-deep-think-preview" label="Deep Think" sub="Math/Code" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-visual-layout" label="Visual Layout" sub="Spatial" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                             </div>
 
                             {/* GEMINI 2.5 SERIES */}
                             <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 2.5 (Performance)</div>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                                <ModelButton id="gemini-2.5-pro-latest" label="2.5 Pro" sub="Balanced" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-latest" label="2.5 Flash" sub="High Throughput" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-lite-latest" label="2.5 Lite" sub="Cost Efficient" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-native-audio-preview-09-2025" label="Native Audio" sub="Multimodal" colorClass="bg-pink-600/80 border-pink-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-pro-latest" label="2.5 Pro Latest" sub="Balanced" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-pro" label="2.5 Pro" sub="Stable" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-latest" label="2.5 Flash Latest" sub="High Throughput" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash" label="2.5 Flash" sub="Stable" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-lite-latest" label="2.5 Lite Latest" sub="Cost Efficient" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-8b" label="2.5 Flash 8B" sub="Small & Fast" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                            </div>
+
+                            {/* GEMINI 2.0 SERIES */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 2.0</div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                                <ModelButton id="gemini-2.0-pro-exp-02-05" label="2.0 Pro Exp" sub="Experimental" colorClass="bg-indigo-600/80 border-indigo-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.0-flash" label="2.0 Flash" sub="Stable" colorClass="bg-indigo-600/80 border-indigo-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.0-flash-lite-preview-02-05" label="2.0 Lite Prev" sub="Preview" colorClass="bg-indigo-600/80 border-indigo-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.0-flash-thinking-exp-01-21" label="2.0 Thinking" sub="Experimental" colorClass="bg-indigo-600/80 border-indigo-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                            </div>
+
+                            {/* LEGACY SERIES */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Legacy (1.5 & 1.0)</div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                                <ModelButton id="gemini-1.5-pro" label="1.5 Pro" sub="Legacy" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-1.5-flash" label="1.5 Flash" sub="Legacy" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-1.5-flash-8b" label="1.5 Flash 8B" sub="Legacy" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-1.0-pro" label="1.0 Pro" sub="Legacy" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                            </div>
+
+                            {/* MULTIMODAL & MEDIA */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Multimodal & Media</div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                                <ModelButton id="gemini-2.5-flash-native-audio-preview-09-2025" label="Audio 09-2025" sub="Native Audio" colorClass="bg-pink-600/80 border-pink-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-native-audio-preview-12-2025" label="Audio 12-2025" sub="Native Audio" colorClass="bg-pink-600/80 border-pink-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-preview-tts" label="TTS Preview" sub="Text to Speech" colorClass="bg-pink-600/80 border-pink-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-image" label="2.5 Image" sub="Image Gen" colorClass="bg-purple-600/80 border-purple-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3.1-flash-image-preview" label="3.1 Image" sub="Image Gen" colorClass="bg-purple-600/80 border-purple-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-3-pro-image-preview" label="3 Pro Image" sub="Image Gen" colorClass="bg-purple-600/80 border-purple-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="veo-3.1-fast-generate-preview" label="Veo Fast" sub="Video Gen" colorClass="bg-orange-600/80 border-orange-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="veo-3.1-generate-preview" label="Veo 3.1" sub="Video Gen" colorClass="bg-orange-600/80 border-orange-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="imagen-4.0-generate-001" label="Imagen 4.0" sub="Image Gen" colorClass="bg-purple-600/80 border-purple-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                            </div>
+
+                            {/* ALIASES */}
+                            <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Aliases</div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                                <ModelButton id="gemini-flash-latest" label="Flash Latest" sub="Alias" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-flash-lite-latest" label="Flash Lite Latest" sub="Alias" colorClass="bg-gray-600/80 border-gray-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                             </div>
 
                             {/* GEMMA & SPECIAL */}
@@ -531,6 +593,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                                 <ModelButton id="gemma-3-12b-it" label="Gemma 3" sub="12B Instruct" colorClass="bg-emerald-600/80 border-emerald-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemma-3-4b-it" label="Gemma 3" sub="4B Instruct" colorClass="bg-emerald-600/80 border-emerald-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                                 <ModelButton id="gemini-agent" label="Agentic" sub="Auto-Loop" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="google-antigravity-engine" label="Antigravity" sub="Engine" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                             </div>
                         </section>
 
@@ -946,7 +1009,8 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
             </div>
         </div>
     </div>
-</div>
+</div>,
+document.body
 );
 };
 

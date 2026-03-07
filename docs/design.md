@@ -1,5 +1,5 @@
 
-# Especificaciones de Diseño (UI/UX): Liquid Glass v4.0.0
+# Especificaciones de Diseño (UI/UX): Liquid Glass v4.2.0
 
 ## Concepto Visual: "Omni-Forge"
 La interfaz se expande para acomodar múltiples dominios de conocimiento sin perder la coherencia estética. El diseño "Liquid Glass" busca transmitir una sensación de tecnología avanzada, limpieza y enfoque profesional, utilizando transparencias, desenfoques de fondo (backdrop-blur) y bordes sutiles.
@@ -30,9 +30,14 @@ Para facilitar la navegación rápida y el reconocimiento cognitivo en la Biblio
 *   **KPIs**: Tarjetas de alto contraste para métricas críticas (Coste Estimado, Tokens Totales, Thinking Budget).
 *   **Pestañas**: Separación clara entre "Resumen General", "Uso por Modelo" y "Logs Detallados".
 
-#### 4. Panel de Flujo de Trabajo (`WorkflowPanel`)
+#### 4. Agent Skills Hub (`AgentSkillsDashboard`)
+*   **Estética**: "Neural-Forge" con gradientes Teal-Esmeralda.
+*   **Layout**: Diseño de panel dividido (Sidebar para lista de habilidades, Main para editor/generador).
+*   **Editor**: Integración de un editor de código minimalista con resaltado de sintaxis básico para diferentes lenguajes (.py, .json, .md).
+
+#### 5. Panel de Flujo de Trabajo (`WorkflowPanel`)
 *   **Estructura**: Diseño en columnas o paneles colapsables para manejar la complejidad de las opciones sin abrumar al usuario.
-*   **Controles de Modelo**: Sliders y toggles estilizados para configurar la temperatura, top-k, y el "Thinking Budget".
+*   **Controles de Modelo**: Sliders y toggles estilizados para configurar la temperatura, top-k, y el selector de "Thinking Level" con 4 niveles de intensidad (Low, Medium, High, Super High).
 *   **Feedback Visual**: Spinners y mensajes de estado claros durante las llamadas a la API de Gemini.
 
 ### Micro-Interacciones y Animaciones

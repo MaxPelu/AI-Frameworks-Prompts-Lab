@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { SaveDiskIcon, XMarkIcon } from './Icons.tsx';
 
 interface SessionNamingModalProps {
@@ -42,7 +43,7 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-[0_0_50px_rgba(99,102,241,0.2)] w-full max-w-md p-6 relative">
                 <button 
@@ -101,7 +102,8 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

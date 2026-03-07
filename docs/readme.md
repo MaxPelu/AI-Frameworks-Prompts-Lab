@@ -4,9 +4,9 @@
 **El Entorno de Desarrollo Integrado (IDE) definitivo para la Ingeniería de Prompts Avanzada, Orquestación de Agentes y Arquitectura de Datos.**
 
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
-![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%202.5%20%7C%20Gemma%203-indigo)
+![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.0.0-purple)
+![Version](https://img.shields.io/badge/Version-4.2.0-purple)
 
 ## 🌟 Visión General
 
@@ -14,7 +14,7 @@
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
 
-## 🚀 Características SOTA v4.0.0
+## 🚀 Características SOTA v4.2.0
 
 ### 1. Biblioteca de Conocimiento Omni-Dominio 📚
 Acceso instantáneo a frameworks especializados clasificados en 6 pilares fundamentales:
@@ -25,7 +25,13 @@ Acceso instantáneo a frameworks especializados clasificados en 6 pilares fundam
 *   **Negocios**: Estrategia corporativa y metodologías ágiles (OKR, Lean Startup, Wardley Mapping).
 *   **Data & SOTA**: Ingeniería de datos moderna y stacks 2026 (Data Mesh, Iceberg, Delta Lake).
 
-### 2. LLM Engineer Toolkit Integration 🛠️
+### 2. Agent Skills Hub 🧠
+Gestión avanzada de capacidades para agentes:
+*   **Repositorio de Habilidades**: Almacena y gestiona fragmentos de código, instrucciones de sistema y herramientas para diferentes modelos (Gemini, Claude, Codex).
+*   **Generación de Skills con IA**: Crea nuevas habilidades a partir de descripciones en lenguaje natural utilizando el motor de Gemini.
+*   **Importación/Exportación**: Soporte para múltiples formatos (.md, .json, .py, .yaml) para integrar habilidades en flujos de trabajo externos.
+
+### 3. LLM Engineer Toolkit Integration 🛠️
 Implementación de lógica y estructuras derivadas del estado del arte en ingeniería de IA:
 *   **Optimización de Modelos**: Soporte conceptual para Unsloth, Torchtune y vLLM.
 *   **Ingeniería Programática**: Frameworks como DSPy e Instructor para prompts deterministas y estructurados.
@@ -37,8 +43,8 @@ Implementación de lógica y estructuras derivadas del estado del arte en ingeni
 
 ### 4. Engine Room 2026 🧠
 Control total sobre la inferencia y el comportamiento del modelo:
-*   **Gemini 3.1 Series**: Pro (Razonamiento SOTA), Flash (Velocidad SOTA), Deep Think (Matemáticas/Código).
-*   **Thinking Config**: Presupuesto de tokens de pensamiento (Thinking Budget) para razonamiento complejo antes de la respuesta, permitiendo al modelo "pensar" antes de hablar.
+*   **Gemini 3.1 Series**: Pro (Razonamiento SOTA), Flash (Velocidad SOTA), Flash Lite (Eficiencia SOTA), Deep Think (Matemáticas/Código).
+*   **Thinking Config**: Control granular del presupuesto de tokens de pensamiento con niveles preestablecidos (Low, Medium, High, Super High) para razonamiento complejo antes de la respuesta, permitiendo al modelo "pensar" antes de hablar.
 *   **Ajuste Fino de Parámetros**: Control granular sobre Temperatura, Top-P, Top-K, Penalización de Frecuencia y Presencia.
 
 ### 5. Generative UI (GenUI) ✨

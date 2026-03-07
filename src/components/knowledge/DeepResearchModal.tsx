@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Framework, GeminiModel, TokenUsage } from '../../types';
 import { XMarkIcon, GlobeAltIcon, ArrowPathIcon, CheckIcon } from '../shared/Icons.tsx';
 import { performDeepResearch } from '../../lib/geminiService.ts';
@@ -43,7 +44,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, 
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col">
                 
@@ -149,7 +150,8 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, 
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

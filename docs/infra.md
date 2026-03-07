@@ -1,5 +1,5 @@
 
-# Infraestructura y Seguridad (v4.0.0)
+# Infraestructura y Seguridad (v4.2.0)
 
 ## Arquitectura del Sistema
 
@@ -26,7 +26,7 @@ Para garantizar la privacidad y la soberanía de los datos del usuario:
 ## Integración de Servicios Externos (SOTA)
 
 1.  **Google Gemini API (v3.1 / v2.5)**: El motor de inteligencia principal.
-    *   **Thinking Tokens**: La infraestructura soporta la configuración y recepción de tokens de pensamiento (razonamiento oculto), crucial para tareas complejas.
+    *   **Thinking Tokens**: La infraestructura soporta la configuración y recepción de tokens de pensamiento (razonamiento oculto) con niveles de intensidad (Low, Medium, High, Super High), crucial para tareas complejas.
     *   **Grounding (Google Search)**: Se utiliza la herramienta `googleSearch` nativa de la API para habilitar la función de "Deep Research", permitiendo al modelo acceder a información en tiempo real.
 2.  **Mermaid.ink**: Servicio externo sin estado utilizado para renderizar diagramas de arquitectura basados en la sintaxis de Mermaid.js generada por la IA.
 

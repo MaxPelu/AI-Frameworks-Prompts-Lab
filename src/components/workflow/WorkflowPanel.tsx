@@ -7,6 +7,11 @@ import { AGENT_FRAMEWORKS } from '../../config/agentConstants.ts';
 import { CODING_FRAMEWORKS } from '../../config/codingConstants.ts';
 import { BUSINESS_FRAMEWORKS } from '../../config/businessConstants.ts';
 import { DATA_FRAMEWORKS } from '../../config/dataConstants.ts';
+import { CYBERSECURITY_FRAMEWORKS } from '../../config/cybersecurityConstants.ts';
+import { CONTEXT_ENGINEERING_FRAMEWORKS } from '../../config/contextEngineeringConstants.ts';
+import { AI_OPS_FRAMEWORKS } from '../../config/aiOpsConstants.ts';
+import { MARKETING_FRAMEWORKS } from '../../config/marketingConstants.ts';
+import { EDUCATION_FRAMEWORKS } from '../../config/educationConstants.ts';
 import { optimizePrompt, expandIdea, suggestUseCase, suggestFramework, IS_API_KEY_AVAILABLE, evolvePrompt, evaluatePromptQuality, suggestRelatedIdeas, extractKeyEntities, generateTitles, summarizeContext, improvePromptBasedOnAnalysis, formatText, FormatType, generateRandomIdea, evaluateIdeaQuality, modifyContentLength, LengthModifier, quickRefine } from '../../lib/geminiService.ts';
 import { SparklesIcon, BeakerIcon, LightBulbIcon, ArrowPathIcon, QuestionMarkCircleIcon, HelixIcon, SaveDiskIcon, ClipboardIcon, CheckIcon, PaperAirplaneIcon, ArrowsPointingOutIcon, AcademicCapIcon, ChatBubbleLeftRightIcon, KeyIcon, NewspaperIcon, DocumentTextIcon, UsersIcon, GlobeAltIcon, CheckBadgeIcon, NoSymbolIcon, Bars3BottomLeftIcon, DiceIcon, TableCellsIcon, ChevronDownIcon, PencilIcon, TrashIcon, MicrophoneIcon, FingerPrintIcon, WrenchScrewdriverIcon, ClockIcon } from '../shared/Icons.tsx';
 import FileUploader from './FileUploader.tsx';
@@ -33,7 +38,7 @@ interface WorkflowPanelProps {
     generatedSources: any[];
     setGeneratedSources: (sources: any[]) => void;
 
-    onSavePrompt: (promptData: Omit<PromptVersion, 'versionId' | 'createdAt' | 'changeSummary'>) => void;
+    onSavePrompt: (promptData: Omit<PromptVersion, 'versionId' | 'createdAt' | 'changeSummary'>, forceDraft?: boolean) => void;
     onTestInArena: (prompt: string) => void;
     onBatchTest: (prompt: string) => void;
     onModelBattle: (config: ArenaBattleConfig) => void;
@@ -78,6 +83,8 @@ interface WorkflowPanelProps {
     onUseGoogleSearchChange: (use: boolean) => void;
     isStructuredOutputEnabled: boolean;
     onIsStructuredOutputEnabledChange: (enabled: boolean) => void;
+    responseSchema: string;
+    onResponseSchemaChange: (schema: string) => void;
     isCodeExecutionEnabled: boolean;
     onIsCodeExecutionEnabledChange: (enabled: boolean) => void;
     isFunctionCallingEnabled: boolean;
@@ -114,7 +121,12 @@ const allFrameworks = [
     ...AGENT_FRAMEWORKS,
     ...CODING_FRAMEWORKS,
     ...BUSINESS_FRAMEWORKS,
-    ...DATA_FRAMEWORKS
+    ...DATA_FRAMEWORKS,
+    ...CYBERSECURITY_FRAMEWORKS,
+    ...CONTEXT_ENGINEERING_FRAMEWORKS,
+    ...AI_OPS_FRAMEWORKS,
+    ...MARKETING_FRAMEWORKS,
+    ...EDUCATION_FRAMEWORKS
 ];
 
 // ... (OPTIMIZATION_STYLE_DESCRIPTIONS remain the same) ...
@@ -363,7 +375,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             frameworkAcronym: 'BORRADOR',
             optimizedPrompt: '', // Saving draft means no optimized result yet
             model: modelSettings.selectedModel,
-        });
+        }, true);
         setTimeout(() => setIsDraftSaving(false), 1000);
     };
     
@@ -495,6 +507,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 stopSequences: modelSettings.stopSequences, seed: modelSettings.seed,
                 thinkingBudget: modelSettings.thinkingBudget, isThinkingMode: modelSettings.isThinkingMode,
                 useGoogleSearch: modelSettings.useGoogleSearch, isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
                 isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled, isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
                 safetySettings: modelSettings.safetySettings,
                 toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
@@ -550,6 +563,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 thinkingBudget: modelSettings.thinkingBudget, isThinkingMode: modelSettings.isThinkingMode,
                 useGoogleSearch: false, // Disable for optimization unless needed
                 isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
                 isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled, isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
                 safetySettings: modelSettings.safetySettings,
                 toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
@@ -784,7 +798,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 frameworkAcronym: selectedFramework.acronym,
                 optimizedPrompt: generatedPrompt,
                 model: modelSettings.selectedModel,
-            });
+            }, false); // Production save
         }
     };
     
@@ -806,7 +820,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         if (!generatedPrompt.trim()) return;
         onModelBattle({
             prompt: generatedPrompt,
-            models: ['gemini-3-pro-preview', 'gemini-3-flash-preview', 'gemma-3-27b-it']
+            models: ['gemini-3.1-pro-preview', 'gemini-3.1-flash-lite-preview', 'gemini-3-flash-preview', 'gemma-3-27b-it']
         });
     };
     
@@ -892,11 +906,13 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         bottomSaveLabel = "Guardando...";
         bottomSaveStyle = "glass-btn-orange opacity-80";
     } else if (promptToIterateId) {
-        bottomSaveLabel = "Guardar Versión";
-        bottomSaveStyle = "bg-indigo-500/20 border-indigo-500 text-indigo-300 hover:bg-indigo-500/30 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]";
+        bottomSaveLabel = "Actualizar Versión";
+        bottomSaveIcon = <CheckBadgeIcon className="w-5 h-5" />;
+        bottomSaveStyle = "bg-teal-500/20 border border-teal-500/40 text-teal-300 hover:bg-teal-500/30 hover:shadow-[0_0_20px_rgba(20,184,166,0.4)]";
     } else if (generatedPrompt) {
-        bottomSaveLabel = "Guardar Sesión";
-        bottomSaveStyle = "glass-btn-orange";
+        bottomSaveLabel = "Publicar en Historial";
+        bottomSaveIcon = <CheckBadgeIcon className="w-5 h-5" />;
+        bottomSaveStyle = "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:shadow-[0_0_20px_rgba(79,70,229,0.5)]";
     }
 
     const toolButtonClass = "p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-teal-400 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg";
@@ -963,6 +979,41 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                         </p>
                     </div>
                 </div>
+                
+                {!promptToIterateId && (
+                    <div className="flex flex-wrap items-center gap-2 justify-end">
+                        <span className="text-xs text-gray-500 mr-1 hidden md:inline-block">Nuevas Categorías:</span>
+                        {[
+                            { name: 'Ciberseguridad', icon: '🛡️' },
+                            { name: 'Ingeniería de Contexto', icon: '🧠' },
+                            { name: 'Operaciones de IA', icon: '⚙️' },
+                            { name: 'Marketing y Growth', icon: '📈' },
+                            { name: 'Educación y Aprendizaje', icon: '📚' }
+                        ].map(cat => (
+                            <button
+                                key={cat.name}
+                                onClick={() => {
+                                    const useCaseObj = CATEGORIZED_USE_CASES.find(c => c.category === cat.name);
+                                    if (useCaseObj && useCaseObj.useCases.length > 0) {
+                                        onUseCaseChange(useCaseObj.useCases[0]);
+                                        const recommended = FRAMEWORK_RECOMMENDATIONS_BY_CATEGORY[cat.name];
+                                        if (recommended) {
+                                            setSelectedFrameworkAcronym(recommended);
+                                        }
+                                        // Scroll to the framework selector
+                                        document.getElementById('framework-select')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }}
+                                className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+                                title={`Seleccionar categoría: ${cat.name}`}
+                            >
+                                <span>{cat.icon}</span>
+                                <span className="hidden sm:inline-block">{cat.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {promptToIterateId && (
                     <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
                         <button 
@@ -1014,13 +1065,13 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                             {/* Tools moved next to Title */}
                             <div className="flex items-center gap-3 p-1">
                                 <button
-                                    onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'save' })}
+                                    onClick={handleSaveDraftStep1}
                                     disabled={!ideaText.trim() || isDraftSaving}
                                     className={`${headerToolButtonClass} ${isDraftSaving ? 'text-orange-400 border-orange-400/30' : ''}`}
-                                    title="Guardar borrador actual en la biblioteca"
+                                    title="Guardar borrador actual en el historial"
                                 >
                                     {isDraftSaving ? <div className="w-5 h-5 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" /> : <SaveDiskIcon className="w-5 h-5" />}
-                                    <span>Guardar</span>
+                                    <span>Borrador</span>
                                 </button>
                                 
                                 {/* 4 NEW BUTTONS - Ensured Visibility - WITH PROGRESS */}
@@ -1660,6 +1711,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                     isThinkingMode: modelSettings.isThinkingMode,
                     useGoogleSearch: modelSettings.useGoogleSearch,
                     isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                    responseSchema: modelSettings.responseSchema,
                     isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
                     isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
                     safetySettings: modelSettings.safetySettings,

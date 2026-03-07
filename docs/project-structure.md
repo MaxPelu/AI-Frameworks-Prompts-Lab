@@ -1,5 +1,5 @@
 
-# Estructura del Proyecto: Laboratorio de Prompts v4.0.0
+# Estructura del Proyecto: Laboratorio de Prompts v4.2.0
 
 La arquitectura del proyecto está diseñada para ser escalable, modular y fácil de mantener, separando claramente la interfaz de usuario, la lógica de negocio (IA) y la base de conocimiento estática.
 
@@ -43,6 +43,8 @@ La arquitectura del proyecto está diseñada para ser escalable, modular y fáci
 │   │   │   ├── QualityAnalysisModal.tsx
 │   │   │   ├── SafetySettingsModal.tsx
 │   │   │   └── Toast.tsx
+│   │   ├── skills/           # Módulo para gestión de habilidades de agentes
+│   │   │   └── AgentSkillsDashboard.tsx
 │   │   └── workflow/         # Pipeline principal de creación y refinamiento de prompts
 │   │       ├── FileUploader.tsx
 │   │       └── WorkflowPanel.tsx

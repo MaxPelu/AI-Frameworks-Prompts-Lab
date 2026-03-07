@@ -1,7 +1,7 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.0.0
+# Especificaciones Técnicas: Laboratorio de Prompts v4.2.0
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.0.0 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.2.0 del Laboratorio de Prompts.
 
 ## 1. Integración de IA Avanzada (`src/lib/geminiService.ts`)
 
@@ -10,8 +10,9 @@ El núcleo de la aplicación es la integración con la API de Google Gemini a tr
 ### 1.1 Modelos y Capacidades SOTA
 El servicio soporta explícitamente la familia **Gemini 3.1** y modelos especializados:
 *   **Gemini 3.1 Pro**: Motor principal para tareas de razonamiento complejo, generación de código y evaluación de calidad.
-*   **Gemini 3.1 Flash**: Optimizado para tareas de alta velocidad y baja latencia, como la sugerencia de casos de uso rápidos o la generación de títulos.
-*   **Thinking Config (Presupuesto de Pensamiento)**: Implementación nativa de `thinking_budget`. Para los modelos que lo soportan (ej. `gemini-3.1-pro-preview`), se puede configurar el nivel de pensamiento (`ThinkingLevel.HIGH` o `ThinkingLevel.LOW`), permitiendo al modelo realizar cadenas de pensamiento ocultas antes de emitir la respuesta final. Esto es crucial para tareas de codificación y lógica matemática.
+*   **Gemini 3.1 Flash**: Optimizado para tareas de alta velocidad y baja latencia.
+*   **Gemini 3.1 Flash Lite**: El modelo más eficiente de la serie 3.1, ideal para tareas rápidas y de bajo costo.
+*   **Thinking Config (Presupuesto de Pensamiento)**: Implementación nativa de `thinking_budget`. Para los modelos que lo soportan (ej. `gemini-3.1-pro-preview`, `gemini-3.1-flash-lite-preview`), se puede configurar el nivel de pensamiento con opciones de **Low**, **Medium**, **High** y **Super High**, permitiendo al modelo realizar cadenas de pensamiento ocultas antes de emitir la respuesta final. Esto es crucial para tareas de codificación y lógica matemática.
 
 ### 1.2 Motores de Investigación y Creación (Agentes)
 *   **Meta-Alquimia (`generateMetaFramework`)**: Utiliza `responseSchema` estricto (JSON Schema) para forzar al modelo a inventar un objeto JSON válido que represente un nuevo framework (Acrónimo, Pasos, Ejemplo). Esto garantiza que la salida sea directamente parseable y renderizable en la UI sin necesidad de expresiones regulares frágiles.
@@ -47,5 +48,10 @@ El sistema de métricas intercepta las respuestas de la API para extraer el obje
 
 ## 5. Persistencia y Estado Local
 
-*   **Local Storage**: Se mantiene el enfoque *local-first*. Los frameworks personalizados creados por el usuario (`customFrameworks`), el historial de sesiones (`savedPrompts`) y las configuraciones del modelo (`modelSettings`) se serializan y guardan en el `localStorage` del navegador.
+*   **Local Storage**: Se mantiene el enfoque *local-first*. Los frameworks personalizados creados por el usuario (`customFrameworks`), el historial de sesiones (`savedPrompts`), las habilidades de agentes (`agentSkills`) y las configuraciones del modelo (`modelSettings`) se serializan y guardan en el `localStorage` del navegador.
 *   **Gestión de Estado React**: Se utiliza una combinación de `useState` para el estado local de los componentes y elevación del estado (Lifting State Up) hacia `App.tsx` para el estado global de la sesión activa, evitando la complejidad innecesaria de librerías externas como Redux para este caso de uso.
+
+## 6. Arquitectura de Interfaz Avanzada
+
+*   **React Portals**: Todos los modales y dashboards de alta densidad (Arena, Tokenomics, Skills Hub, etc.) se renderizan utilizando `createPortal`. Esto garantiza que los elementos superpuestos se monten directamente en el `body`, evitando problemas de apilamiento (z-index) y recortes por contenedores con `overflow: hidden`.
+*   **Liquid Glass UI System**: Implementación de un sistema de diseño basado en Tailwind CSS 4 que utiliza variables de tema dinámicas para cambiar la estética de la aplicación según el dominio activo, manteniendo una coherencia visual a través de efectos de cristal líquido y neón.

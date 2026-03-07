@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { SafetySettings, SafetySettingValue } from '../../types';
 import { XMarkIcon, ShieldCheckIcon } from './Icons.tsx';
 
@@ -73,7 +74,7 @@ const SafetySettingsModal: React.FC<SafetySettingsModalProps> = ({ isOpen, onClo
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
                 <header className="flex justify-between items-center p-4 border-b border-slate-700">
@@ -119,7 +120,8 @@ const SafetySettingsModal: React.FC<SafetySettingsModalProps> = ({ isOpen, onClo
                     </button>
                 </footer>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

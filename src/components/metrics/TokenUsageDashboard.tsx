@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Chart, registerables } from 'chart.js';
 import { TokenUsage } from '../../types/index.ts';
 import { 
@@ -240,7 +241,7 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[60] flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-slate-900 border border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(45,212,191,0.15)] w-full max-w-7xl h-[90vh] flex flex-col overflow-hidden ring-1 ring-white/5">
                 
@@ -428,7 +429,8 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
