@@ -14,6 +14,7 @@ interface HistoryDashboardProps {
     onIteratePrompt: (id: string, versionId?: string) => void;
     onExportPrompt: (prompt: SavedPrompt) => void;
     onRenamePrompt: (id: string) => void;
+    inlineMode?: boolean;
 }
 
 const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
@@ -24,7 +25,8 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
     onDeleteVersion,
     onIteratePrompt,
     onExportPrompt,
-    onRenamePrompt
+    onRenamePrompt,
+    inlineMode = false
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,12 +41,12 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
 
     if (!isOpen) return null;
 
-    return createPortal(
-        <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex flex-col animate-fade-in">
+    const content = (
+        <div className={`${inlineMode ? 'h-full flex flex-col' : 'fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex flex-col animate-fade-in'}`}>
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/50">
+            <div className={`flex justify-between items-center p-6 border-b border-white/10 ${inlineMode ? '' : 'bg-slate-900/50'}`}>
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400">
+                    <div className="p-3 bg-teal-500/10 rounded-xl border border-teal-500/20 text-teal-400">
                         <BookOpenIcon className="w-8 h-8" />
                     </div>
                     <div>
@@ -69,7 +71,7 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
                         placeholder="Buscar por nombre, idea o contenido del prompt..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition-all text-lg"
+                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-gray-200 placeholder-gray-600 focus:outline-none focus:border-teal-500/50 transition-all text-lg"
                         autoFocus
                     />
                 </div>
@@ -108,9 +110,11 @@ const HistoryDashboard: React.FC<HistoryDashboardProps> = ({
                     )}
                 </div>
             </div>
-        </div>,
-        document.body
+        </div>
     );
+
+    if (inlineMode) return content;
+    return createPortal(content, document.body);
 };
 
 export default HistoryDashboard;

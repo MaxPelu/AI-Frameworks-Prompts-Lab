@@ -54,14 +54,14 @@ const MetaFrameworkModal: React.FC<MetaFrameworkModalProps> = ({ isOpen, onClose
                 
                 {/* Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600 rounded-full blur-[120px]"></div>
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-600 rounded-full blur-[120px]"></div>
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-600 rounded-full blur-[120px]"></div>
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-700 rounded-full blur-[120px]"></div>
                 </div>
 
                 <header className="flex justify-between items-center p-8 border-b border-white/5 relative z-10">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                            <DiceIcon className="w-8 h-8 text-white" />
+                        <div className="w-14 h-14 rounded-2xl bg-teal-600/20 border border-teal-500/30 flex items-center justify-center shadow-lg shadow-teal-500/20">
+                            <DiceIcon className="w-8 h-8 text-teal-400" />
                         </div>
                         <div>
                             <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">Meta-Alquimia</h2>
@@ -81,7 +81,7 @@ const MetaFrameworkModal: React.FC<MetaFrameworkModalProps> = ({ isOpen, onClose
                                 <p className="text-gray-400 text-sm">Gemini analizará la estructura semántica del problema para forjar un framework único que no existe en los libros de texto.</p>
                             </div>
                             <div className="relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                                <div className="absolute -inset-1 bg-teal-500/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                                 <textarea
                                     value={nicheProblem}
                                     onChange={(e) => setNicheProblem(e.target.value)}
@@ -92,7 +92,7 @@ const MetaFrameworkModal: React.FC<MetaFrameworkModalProps> = ({ isOpen, onClose
                             <button
                                 onClick={handleForge}
                                 disabled={!nicheProblem.trim()}
-                                className="w-full py-5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl font-black text-white uppercase tracking-tighter text-xl shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all active:scale-[0.98] disabled:opacity-30"
+                                className="w-full py-5 bg-teal-600/20 border border-teal-500/30 rounded-2xl font-black text-teal-100 uppercase tracking-tighter text-xl shadow-xl shadow-teal-500/10 hover:bg-teal-600/30 transition-all active:scale-[0.98] disabled:opacity-30"
                             >
                                 Forjar Metodología
                             </button>

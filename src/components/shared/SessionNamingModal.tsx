@@ -45,7 +45,7 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
 
     return createPortal(
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-[0_0_50px_rgba(99,102,241,0.2)] w-full max-w-md p-6 relative">
+            <div className="bg-slate-900 border border-teal-500/30 rounded-2xl shadow-[0_0_50px_rgba(20,184,166,0.1)] w-full max-w-md p-6 relative">
                 <button 
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
@@ -55,7 +55,7 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
 
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400">
+                        <div className="p-3 bg-teal-500/10 rounded-xl text-teal-400">
                             <SaveDiskIcon className="w-6 h-6" />
                         </div>
                         <div>
@@ -79,7 +79,7 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
                             onChange={(e) => setName(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Ej: Campaña Marketing Café..."
-                            className="glass-input w-full rounded-xl p-3 text-white placeholder-gray-600 focus:border-indigo-500 transition-all text-lg font-medium"
+                            className="glass-input w-full rounded-xl p-3 text-white placeholder-gray-600 focus:border-teal-500 transition-all text-lg font-medium"
                         />
                     </div>
 
@@ -95,7 +95,7 @@ const SessionNamingModal: React.FC<SessionNamingModalProps> = ({
                         <button
                             onClick={handleSave}
                             disabled={!name.trim()}
-                            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            className="flex-1 bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 text-white font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                             {isRenameMode ? 'Actualizar Nombre' : 'Guardar y Nuevo'}
                         </button>

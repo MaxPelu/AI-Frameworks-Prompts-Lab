@@ -39,9 +39,9 @@ interface KnowledgePanelProps {
 
 const DIFFICULTY_LEVELS = [
     { id: 1, label: "Nivel 1: Fundamentos", color: "text-teal-400", icon: <LightBulbIcon className="w-5 h-5" />, bg: "from-teal-500/20 to-teal-900/5" },
-    { id: 2, label: "Nivel 2: Técnicas Intermedias", color: "text-blue-400", icon: <AcademicCapIcon className="w-5 h-5" />, bg: "from-blue-500/20 to-blue-900/5" },
-    { id: 3, label: "Nivel 3: Ingeniería Avanzada", color: "text-purple-400", icon: <BeakerIcon className="w-5 h-5" />, bg: "from-purple-500/20 to-purple-900/5" },
-    { id: 4, label: "Nivel 4: SOTA / Frontier", color: "text-pink-400", icon: <SparklesIcon className="w-5 h-5" />, bg: "from-pink-500/20 to-pink-900/5" },
+    { id: 2, label: "Nivel 2: Técnicas Intermedias", color: "text-teal-400", icon: <AcademicCapIcon className="w-5 h-5" />, bg: "from-teal-500/20 to-teal-900/5" },
+    { id: 3, label: "Nivel 3: Ingeniería Avanzada", color: "text-teal-400", icon: <BeakerIcon className="w-5 h-5" />, bg: "from-teal-500/20 to-teal-900/5" },
+    { id: 4, label: "Nivel 4: SOTA / Frontier", color: "text-teal-400", icon: <SparklesIcon className="w-5 h-5" />, bg: "from-teal-500/20 to-teal-900/5" },
 ];
 
 const getDifficultyForCategory = (category: string): number => {
@@ -92,7 +92,7 @@ const PaginationControls: React.FC<{ currentPage: number; totalPages: number; on
                     <button 
                         key={index}
                         onClick={() => onPageChange(page as number)}
-                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold border ${currentPage === page ? 'bg-teal-500 border-teal-400 text-white shadow-lg' : 'glass-button text-gray-300'}`}
+                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold border ${currentPage === page ? 'bg-teal-600/20 border-teal-500/30 text-teal-100 shadow-lg' : 'glass-button text-gray-300'}`}
                     >
                         {page}
                     </button>
@@ -123,13 +123,14 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeepResearchOpen, setIsDeepResearchOpen] = useState(false);
   const [isMetaForgeOpen, setIsMetaForgeOpen] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, activeTab]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, activeTab]);
 
   const lowerCaseQuery = searchQuery.toLowerCase();
 
@@ -148,9 +149,6 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
       else if (activeTab === 'educationFrameworks') base = EDUCATION_FRAMEWORKS;
 
       if (customFrameworks.length > 0) {
-          // Simple filter for custom ones (improved logic can be added based on user selection metadata)
-          // For now, we append custom frameworks to the current tab if they seem generic or user didn't specify category well
-          // In a real app, custom frameworks would have a specific 'type' field.
           const combined = [...customFrameworks, ...base];
           const uniqueFrameworks = combined.filter((fw, index, self) => 
               index === self.findIndex((t) => t.id === fw.id)
@@ -165,13 +163,16 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
       const matchesCategory = selectedCategory === 'all' || framework.category === selectedCategory;
       if (!matchesCategory) return false;
 
+      const matchesDifficulty = selectedDifficulty === 'all' || getDifficultyForCategory(framework.category) === parseInt(selectedDifficulty);
+      if (!matchesDifficulty) return false;
+
       const matchesSearch = lowerCaseQuery === '' ||
                             framework.acronym.toLowerCase().includes(lowerCaseQuery) ||
                             framework.name.toLowerCase().includes(lowerCaseQuery) ||
                             framework.description.toLowerCase().includes(lowerCaseQuery);
       return matchesSearch;
     });
-  }, [baseFrameworks, selectedCategory, lowerCaseQuery]);
+  }, [baseFrameworks, selectedCategory, selectedDifficulty, lowerCaseQuery]);
 
   const getCurrentCategories = () => {
     switch(activeTab) {
@@ -207,7 +208,7 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
     
     return (
         <div className="animate-fade-in">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
                 {currentFrameworks.map((fw: Framework) => (
                     <FrameworkCard 
                         key={fw.id} 
@@ -257,7 +258,7 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
                               </span>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 px-2">
+                          <div className="grid grid-cols-4 gap-4 px-2">
                               {frameworksInLevel.map((fw: Framework) => (
                                   <FrameworkCard 
                                       key={fw.id} 
@@ -305,98 +306,64 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
         </div>
       </div>
       
-      <div className="flex border-b border-white/10 mb-6 overflow-x-auto scrollbar-hide pb-2 gap-1">
-        <button 
-          onClick={() => onTabChange('promptFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'promptFrameworks' ? 'text-teal-400 border-b-2 border-teal-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Prompting
-        </button>
-        <button 
-          onClick={() => onTabChange('contextFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'contextFrameworks' ? 'text-purple-400 border-b-2 border-purple-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Context/RAG
-        </button>
-         <button 
-          onClick={() => onTabChange('agentFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'agentFrameworks' ? 'text-pink-400 border-b-2 border-pink-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Agentes
-        </button>
-        <button 
-          onClick={() => onTabChange('codingFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'codingFrameworks' ? 'text-blue-400 border-b-2 border-blue-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Codificación
-        </button>
-        <button 
-          onClick={() => onTabChange('businessFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'businessFrameworks' ? 'text-yellow-400 border-b-2 border-yellow-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Negocios
-        </button>
-        <button 
-          onClick={() => onTabChange('dataFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'dataFrameworks' ? 'text-green-400 border-b-2 border-green-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Data/Sota
-        </button>
-        <button 
-          onClick={() => onTabChange('cybersecurityFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'cybersecurityFrameworks' ? 'text-red-400 border-b-2 border-red-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Ciberseguridad
-        </button>
-        <button 
-          onClick={() => onTabChange('contextEngineeringFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'contextEngineeringFrameworks' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Ing. Contexto
-        </button>
-        <button 
-          onClick={() => onTabChange('aiOpsFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'aiOpsFrameworks' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          AI Ops
-        </button>
-        <button 
-          onClick={() => onTabChange('marketingFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'marketingFrameworks' ? 'text-orange-400 border-b-2 border-orange-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Marketing
-        </button>
-        <button 
-          onClick={() => onTabChange('educationFrameworks')}
-          className={`px-4 py-2 text-xs font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === 'educationFrameworks' ? 'text-emerald-400 border-b-2 border-emerald-400 bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-        >
-          Educación
-        </button>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-grow">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input 
-            type="text"
-            placeholder="Buscar frameworks..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="glass-input w-full rounded-xl pl-10 pr-4 py-3 text-gray-200 text-sm"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-[#0F111A] p-2 rounded-2xl border border-white/5 shadow-lg mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar mask-linear-fade">
+            {[
+                { id: 'promptFrameworks', label: 'Prompting' },
+                { id: 'contextFrameworks', label: 'Contexto' },
+                { id: 'agentFrameworks', label: 'Agentes' },
+                { id: 'codingFrameworks', label: 'Coding' },
+                { id: 'businessFrameworks', label: 'Business' },
+                { id: 'dataFrameworks', label: 'Data' },
+                { id: 'cybersecurityFrameworks', label: 'Seguridad' },
+                { id: 'contextEngineeringFrameworks', label: 'Ing. Contexto' },
+                { id: 'aiOpsFrameworks', label: 'AI Ops' },
+                { id: 'marketingFrameworks', label: 'Marketing' },
+                { id: 'educationFrameworks', label: 'Educación' },
+            ].map(tab => (
+                <button
+                    key={tab.id}
+                    onClick={() => onTabChange(tab.id as ActiveTab)}
+                    className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap border ${
+                        activeTab === tab.id
+                        ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]'
+                        : 'bg-white/5 border-white/5 text-gray-500 hover:text-gray-300 hover:bg-white/10 hover:border-white/10'
+                    }`}
+                >
+                    {tab.label}
+                </button>
+            ))}
         </div>
-        <div className="relative sm:w-64">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="glass-input appearance-none w-full rounded-xl pl-4 pr-10 py-3 text-gray-200 text-sm cursor-pointer"
+
+        <div className="flex gap-2 w-full md:w-auto">
+            <select 
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-black/40 border border-white/10 rounded-full px-4 py-2.5 text-gray-300 text-xs focus:outline-none focus:border-purple-500/50 transition-all"
             >
-              <option value="all" className="bg-indigo-950 text-white">-- Ver por Niveles (Todos) --</option>
-              {currentCategories.map((cat, index) => (
-                <option key={index} value={cat} className="bg-indigo-950 text-white">{`${ROMAN_NUMERALS[index] || ''}. ${cat}`}</option>
-              ))}
+                <option value="all">Todas las categorías</option>
+                {currentCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
-            <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+
+            <select 
+                value={selectedDifficulty}
+                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                className="bg-black/40 border border-white/10 rounded-full px-4 py-2.5 text-gray-300 text-xs focus:outline-none focus:border-purple-500/50 transition-all"
+            >
+                <option value="all">Todos los niveles</option>
+                {DIFFICULTY_LEVELS.map(level => <option key={level.id} value={level.id}>{level.label}</option>)}
+            </select>
+
+            <div className="relative flex-1 md:w-48 group">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <input 
+                    type="text"
+                    placeholder="Buscar..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-gray-300 text-xs focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all placeholder-gray-600"
+                />
+            </div>
         </div>
       </div>
 

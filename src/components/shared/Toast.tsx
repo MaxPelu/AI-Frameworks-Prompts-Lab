@@ -23,15 +23,15 @@ export const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose 
     if (!isVisible) return null;
 
     const bgColors = {
-        success: 'bg-teal-900/90 border-teal-500',
-        error: 'bg-red-900/90 border-red-500',
-        info: 'bg-slate-800/90 border-indigo-500'
+        success: 'bg-teal-900/90 border-teal-500/50',
+        error: 'bg-red-900/90 border-red-500/50',
+        info: 'bg-slate-900/90 border-teal-500/50'
     };
 
     const icons = {
         success: <CheckCircleIcon className="w-6 h-6 text-teal-400" />,
         error: <XCircleIcon className="w-6 h-6 text-red-400" />,
-        info: <div className="w-6 h-6 text-indigo-400">ℹ️</div>
+        info: <div className="w-6 h-6 text-teal-400">ℹ️</div>
     };
 
     return (

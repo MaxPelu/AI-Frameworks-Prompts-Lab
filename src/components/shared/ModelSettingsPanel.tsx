@@ -178,7 +178,7 @@ const ModelButton: React.FC<{
         className={`px-3 py-2.5 rounded-xl transition-all duration-300 font-bold flex items-center justify-center relative overflow-hidden group border
             ${current === id 
                 ? (highlight 
-                    ? 'bg-gradient-to-br from-teal-500/90 to-blue-600/90 border-teal-400 text-white shadow-[0_0_20px_rgba(45,212,191,0.4)] scale-[1.02]' 
+                    ? 'bg-gradient-to-br from-teal-500/90 to-blue-300/90 border-teal-400 text-white shadow-[0_0_20px_rgba(45,212,191,0.4)] scale-[1.02]' 
                     : `${colorClass || 'bg-indigo-600/80 border-indigo-400'} text-white shadow-lg scale-[1.02]`) 
                 : 'hover:bg-white/10 text-gray-400 bg-white/5 border-white/5 hover:border-white/20 active:scale-95'}`}
     >
@@ -373,7 +373,11 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (panelRef.current && !panelRef.current.contains(event.target as Node) && anchorRef.current && !anchorRef.current.contains(event.target as Node)) {
+            if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+                // If anchorRef exists and click is inside it, don't close (let toggle handle it)
+                if (anchorRef?.current && anchorRef.current.contains(event.target as Node)) {
+                    return;
+                }
                 onClose();
             }
         };
@@ -406,13 +410,15 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
     const isThinkingSupported = settings.selectedModel.includes('gemini-2.5') || settings.selectedModel.includes('gemini-3') || settings.selectedModel === 'gemini-2.5-flash-lite-latest' || settings.selectedModel === 'gemini-agent' || settings.selectedModel === 'google-antigravity-engine';
     const isNativeAudioSupported = settings.selectedModel === 'gemini-2.5-flash-native-audio-preview-09-2025';
 
+    if (!isOpen) return null;
+
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
             <div ref={panelRef} className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-[3rem] border border-white/10 shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col ring-1 ring-white/5">
                 {/* --- HEADER & PRESETS --- */}
                 <div className="p-8 border-b border-white/10 bg-white/5 backdrop-blur-3xl flex justify-between items-center">
                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-purple-500/20 rounded-2xl text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+                        <div className="p-3 bg-teal-500/20 rounded-2xl text-teal-400 shadow-lg">
                             <WrenchScrewdriverIcon className="w-8 h-8" />
                         </div>
                         <div>
@@ -448,7 +454,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                                     <button 
                                         key={tab.id} 
                                         onClick={() => setActiveTab(tab.id as any)} 
-                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-teal-500 text-slate-900 shadow-lg shadow-teal-500/20' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'}`}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-teal-600/20 border border-teal-500/30 text-teal-100 shadow-lg' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'}`}
                                     >
                                         {tab.icon}
                                         {tab.label}
@@ -481,7 +487,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                                 {isSavingPreset && (
                                     <div className="space-y-2 animate-fade-in">
                                         <input type="text" value={newPresetName} onChange={(e) => setNewPresetName(e.target.value)} placeholder="Nombre..." className="bg-black/40 border border-white/10 w-full text-[10px] p-2 rounded-lg text-white focus:outline-none focus:border-teal-500/50" />
-                                        <button onClick={handleSavePreset} disabled={!newPresetName} className="w-full bg-teal-500 text-slate-900 py-2 rounded-lg text-[10px] font-black hover:bg-teal-400 disabled:opacity-50">GUARDAR ACTUAL</button>
+                                        <button onClick={handleSavePreset} disabled={!newPresetName} className="w-full bg-teal-600/20 border border-teal-500/30 text-teal-100 py-2 rounded-lg text-[10px] font-black hover:bg-teal-600/30 disabled:opacity-50">GUARDAR ACTUAL</button>
                                     </div>
                                 )}
                             </div>
@@ -539,12 +545,12 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                             {/* GEMINI 2.5 SERIES */}
                             <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gemini 2.5 (Performance)</div>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                                <ModelButton id="gemini-2.5-pro-latest" label="2.5 Pro Latest" sub="Balanced" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-pro" label="2.5 Pro" sub="Stable" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-latest" label="2.5 Flash Latest" sub="High Throughput" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash" label="2.5 Flash" sub="Stable" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-lite-latest" label="2.5 Lite Latest" sub="Cost Efficient" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
-                                <ModelButton id="gemini-2.5-flash-8b" label="2.5 Flash 8B" sub="Small & Fast" colorClass="bg-blue-600/80 border-blue-400" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-pro-latest" label="2.5 Pro Latest" sub="Balanced" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-pro" label="2.5 Pro" sub="Stable" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-latest" label="2.5 Flash Latest" sub="High Throughput" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash" label="2.5 Flash" sub="Stable" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-lite-latest" label="2.5 Lite Latest" sub="Cost Efficient" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
+                                <ModelButton id="gemini-2.5-flash-8b" label="2.5 Flash 8B" sub="Small & Fast" colorClass="bg-blue-300/80 border-blue-200" current={settings.selectedModel} onClick={handleModelSelect} disabled={disabled} />
                             </div>
 
                             {/* GEMINI 2.0 SERIES */}
@@ -1009,9 +1015,9 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
             </div>
         </div>
     </div>
-</div>,
-document.body
-);
+        </div>,
+        document.body
+    );
 };
 
 export default ModelSettingsPanel;

@@ -73,8 +73,8 @@ const ArenaModal: React.FC<ArenaModalProps> = ({
             <div className="bg-slate-900 border border-white/10 rounded-[3rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.9)] w-full max-w-[95vw] h-[92vh] flex flex-col p-6 overflow-hidden ring-1 ring-white/5">
                 <header className="flex justify-between items-center mb-6 flex-shrink-0 px-4">
                     <div className="flex items-center gap-5">
-                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${isBattleMode ? 'bg-gradient-to-br from-pink-500 to-indigo-600 shadow-pink-500/20' : 'bg-gradient-to-br from-teal-500 to-blue-600 shadow-teal-500/20'}`}>
-                            <SparklesIcon className="w-8 h-8 text-white" />
+                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-teal-900/40 border border-teal-500/30`}>
+                            <SparklesIcon className="w-8 h-8 text-teal-400" />
                         </div>
                         <div>
                             <h2 className="text-3xl font-black text-gray-100 tracking-tighter uppercase italic">

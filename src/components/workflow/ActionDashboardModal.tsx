@@ -102,15 +102,15 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
 
     const getActionDetails = () => {
         switch (actionType) {
-            case 'expand': return { title: 'Expansión de Idea', icon: <ArrowsPointingOutIcon className="w-6 h-6" />, color: 'indigo' };
-            case 'optimize': return { title: 'Optimización de Prompt', icon: <SparklesIcon className="w-6 h-6" />, color: 'purple' };
-            case 'magic': return { title: 'Mejora Mágica', icon: <SparklesIcon className="w-6 h-6" />, color: 'fuchsia' };
-            case 'fix': return { title: 'Corrección Ortográfica', icon: <WrenchScrewdriverIcon className="w-6 h-6" />, color: 'blue' };
-            case 'translate': return { title: 'Traducción', icon: <GlobeAltIcon className="w-6 h-6" />, color: 'green' };
-            case 'simplify': return { title: 'Simplificación', icon: <TableCellsIcon className="w-6 h-6" />, color: 'yellow' };
-            case 'save': return { title: 'Gestión de Guardado', icon: <SaveDiskIcon className="w-6 h-6" />, color: 'orange' };
+            case 'expand': return { title: 'Expansión de Idea', icon: <ArrowsPointingOutIcon className="w-6 h-6" />, color: 'teal' };
+            case 'optimize': return { title: 'Optimización de Prompt', icon: <SparklesIcon className="w-6 h-6" />, color: 'teal' };
+            case 'magic': return { title: 'Mejora Mágica', icon: <SparklesIcon className="w-6 h-6" />, color: 'teal' };
+            case 'fix': return { title: 'Corrección Ortográfica', icon: <WrenchScrewdriverIcon className="w-6 h-6" />, color: 'slate' };
+            case 'translate': return { title: 'Traducción', icon: <GlobeAltIcon className="w-6 h-6" />, color: 'teal' };
+            case 'simplify': return { title: 'Simplificación', icon: <TableCellsIcon className="w-6 h-6" />, color: 'slate' };
+            case 'save': return { title: 'Gestión de Guardado', icon: <SaveDiskIcon className="w-6 h-6" />, color: 'slate' };
             case 'copy': return { title: 'Copiado al Portapapeles', icon: <ClipboardIcon className="w-6 h-6" />, color: 'teal' };
-            case 'create_session': return { title: 'Nueva Sesión', icon: <SparklesIcon className="w-6 h-6" />, color: 'sky' };
+            case 'create_session': return { title: 'Nueva Sesión', icon: <SparklesIcon className="w-6 h-6" />, color: 'teal' };
             default: return { title: 'Procesando...', icon: <CpuChipIcon className="w-6 h-6" />, color: 'gray' };
         }
     };
@@ -288,9 +288,9 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                             <select 
                                                 value={selectedModel}
                                                 onChange={(e) => setSelectedModel(e.target.value as GeminiModel)}
-                                                className="bg-black/40 border border-white/10 rounded-lg px-2 py-2 text-xs text-white focus:outline-none focus:border-purple-500/50"
+                                                className="bg-black/40 border border-white/10 rounded-lg px-2 py-2 text-xs text-white focus:outline-none focus:border-teal-500/50"
                                             >
-                                                {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
+                                                {MODELS.map(m => <option key={m} value={m} className="bg-[#020617]">{m}</option>)}
                                             </select>
                                         </div>
 
@@ -299,9 +299,9 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                             <select 
                                                 value={selectedTone}
                                                 onChange={(e) => setSelectedTone(e.target.value)}
-                                                className="bg-black/40 border border-white/10 rounded-lg px-2 py-2 text-xs text-white focus:outline-none focus:border-purple-500/50"
+                                                className="bg-black/40 border border-white/10 rounded-lg px-2 py-2 text-xs text-white focus:outline-none focus:border-teal-500/50"
                                             >
-                                                {TONES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                                {TONES.map(t => <option key={t.id} value={t.id} className="bg-[#020617]">{t.name}</option>)}
                                             </select>
                                         </div>
 
@@ -480,7 +480,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                         {onRunAutoFlow && ['expand', 'optimize'].includes(actionType) && (
                                             <button 
                                                 onClick={() => onRunAutoFlow(result)}
-                                                className={`px-4 py-2 rounded-xl text-sm font-bold bg-${details.color}-500 text-white hover:bg-${details.color}-400 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.3)]`}
+                                                className={`px-4 py-2 rounded-xl text-sm font-bold bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 transition-all flex items-center gap-2 shadow-lg`}
                                             >
                                                 <PlayIcon className="w-4 h-4" /> Correr Flujo
                                             </button>

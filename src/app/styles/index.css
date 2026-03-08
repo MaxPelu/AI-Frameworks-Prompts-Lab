@@ -6,36 +6,33 @@
 @tailwind utilities;
 
 :root {
-    --color-bg: #0f172a; /* Richer dark blue-gray base */
+    --color-bg: #042940; /* Provided dark blue base */
     
-    /* Vibrant Accent Palette */
-    --color-accent-blue: #4285F4;
-    --color-accent-pink: #EA4335;
-    --color-accent-purple: #FBBC05;
-    --color-accent-orange: #34A853;
-    --color-accent-green: #4ade80;
+    /* Cyberpunk Tropical Palette */
+    --color-accent-blue: #00d4ff;   /* Neon Cyan */
+    --color-accent-pink: #f482f5;   /* Neon Magenta */
+    --color-accent-purple: #a855f7; /* Lighter Purple */
+    --color-accent-orange: #008ac5; /* Medium Blue (Replacing Orange) */
+    --color-accent-green: #00d4ff;  /* Neon Cyan (Replacing Green) */
+    --color-accent-teal: #008ac5;   /* Medium Blue (Replacing Teal) */
 
     /* Glass Vars */
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-surface: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-surface: rgba(4, 41, 64, 0.6);
 }
 
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--color-bg);
-    color: #f8fafc;
+    color: #e2e8f0; /* Light text for dark background */
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
 
-/* --- LIQUID GLASS BACKGROUND --- */
+/* --- SOLID PURPLE BACKGROUND --- */
 .aurora-background {
-    background-color: #0f172a;
-    background-image: 
-        radial-gradient(at 0% 0%, rgba(66, 133, 244, 0.2) 0px, transparent 50%),   /* Blue */
-        radial-gradient(at 100% 0%, rgba(234, 67, 53, 0.2) 0px, transparent 50%),  /* Red */
-        radial-gradient(at 100% 100%, rgba(251, 188, 5, 0.2) 0px, transparent 50%), /* Yellow */
-        radial-gradient(at 0% 100%, rgba(52, 168, 83, 0.2) 0px, transparent 50%);  /* Green */
+    background-color: #042940;
+    background-image: none;
     background-attachment: fixed;
     background-size: 100% 100%;
 }
@@ -43,18 +40,18 @@ body {
 /* --- GLASS COMPONENT CLASSES --- */
 
 .glass-panel {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(10, 20, 30, 0.85);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card {
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(15, 25, 35, 0.75);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
@@ -66,8 +63,8 @@ body {
 
 /* Input Field - "Indented Glass" */
 .glass-input {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 20, 30, 0.7);
+    border: 1px solid rgba(0, 212, 255, 0.3);
     color: #ffffff;
     transition: all 0.2s ease;
 }
@@ -83,55 +80,55 @@ body {
 
 /* Base Button */
 .glass-button {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    color: #a1a1aa;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e4e4e7;
     transition: all 0.2s ease;
 }
 
 .glass-button:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #f4f4f5;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
 }
 
 /* SKY BLUE VARIANT (Primary Actions) */
 .glass-btn-skyblue {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    color: #a1a1aa;
+    background: rgba(0, 138, 197, 0.2);
+    border: 1px solid rgba(0, 138, 197, 0.4);
+    color: #bae6fd;
     transition: all 0.2s ease;
 }
 .glass-btn-skyblue:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(0, 138, 197, 0.35);
     border-color: var(--color-accent-blue);
-    color: var(--color-accent-blue);
+    color: #ffffff;
 }
 
-/* ORANGE VARIANT (Save/Destructive) */
+/* ORANGE VARIANT (Save/Destructive - Now Blue/Cyan) */
 .glass-btn-orange {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    color: #a1a1aa;
+    background: rgba(0, 212, 255, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #fed7aa;
     transition: all 0.2s ease;
 }
 .glass-btn-orange:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--color-accent-orange);
-    color: var(--color-accent-orange);
+    background: rgba(0, 212, 255, 0.25);
+    border-color: var(--color-accent-blue);
+    color: #ffffff;
 }
 
 /* PURPLE/PINK VARIANT (AI/Magic) */
 .glass-btn-magic {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    color: #a1a1aa;
+    background: rgba(244, 130, 245, 0.15);
+    border: 1px solid rgba(244, 130, 245, 0.3);
+    color: #fbcfe8;
     transition: all 0.2s ease;
 }
 .glass-btn-magic:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(244, 130, 245, 0.25);
     border-color: var(--color-accent-pink);
-    color: var(--color-accent-pink);
+    color: #ffffff;
 }
 
 /* --- TEXT & HEADERS --- */
@@ -139,8 +136,8 @@ body {
     background: linear-gradient(
         to right, 
         var(--color-accent-blue), 
-        var(--color-accent-purple), 
-        var(--color-accent-pink)
+        var(--color-accent-teal), 
+        #94a3b8
     );
     -webkit-background-clip: text;
     background-clip: text;

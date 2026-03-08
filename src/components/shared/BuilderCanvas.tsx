@@ -98,12 +98,12 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
     return createPortal(
         <div 
             ref={canvasRef}
-            className="fixed inset-0 bg-slate-900 z-50 flex animate-fade-in" 
+            className="fixed inset-0 bg-slate-950 z-50 flex animate-fade-in" 
             aria-modal="true"
             role="dialog"
         >
-            <div className="bg-slate-900 w-full h-full flex flex-col">
-                <header className="flex justify-between items-center p-4 border-b border-slate-700 flex-shrink-0">
+            <div className="bg-slate-950 w-full h-full flex flex-col">
+                <header className="flex justify-between items-center p-4 border-b border-white/10 flex-shrink-0">
                     <h2 className="text-xl font-bold text-gray-100">
                         Constructor de Prompts: <span className="text-teal-400">{framework.acronym}</span>
                     </h2>
@@ -119,13 +119,13 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
 
                 <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 min-h-0">
                     {/* Reference Panel */}
-                    <aside className="w-full lg:w-1/3 flex flex-col gap-4 bg-slate-800/50 border border-slate-700 rounded-lg p-4 overflow-y-auto">
+                    <aside className="w-full lg:w-1/3 flex flex-col gap-4 bg-white/5 border border-white/10 rounded-xl p-4 overflow-y-auto">
                         <div className="relative">
                             <label className="text-sm text-gray-400 mb-1 block">Framework de Referencia:</label>
                              <select
                                 value={referenceFramework.id}
                                 onChange={handleFrameworkChange}
-                                className="appearance-none w-full bg-slate-800 border border-slate-700 rounded-md pl-4 pr-10 py-2.5 text-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                className="appearance-none w-full bg-slate-900 border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
                             >
                                 {allFrameworks.map(fw => (
                                     <option key={fw.id} value={fw.id}>{fw.acronym}: {fw.name}</option>
@@ -133,14 +133,14 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
                             </select>
                             <ChevronDownIcon className="absolute right-3 top-10 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </div>
-                        <div className="border-t border-slate-700 pt-4">
+                        <div className="border-t border-white/10 pt-4">
                             <h3 className="text-lg font-bold text-teal-400">{referenceFramework.acronym}</h3>
                             <p className="font-semibold text-gray-200">{referenceFramework.name}</p>
                             <p className="text-sm text-gray-400 mt-2">{referenceFramework.description}</p>
                             {referenceFramework.example && (
                                 <div className="mt-4">
                                     <h4 className="font-semibold text-teal-300 mb-2 text-sm">Ejemplo de Uso:</h4>
-                                    <div className="bg-slate-900/70 p-3 rounded-md text-xs text-gray-300 whitespace-pre-wrap font-mono">
+                                    <div className="bg-black/40 p-3 rounded-lg text-xs text-gray-300 whitespace-pre-wrap font-mono border border-white/5">
                                         <code>{referenceFramework.example.prompt}</code>
                                     </div>
                                 </div>
@@ -153,22 +153,22 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
                          <textarea
                             value={promptText}
                             onChange={(e) => setPromptText(e.target.value)}
-                            className="w-full h-full flex-1 bg-slate-800 border border-slate-700 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none font-mono text-base"
+                            className="w-full h-full flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none font-mono text-base"
                             placeholder="Construye tu prompt aquí..."
                         />
                     </section>
                 </main>
 
-                <footer className="p-4 border-t border-slate-700 flex-shrink-0 flex justify-end gap-4">
+                <footer className="p-4 border-t border-white/10 flex-shrink-0 flex justify-end gap-4 bg-black/20">
                     <button 
                         onClick={onClose}
-                        className="bg-slate-700 hover:bg-slate-600 text-gray-200 px-4 py-2 rounded-md transition-colors font-semibold"
+                        className="bg-white/5 hover:bg-white/10 text-gray-300 px-4 py-2 rounded-lg transition-colors font-semibold"
                     >
                         Cerrar
                     </button>
                     <button 
                         onClick={handleSend}
-                        className="bg-teal-500 text-white font-bold px-4 py-2 rounded-md hover:bg-teal-600 transition-colors"
+                        className="bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 font-bold px-4 py-2 rounded-lg transition-colors"
                     >
                         Enviar a Flujo de Trabajo
                     </button>

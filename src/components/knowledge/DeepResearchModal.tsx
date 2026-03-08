@@ -45,13 +45,13 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, 
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col">
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col">
                 
                 {/* Header */}
-                <div className="p-6 border-b border-slate-700 flex justify-between items-center">
+                <div className="p-6 border-b border-white/5 flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-indigo-400 flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-teal-500 flex items-center gap-3">
                             <GlobeAltIcon className="w-8 h-8 text-teal-400" />
                             Deep Research: Frameworks
                         </h2>
@@ -77,7 +77,7 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, 
                             </div>
                             <button 
                                 onClick={handleSearch} 
-                                className="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg transition-all shadow-lg shadow-teal-900/50 hover:scale-105"
+                                className="px-6 py-3 bg-teal-600/20 border border-teal-500/30 text-teal-100 font-bold rounded-xl transition-all shadow-lg hover:bg-teal-600/30"
                             >
                                 Iniciar Investigación
                             </button>

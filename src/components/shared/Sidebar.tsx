@@ -46,12 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     const totalTokens = tokenHistory.reduce((acc, curr) => acc + (curr.totalTokens || 0), 0);
 
-    const NavContent = () => (
+    const renderNavContent = () => (
         <div className="flex flex-col h-full">
             {/* Logo Area */}
             <div className="p-6 flex items-center gap-3 border-b border-white/5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-                    <SparklesIcon className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 rounded-xl bg-teal-900/40 border border-teal-500/30 flex items-center justify-center shadow-lg">
+                    <SparklesIcon className="w-5 h-5 text-teal-400" />
                 </div>
                 <span className="font-bold text-lg tracking-tight text-white">Prompt Lab</span>
                 {isMobileMenuOpen && (
@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onNewSession();
                         setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition-all group mb-6"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-teal-600/20 border border-teal-500/30 text-teal-100 font-bold shadow-lg hover:bg-teal-600/30 transition-all group mb-6"
                 >
                     <PlusIcon className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     <span>Nueva Sesión</span>
@@ -117,10 +117,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-300"></div>
                             <span className="text-xs font-mono text-gray-300">Modelo</span>
                         </div>
-                        <span className="text-xs font-mono font-bold text-blue-400 truncate max-w-[100px]" title={selectedModel}>
+                        <span className="text-xs font-mono font-bold text-blue-200 truncate max-w-[100px]" title={selectedModel}>
                             {selectedModel.replace('gemini-', '').replace('-preview', '')}
                         </span>
                     </div>
@@ -147,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             {/* Mobile Header */}
             <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900/90 backdrop-blur-xl border-b border-white/10 z-50 flex items-center justify-between px-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-blue-300 flex items-center justify-center shadow-lg shadow-teal-500/20">
                         <SparklesIcon className="w-5 h-5 text-white" />
                     </div>
                     <span className="font-bold text-lg tracking-tight text-white">Prompt Lab</span>
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Desktop Sidebar */}
             <div className="hidden lg:block w-64 h-screen fixed left-0 top-0 bg-[#0f172a] border-r border-white/10 z-50">
-                <NavContent />
+                {renderNavContent()}
             </div>
 
             {/* Mobile Drawer Overlay */}
@@ -173,7 +173,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onClick={() => setIsMobileMenuOpen(false)}
                     />
                     <div className="absolute left-0 top-0 bottom-0 w-3/4 max-w-xs bg-slate-900 border-r border-white/10 shadow-2xl animate-slide-in-left">
-                        <NavContent />
+                        {renderNavContent()}
                     </div>
                 </div>
             )}

@@ -200,7 +200,7 @@ const BatchTestingModal: React.FC<BatchTestingModalProps> = ({
                          <button 
                             onClick={handleRunBatch}
                             disabled={isProcessing || csvRows.length === 0}
-                            className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-teal-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full bg-teal-600/20 border border-teal-500/30 text-teal-100 font-bold py-3 rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-teal-600/30"
                         >
                             {isProcessing ? (
                                 <>

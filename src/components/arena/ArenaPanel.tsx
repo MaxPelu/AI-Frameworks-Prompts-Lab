@@ -60,9 +60,9 @@ interface ArenaPanelProps {
 }
 
 const getModelDescriptor = (model: GeminiModel) => {
-    if (model.includes('pro')) return { label: 'Reasoning', color: 'text-purple-400 bg-purple-500/10' };
+    if (model.includes('pro')) return { label: 'Reasoning', color: 'text-teal-400 bg-teal-500/10' };
     if (model.includes('flash')) return { label: 'Speed SOTA', color: 'text-teal-400 bg-teal-500/10' };
-    if (model.includes('gemma')) return { label: 'Open Weights', color: 'text-pink-400 bg-pink-500/10' };
+    if (model.includes('gemma')) return { label: 'Open Weights', color: 'text-slate-400 bg-slate-500/10' };
     return { label: 'Standard', color: 'text-gray-400 bg-white/5' };
 };
 
@@ -354,7 +354,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
                     disabled={!result}
                     className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-full border transition-all ${
                         isGenUIActive 
-                        ? 'bg-purple-600/50 border-purple-400 text-white shadow-lg' 
+                        ? 'bg-teal-600/20 border-teal-500/30 text-teal-100 shadow-lg' 
                         : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     title="Generative UI: Renderiza visualmente código, datos y diagramas."
@@ -402,7 +402,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
                     <button
                         onClick={handleGenerate}
                         disabled={isGenerating || isOptimizing || !prompt || isFormatting || isModifyingPromptLength}
-                        className={`flex-1 flex items-center justify-center gap-2 font-black py-3 rounded-2xl transition-all text-xs uppercase tracking-tighter shadow-lg ${isGenerating ? 'bg-white/10 text-teal-400' : 'bg-teal-500 hover:bg-teal-400 text-slate-900 active:scale-95'}`}
+                        className={`flex-1 flex items-center justify-center gap-2 font-black py-3 rounded-2xl transition-all text-xs uppercase tracking-tighter shadow-lg ${isGenerating ? 'bg-white/10 text-teal-400' : 'bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 active:scale-95'}`}
                         title="Ejecuta el prompt y genera una respuesta."
                     >
                         {isGenerating ? (
@@ -472,7 +472,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
                 {(critique || isCritiquing || critiqueError) && (
                     <div className="mt-2 border-t border-white/5 pt-3 overflow-y-auto max-h-32 shrink-0 animate-fade-in">
                         <div className="flex items-center gap-2 mb-2">
-                             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+                             <div className="w-1.5 h-1.5 bg-teal-500 rounded-full"></div>
                              <h4 className="font-black text-gray-300 text-[10px] uppercase tracking-[0.2em]">Auditoría de Sesión</h4>
                         </div>
                          {isCritiquing && <p className="text-gray-500 text-xs italic animate-pulse">Deconstruyendo respuesta...</p>}
@@ -480,8 +480,8 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
                         {critique && (
                             <div className="text-[11px] space-y-2">
                                 <div className="flex items-center gap-4">
-                                    <div className="bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">
-                                        <span className="font-black text-indigo-400">{critique.score}/10</span>
+                                    <div className="bg-teal-500/10 px-3 py-1 rounded-lg border border-teal-500/20">
+                                        <span className="font-black text-teal-400">{critique.score}/10</span>
                                     </div>
                                     <span className="text-gray-400 leading-tight italic">"{critique.suggestion}"</span>
                                 </div>

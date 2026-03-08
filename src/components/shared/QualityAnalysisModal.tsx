@@ -19,8 +19,8 @@ interface QualityAnalysisModalProps {
 
 const getScoreColor = (score: number, alpha = 1) => {
     if (score < 40) return `rgba(239, 68, 68, ${alpha})`; // red-500
-    if (score < 75) return `rgba(250, 204, 21, ${alpha})`; // yellow-400
-    return `rgba(45, 212, 191, ${alpha})`; // teal-400
+    if (score < 75) return `rgba(148, 163, 184, ${alpha})`; // slate-400
+    return `rgba(20, 184, 166, ${alpha})`; // teal-500
 };
 
 // Robust score access helper to prevent crashes
@@ -250,7 +250,7 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                                 </CategoryCard>
 
                                 {/* 2. CATEGORÍA FIABILIDAD */}
-                                <CategoryCard title="Fiabilidad y Seguridad" icon={<ShieldCheckIcon className="w-4 h-4" />} colorClass="text-indigo-400">
+                                <CategoryCard title="Fiabilidad y Seguridad" icon={<ShieldCheckIcon className="w-4 h-4" />} colorClass="text-slate-400">
                                     <MetricRow label="Protocolos de Seguridad" score={getScore(result.safety)} feedback={result.safety?.feedback} />
                                     <MetricRow label="Robustez (Anti-Prompt Injection)" score={getScore(result.robustness)} feedback={result.robustness?.feedback} />
                                     <MetricRow label="Sesgo Algorítmico" score={getScore(result.potentialForBias)} feedback={result.potentialForBias?.feedback} />
@@ -258,7 +258,7 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                                 </CategoryCard>
 
                                 {/* 3. CATEGORÍA CREATIVIDAD/CONTEXTO */}
-                                <CategoryCard title="Voz y Creatividad" icon={<BeakerIcon className="w-4 h-4" />} colorClass="text-pink-400">
+                                <CategoryCard title="Voz y Creatividad" icon={<BeakerIcon className="w-4 h-4" />} colorClass="text-teal-400">
                                     <MetricRow label="Riqueza de Contexto" score={getScore(result.contextRichness)} feedback={result.contextRichness?.feedback} />
                                     <MetricRow label="Índice de Creatividad" score={getScore(result.creativity)} feedback={result.creativity?.feedback} />
                                     <MetricRow label="Alineación de Tono" score={getScore(result.toneAndStyle)} feedback={result.toneAndStyle?.feedback} />
@@ -266,16 +266,16 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                                 </CategoryCard>
 
                                 {/* 4. CATEGORÍA EFICIENCIA */}
-                                <CategoryCard title="Eficiencia Operativa" icon={<ScaleIcon className="w-4 h-4" />} colorClass="text-orange-400">
+                                <CategoryCard title="Eficiencia Operativa" icon={<ScaleIcon className="w-4 h-4" />} colorClass="text-slate-400">
                                     <MetricRow label="Uso de Tokens (Eficiencia)" score={getScore(result.efficiency)} feedback={result.efficiency?.feedback} />
                                     <MetricRow label="Accionabilidad Inmediata" score={getScore(result.actionability)} feedback={result.actionability?.feedback} />
                                     <MetricRow label="Complejidad Cognitiva" score={getScore(result.taskComplexity)} feedback={result.taskComplexity?.feedback} />
                                 </CategoryCard>
 
                                 {/* Recomendación Principal Full-Width */}
-                                <div className="col-span-full mt-4 bg-teal-500/10 border border-teal-500/30 rounded-[2rem] p-6 flex flex-col md:flex-row items-center gap-6 shadow-[0_10px_30px_-5px_rgba(45,212,191,0.2)]">
-                                    <div className="w-16 h-16 rounded-2xl bg-teal-500 flex items-center justify-center flex-shrink-0 animate-bounce">
-                                        <CheckIcon className="w-10 h-10 text-slate-900" />
+                                <div className="col-span-full mt-4 bg-teal-900/20 border border-teal-500/30 rounded-[2rem] p-6 flex flex-col md:flex-row items-center gap-6 shadow-lg">
+                                    <div className="w-16 h-16 rounded-2xl bg-teal-900/40 border border-teal-500/30 flex items-center justify-center flex-shrink-0 animate-bounce">
+                                        <CheckIcon className="w-10 h-10 text-teal-400" />
                                     </div>
                                     <div className="text-center md:text-left">
                                         <h4 className="text-teal-400 font-black uppercase tracking-widest text-xs mb-1">Recomendación Prioritaria</h4>
@@ -300,9 +300,9 @@ const QualityAnalysisModal: React.FC<QualityAnalysisModalProps> = ({ isOpen, onC
                             <button 
                                 onClick={onImprovePrompt}
                                 disabled={isImproving || !result}
-                                className="flex-1 sm:flex-none flex items-center justify-center gap-3 bg-gradient-to-r from-teal-500 to-blue-600 text-white font-black px-10 py-3 rounded-xl hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] transition-all duration-500 disabled:opacity-30 disabled:cursor-not-allowed transform active:scale-95 text-sm uppercase tracking-tighter italic"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-3 bg-teal-600/20 border border-teal-500/30 text-teal-100 font-black px-10 py-3 rounded-xl hover:bg-teal-600/30 hover:shadow-lg transition-all duration-500 disabled:opacity-30 disabled:cursor-not-allowed transform active:scale-95 text-sm uppercase tracking-tighter italic"
                             >
-                                <SparklesIcon className="w-5 h-5 text-white animate-pulse" />
+                                <SparklesIcon className="w-5 h-5 text-teal-400 animate-pulse" />
                                 {isImproving ? 'Ejecutando Mejoras...' : 'Mejorar Prompt con IA'}
                             </button>
                         )}

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // Extreme Tuning v5.0
 import { motion, AnimatePresence } from 'motion/react';
-import Sidebar from '../components/shared/Sidebar.tsx';
+import TopHeader from '../components/shared/TopHeader.tsx';
 import WorkflowPanel from '../components/workflow/WorkflowPanel.tsx';
 import KnowledgePanel from '../components/knowledge/KnowledgePanel.tsx';
 import ArenaModal from '../components/arena/ArenaModal.tsx';
@@ -16,6 +16,9 @@ import TokenUsageDashboard from '../components/metrics/TokenUsageDashboard.tsx';
 import SessionNamingModal from '../components/shared/SessionNamingModal.tsx';
 import HistoryDashboard from '../components/history/HistoryDashboard.tsx';
 import AgentSkillsDashboard from '../components/skills/AgentSkillsDashboard.tsx';
+import RedTeamDashboard from '../components/shared/RedTeamDashboard.tsx';
+import ForensicDashboard from '../components/shared/ForensicDashboard.tsx';
+import GuideDashboard from '../components/shared/GuideDashboard.tsx';
 import ActionDashboardModal, { DashboardActionType } from '../components/workflow/ActionDashboardModal.tsx';
 import CreateSessionDashboardModal, { SessionTemplate } from '../components/workflow/CreateSessionDashboardModal.tsx';
 import { Toast, ToastType } from '../components/shared/Toast.tsx';
@@ -23,11 +26,11 @@ import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, Safet
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
 import { FRAMEWORKS } from '../config/constants.ts';
 import { CATEGORIES, CATEGORIZED_USE_CASES } from '../config/constants.ts';
-import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon } from '../components/shared/Icons.tsx';
+import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon, XMarkIcon } from '../components/shared/Icons.tsx';
 
 const App: React.FC = () => {
     // Workspace View State
-    const [currentView, setCurrentView] = useState<'home' | 'arena' | 'batch' | 'metrics' | 'history' | 'skills'>('home');
+    const [currentView, setCurrentView] = useState<'home' | 'arena' | 'batch' | 'metrics' | 'history' | 'skills' | 'library' | 'guide' | 'redteam' | 'forensic'>('home');
     
     // Global App State
     const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
@@ -171,11 +174,14 @@ const App: React.FC = () => {
             }
             if (e.key === 'Escape') {
                 setIsCommandPaletteOpen(false);
+                if (currentView !== 'home') {
+                    setCurrentView('home');
+                }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    }, [currentView]);
 
     useEffect(() => {
         try {
@@ -765,21 +771,41 @@ const App: React.FC = () => {
         isSaveDisabled = false;
     }
 
+    const totalTokens = tokenUsageHistory.reduce((acc, curr) => acc + curr.totalTokens, 0);
+
     return (
-        <div className="min-h-screen text-gray-100 font-sans selection:bg-teal-500/30 selection:text-teal-200 aurora-background overflow-x-hidden">
-            <Sidebar 
-                currentView={currentView} 
-                setCurrentView={setCurrentView} 
+        <div className="min-h-screen text-gray-100 font-sans selection:bg-teal-500/30 selection:text-teal-200 aurora-background overflow-x-hidden flex flex-col">
+            <TopHeader 
+                sessionCount={savedPrompts.length}
+                promptCount={totalResults}
+                tokenCount={totalTokens}
+                onToggleAutoSave={toggleAutoSave}
+                isAutoSaveEnabled={isAutoSaveEnabled}
+                onOpenHistory={() => setCurrentView('history')}
+                onOpenMetrics={() => setCurrentView('metrics')}
+                onSave={() => handleGlobalSave(false)}
+                onOpenArena={() => setCurrentView('arena')}
+                onOpenSkills={() => setCurrentView('skills')}
+                onOpenBatch={() => setCurrentView('batch')}
+                onOpenSettings={() => setIsSettingsOpen(true)}
                 onNewSession={handleCreateSession}
-                onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-                tokenHistory={tokenUsageHistory}
-                selectedModel={selectedModel}
-                isMetricsOpen={isMetricsDashboardOpen}
-                setIsMetricsOpen={setIsMetricsDashboardOpen}
+                onOpenCommands={() => setIsCommandPaletteOpen(true)}
+                onOpenLibrary={() => setCurrentView('library')}
+                onOpenGuide={() => setCurrentView('guide')}
+                onOpenRedTeam={() => setCurrentView('redteam')}
+                onOpenForensic={() => setCurrentView('forensic')}
+                onOpenExport={() => {
+                    if (promptToIterateId) {
+                        const prompt = savedPrompts.find(p => p.id === promptToIterateId);
+                        if (prompt) handleExportPrompt(prompt);
+                    } else {
+                        showNotification('Selecciona un prompt del historial para exportar', 'info');
+                    }
+                }}
             />
 
             {/* Main Content Area */}
-            <div className="lg:ml-64 pt-16 lg:pt-0 transition-all duration-300">
+            <div className="flex-1 w-full transition-all duration-300 pt-24">
                 <AnimatePresence>
                 {isCommandPaletteOpen && (
                     <motion.div 
@@ -887,6 +913,16 @@ const App: React.FC = () => {
                                             onRenameSession={handleRenameSession}
                                             onDeleteSession={handleDeletePrompt}
                                             onTokenUsageReceived={handleTokenUsage}
+                                            
+                                            // New Header Actions
+                                            onOpenHistory={() => setCurrentView('history')}
+                                            onOpenMetrics={() => setCurrentView('metrics')}
+                                            onOpenSkills={() => setCurrentView('skills')}
+                                            onOpenArena={() => setCurrentView('arena')}
+                                            onOpenBatch={() => setCurrentView('batch')}
+                                            isAutoSaveEnabled={isAutoSaveEnabled}
+                                            onToggleAutoSave={toggleAutoSave}
+
                                             {...allModelSettings}
                                         />
                                     </div>
@@ -1009,6 +1045,96 @@ const App: React.FC = () => {
                                 />
                             </motion.div>
                         )}
+
+                        {currentView === 'library' && (
+                            <motion.div 
+                                key="library"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-purple-500/20 rounded-lg border border-purple-500/30">
+                                            <BookOpenIcon className="w-6 h-6 text-purple-400" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-black text-white tracking-tight uppercase">BIBLIOTECA DE CONOCIMIENTO</h2>
+                                            <p className="text-xs text-gray-500 uppercase tracking-widest">Explora Frameworks de Ingeniería de Prompts</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setCurrentView('home')} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                                        <XMarkIcon className="w-6 h-6 text-gray-400" />
+                                    </button>
+                                </div>
+                                <KnowledgePanel 
+                                    activeTab={activeTab} 
+                                    onTabChange={setActiveTab} 
+                                    savedPrompts={savedPrompts}
+                                    customFrameworks={customFrameworks}
+                                    onAddCustomFramework={handleAddCustomFramework}
+                                    onDeletePrompt={handleDeletePrompt}
+                                    onDeleteVersion={handleDeleteVersion}
+                                    onIteratePrompt={handleSetPromptToIterate}
+                                    onSelectFrameworkForBuild={handleSelectFrameworkForBuild}
+                                    onToggleFrameworkForCompare={handleToggleFrameworkForCompare}
+                                    frameworksInCompareList={frameworksToCompare.map(f => f.id)}
+                                    onExportPrompt={handleExportPrompt}
+                                    currentModel={selectedModel}
+                                    onTokenUsageReceived={handleTokenUsage}
+                                    onRenamePrompt={handleRenameSession}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'guide' && (
+                            <motion.div 
+                                key="guide"
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 50 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <GuideDashboard 
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'redteam' && (
+                            <motion.div 
+                                key="redteam"
+                                initial={{ opacity: 0, scale: 1.1 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.1 }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <RedTeamDashboard 
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
+
+                        {currentView === 'forensic' && (
+                            <motion.div 
+                                key="forensic"
+                                initial={{ opacity: 0, filter: 'blur(20px)' }}
+                                animate={{ opacity: 1, filter: 'blur(0px)' }}
+                                exit={{ opacity: 0, filter: 'blur(20px)' }}
+                                className="glass-panel rounded-[3rem] p-8 min-h-[80vh]"
+                            >
+                                <ForensicDashboard 
+                                    isOpen={true}
+                                    onClose={() => setCurrentView('home')}
+                                    inlineMode={true}
+                                />
+                            </motion.div>
+                        )}
                     </AnimatePresence>
                 </main>
             </div>
@@ -1030,26 +1156,6 @@ const App: React.FC = () => {
                     onCompare={handleOpenArenaForCompare}
                     onRemove={handleToggleFrameworkForCompare}
                     onClear={handleClearCompare}
-                />
-            )}
-
-            {isArenaOpen && (
-                <ArenaModal 
-                    onClose={closeArena}
-                    testConfig={!arenaBattleConfig && frameworksToCompare.length === 0 ? { prompt: arenaTestPrompt } : undefined}
-                    compareConfig={!arenaBattleConfig && frameworksToCompare.length > 0 ? { frameworks: frameworksToCompare, idea: ideaText, useCase: useCase } : undefined}
-                    battleConfig={arenaBattleConfig}
-                    onTokenUsageReceived={handleTokenUsage}
-                    {...allModelSettings}
-                />
-            )}
-
-            {isBatchModalOpen && (
-                <BatchTestingModal
-                    isOpen={isBatchModalOpen}
-                    onClose={() => setIsBatchModalOpen(false)}
-                    initialPrompt={batchInitialPrompt}
-                    {...allModelSettings}
                 />
             )}
 
@@ -1077,12 +1183,6 @@ const App: React.FC = () => {
                 />
             )}
 
-            <TokenUsageDashboard 
-                isOpen={isMetricsDashboardOpen}
-                onClose={() => setIsMetricsDashboardOpen(false)}
-                history={tokenUsageHistory}
-            />
-
             <SessionNamingModal
                 isOpen={sessionNamingState.isOpen}
                 onClose={() => setSessionNamingState(prev => ({ ...prev, isOpen: false }))}
@@ -1090,25 +1190,6 @@ const App: React.FC = () => {
                 onDiscard={handleModalDiscard}
                 initialName={sessionNamingState.initialName}
                 isRenameMode={sessionNamingState.isRenameMode}
-            />
-
-            <HistoryDashboard
-                isOpen={isHistoryDashboardOpen}
-                onClose={() => setIsHistoryDashboardOpen(false)}
-                savedPrompts={savedPrompts}
-                onDeletePrompt={handleDeletePrompt}
-                onDeleteVersion={handleDeleteVersion}
-                onIteratePrompt={handleSetPromptToIterate}
-                onExportPrompt={handleExportPrompt}
-                onRenamePrompt={handleRenameSession}
-            />
-
-            <AgentSkillsDashboard
-                isOpen={isSkillsDashboardOpen}
-                onClose={() => setIsSkillsDashboardOpen(false)}
-                agentSkills={agentSkills}
-                setAgentSkills={setAgentSkills}
-                apiKey={process.env.GEMINI_API_KEY || null}
             />
 
             <CreateSessionDashboardModal

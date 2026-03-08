@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
 ![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.2.0-purple)
+![Version](https://img.shields.io/badge/Version-4.2.2-purple)
 
 ## 🌟 Visión General
 
@@ -14,7 +14,19 @@
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
 
-## 🚀 Características SOTA v4.2.0
+## 🚀 Características SOTA v4.2.2 (UI & Header Restoration)
+
+### 0. Restauración de UI y Estabilidad 🛠️
+*   **Header Global**: Se reintrodujo un header persistente en el panel de trabajo con acceso rápido a herramientas clave.
+*   **Botones de Acceso Rápido**: Se añadieron botones para **Auto-Save**, **Arena**, **Batch Testing**, **Historial**, **Skills Library** y **Métricas** directamente en el área de trabajo.
+*   **Integración de Modales**: Los botones del header ahora abren las herramientas como superposiciones (modales) para preservar el contexto de trabajo, en lugar de cambiar de vista.
+*   **Estabilidad del Sidebar**: Se mantiene la navegación lateral funcional y consistente.
+
+### v4.2.1 (UI Restoration Update)
+
+### 0. Restauración de UI y Estabilidad 🛠️
+*   **Corrección de Modales**: Se restauró el uso de `createPortal` en todos los modales y dashboards (Arena, Batch Testing, History, Settings, etc.) para asegurar que se rendericen correctamente sobre la interfaz principal, evitando problemas de desbordamiento y ocultamiento de elementos.
+*   **Estabilidad del Sidebar**: Se refactorizó la lógica de renderizado del menú de navegación (`NavContent`) para evitar desmontajes innecesarios, garantizando que los botones sean siempre clickeables y la interfaz no parpadee.
 
 ### 1. Biblioteca de Conocimiento Omni-Dominio 📚
 Acceso instantáneo a frameworks especializados clasificados en 6 pilares fundamentales:

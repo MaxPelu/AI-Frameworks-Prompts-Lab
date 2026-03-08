@@ -51,7 +51,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
               <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
               <span className="font-semibold text-teal-400 drop-shadow-sm">{latestVersion.frameworkAcronym}</span>
               <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-              <span className="font-semibold text-indigo-300 drop-shadow-sm">{latestVersion.model}</span>
+              <span className="font-semibold text-teal-300 drop-shadow-sm">{latestVersion.model}</span>
               {latestVersion.isDraft && (
                   <span className="ml-2 px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-md text-[10px] font-black uppercase tracking-tighter">Borrador</span>
               )}
@@ -86,7 +86,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
         <div className="flex items-center gap-3 border-t border-white/10 pt-4">
              <button 
                 onClick={() => onIterate(prompt.id)} 
-                className="flex-1 flex items-center justify-center gap-2 text-sm font-bold bg-indigo-600/20 border border-indigo-500 text-indigo-200 hover:bg-indigo-600/40 hover:text-white hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] py-2.5 rounded-xl transition-all duration-300 group/btn"
+                className="flex-1 flex items-center justify-center gap-2 text-sm font-bold bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 hover:text-white py-2.5 rounded-xl transition-all duration-300 group/btn"
                 title="Cargar esta sesión en el editor principal para continuar trabajando"
             >
                   <ArrowPathIcon className="w-4 h-4 group-hover/btn:rotate-180 transition-transform" />

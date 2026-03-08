@@ -16,7 +16,7 @@ const ComparisonTray: React.FC<ComparisonTrayProps> = ({ frameworks, onCompare, 
                 <div className="flex items-center gap-3 flex-wrap flex-1">
                     <span className="text-sm font-semibold text-gray-200">Comparando:</span>
                     {frameworks.map(fw => (
-                        <div key={fw.id} className="flex items-center gap-1.5 bg-indigo-900/50 text-indigo-200 text-xs font-bold px-2 py-1 rounded-full">
+                        <div key={fw.id} className="flex items-center gap-1.5 bg-teal-900/50 text-teal-200 text-xs font-bold px-2 py-1 rounded-full border border-teal-500/20">
                             <span>{fw.acronym}</span>
                             <button onClick={() => onRemove(fw)} className="hover:text-white">
                                 <XCircleIcon className="w-4 h-4" />
@@ -34,7 +34,7 @@ const ComparisonTray: React.FC<ComparisonTrayProps> = ({ frameworks, onCompare, 
                     </button>
                     <button 
                         onClick={onCompare}
-                        className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md transition-colors font-semibold glow-box-secondary-interactive"
+                        className="flex items-center gap-2 bg-teal-600/20 border border-teal-500/30 text-teal-100 px-4 py-2 rounded-xl transition-all font-bold shadow-lg hover:bg-teal-600/30"
                     >
                         <BeakerIcon className="w-5 h-5" />
                         Comparar ({frameworks.length})

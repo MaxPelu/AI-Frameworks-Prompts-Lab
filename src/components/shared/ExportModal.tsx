@@ -165,8 +165,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
     };
 
     return createPortal(
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col p-6">
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
+            <div className="bg-slate-900/95 border border-white/10 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col p-6">
                  <header className="flex justify-between items-center mb-4">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-100">Exportar Prompt</h2>
@@ -214,7 +214,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ prompt, onClose }) => {
                 <footer className="mt-6 text-center">
                     <button 
                         onClick={onClose}
-                        className="bg-slate-700 hover:bg-slate-600 text-gray-200 px-6 py-2 rounded-md transition-colors font-semibold"
+                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-gray-200 px-6 py-2 rounded-md transition-colors font-semibold"
                     >
                         Cerrar
                     </button>

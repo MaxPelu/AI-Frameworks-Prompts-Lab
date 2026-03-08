@@ -20,6 +20,7 @@ interface TokenUsageDashboardProps {
     isOpen: boolean;
     onClose: () => void;
     history: TokenUsage[];
+    inlineMode?: boolean;
 }
 
 // --- PRICING CONSTANTS (Est. per 1M tokens) ---
@@ -59,7 +60,7 @@ const StatCard: React.FC<{ label: string; value: string | number; sub?: string; 
     </div>
 );
 
-const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClose, history }) => {
+const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClose, history, inlineMode = false }) => {
     const [activeTab, setActiveTab] = useState<'overview' | 'models' | 'logs'>('overview');
     const chartRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
     const chartInstances = useRef<{ [key: string]: Chart | null }>({});
@@ -241,9 +242,9 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
 
     if (!isOpen) return null;
 
-    return createPortal(
-        <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[60] flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-slate-900 border border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(45,212,191,0.15)] w-full max-w-7xl h-[90vh] flex flex-col overflow-hidden ring-1 ring-white/5">
+    const content = (
+        <div className={`${inlineMode ? 'h-full flex flex-col' : 'fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[60] flex items-center justify-center p-4 animate-fade-in'}`}>
+            <div className={`${inlineMode ? 'flex-1 flex flex-col overflow-hidden' : 'bg-slate-900 border border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(45,212,191,0.15)] w-full max-w-7xl h-[90vh] flex flex-col overflow-hidden ring-1 ring-white/5'}`}>
                 
                 {/* --- HEADER --- */}
                 <header className="p-6 border-b border-white/10 bg-white/5 backdrop-blur-md flex flex-wrap justify-between items-center gap-4">
@@ -298,28 +299,28 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
                             label="Costo Estimado" 
                             value={`$${stats.cost.toFixed(4)}`} 
                             sub="Basado en tarifas públicas" 
-                            color="bg-emerald-500" 
+                            color="bg-teal-500" 
                             icon={<ScaleIcon className="w-12 h-12" />}
                         />
                         <StatCard 
                             label="Tokens Totales" 
                             value={stats.totalTokens.toLocaleString()} 
                             sub={`${history.length} Peticiones`} 
-                            color="bg-blue-500" 
+                            color="bg-slate-500" 
                             icon={<ChartBarIcon className="w-12 h-12" />}
                         />
                         <StatCard 
                             label="Thinking Budget" 
                             value={stats.thinking.toLocaleString()} 
                             sub="Tokens de Razonamiento" 
-                            color="bg-indigo-500" 
+                            color="bg-teal-600" 
                             icon={<SparklesIcon className="w-12 h-12" />}
                         />
                         <StatCard 
                             label="Eficiencia Caché" 
                             value={`${stats.cacheHitRate.toFixed(1)}%`} 
                             sub={`${stats.cached.toLocaleString()} Tokens Ahorrados`} 
-                            color="bg-yellow-500" 
+                            color="bg-slate-600" 
                             icon={<ArrowDownTrayIcon className="w-12 h-12" />}
                         />
                     </div>
@@ -391,10 +392,10 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
                                             <th className="px-6 py-4">Modelo</th>
                                             <th className="px-6 py-4">Acción</th>
                                             <th className="px-6 py-4 text-right">Input</th>
-                                            <th className="px-6 py-4 text-right text-indigo-400">Thinking</th>
+                                            <th className="px-6 py-4 text-right text-teal-400">Thinking</th>
                                             <th className="px-6 py-4 text-right">Output</th>
                                             <th className="px-6 py-4 text-right">Total</th>
-                                            <th className="px-6 py-4 text-right text-emerald-400">Costo Est.</th>
+                                            <th className="px-6 py-4 text-right text-teal-400">Costo Est.</th>
                                             <th className="px-6 py-4 text-right">Hora</th>
                                         </tr>
                                     </thead>
@@ -415,10 +416,10 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-3 text-right text-gray-400">{entry.promptTokens}</td>
-                                                <td className="px-6 py-3 text-right text-indigo-300 font-bold">{entry.thinkingTokens || '-'}</td>
-                                                <td className="px-6 py-3 text-right text-purple-300">{entry.candidatesTokens}</td>
+                                                <td className="px-6 py-3 text-right text-teal-300 font-bold">{entry.thinkingTokens || '-'}</td>
+                                                <td className="px-6 py-3 text-right text-teal-300">{entry.candidatesTokens}</td>
                                                 <td className="px-6 py-3 text-right font-bold text-white">{entry.totalTokens}</td>
-                                                <td className="px-6 py-3 text-right text-emerald-400">${calculateCost(entry).toFixed(5)}</td>
+                                                <td className="px-6 py-3 text-right text-teal-400">${calculateCost(entry).toFixed(5)}</td>
                                                 <td className="px-6 py-3 text-right text-gray-500">{new Date(entry.timestamp).toLocaleTimeString()}</td>
                                             </tr>
                                         ))}
@@ -429,9 +430,11 @@ const TokenUsageDashboard: React.FC<TokenUsageDashboardProps> = ({ isOpen, onClo
                     )}
                 </div>
             </div>
-        </div>,
-        document.body
+        </div>
     );
+
+    if (inlineMode) return content;
+    return createPortal(content, document.body);
 };
 
 export default TokenUsageDashboard;

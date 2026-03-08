@@ -31,12 +31,12 @@ const SafetyCategoryControl: React.FC<{
     currentValue: SafetySettingValue;
     onChange: (category: keyof SafetySettings, value: SafetySettingValue) => void;
 }> = ({ categoryKey, label, description, currentValue, onChange }) => (
-    <div className="border-t border-slate-700 py-4">
+    <div className="border-t border-white/5 py-4">
         <h4 className="font-semibold text-gray-100">{label}</h4>
         <p className="text-xs text-gray-400 mb-3">{description}</p>
         <div className="space-y-2">
             {SETTING_OPTIONS.map(option => (
-                <label key={option.value} className="flex items-start p-3 bg-slate-800/50 rounded-md cursor-pointer hover:bg-slate-700/50 transition-colors">
+                <label key={option.value} className="flex items-start p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 transition-colors border border-white/5">
                     <input
                         type="radio"
                         name={categoryKey}
@@ -75,9 +75,9 @@ const SafetySettingsModal: React.FC<SafetySettingsModalProps> = ({ isOpen, onClo
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
-                <header className="flex justify-between items-center p-4 border-b border-slate-700">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" aria-modal="true">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
+                <header className="flex justify-between items-center p-4 border-b border-white/5">
                     <div className="flex items-center gap-3">
                         <ShieldCheckIcon className="w-7 h-7 text-teal-400" />
                         <h2 className="text-xl font-bold text-slate-100">Ajustes de Seguridad del Contenido</h2>
@@ -105,16 +105,16 @@ const SafetySettingsModal: React.FC<SafetySettingsModalProps> = ({ isOpen, onClo
                     </div>
                 </div>
 
-                <footer className="p-4 bg-slate-800/50 border-t border-slate-700 flex justify-end gap-4">
+                <footer className="p-4 bg-black/20 border-t border-white/5 flex justify-end gap-4">
                     <button
                         onClick={onClose}
-                        className="bg-slate-700 hover:bg-slate-600 text-gray-200 px-4 py-2 rounded-md transition-colors font-semibold"
+                        className="bg-white/5 hover:bg-white/10 text-gray-300 px-4 py-2 rounded-lg transition-colors font-semibold"
                     >
                         Cancelar
                     </button>
                     <button
                         onClick={handleSave}
-                        className="bg-teal-600 text-white font-bold px-4 py-2 rounded-md hover:bg-teal-500 transition-colors"
+                        className="bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 font-bold px-4 py-2 rounded-lg transition-colors"
                     >
                         Guardar Ajustes
                     </button>

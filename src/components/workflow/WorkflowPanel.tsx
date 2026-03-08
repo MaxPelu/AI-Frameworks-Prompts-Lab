@@ -13,7 +13,7 @@ import { AI_OPS_FRAMEWORKS } from '../../config/aiOpsConstants.ts';
 import { MARKETING_FRAMEWORKS } from '../../config/marketingConstants.ts';
 import { EDUCATION_FRAMEWORKS } from '../../config/educationConstants.ts';
 import { optimizePrompt, expandIdea, suggestUseCase, suggestFramework, IS_API_KEY_AVAILABLE, evolvePrompt, evaluatePromptQuality, suggestRelatedIdeas, extractKeyEntities, generateTitles, summarizeContext, improvePromptBasedOnAnalysis, formatText, FormatType, generateRandomIdea, evaluateIdeaQuality, modifyContentLength, LengthModifier, quickRefine } from '../../lib/geminiService.ts';
-import { SparklesIcon, BeakerIcon, LightBulbIcon, ArrowPathIcon, QuestionMarkCircleIcon, HelixIcon, SaveDiskIcon, ClipboardIcon, CheckIcon, PaperAirplaneIcon, ArrowsPointingOutIcon, AcademicCapIcon, ChatBubbleLeftRightIcon, KeyIcon, NewspaperIcon, DocumentTextIcon, UsersIcon, GlobeAltIcon, CheckBadgeIcon, NoSymbolIcon, Bars3BottomLeftIcon, DiceIcon, TableCellsIcon, ChevronDownIcon, PencilIcon, TrashIcon, MicrophoneIcon, FingerPrintIcon, WrenchScrewdriverIcon, ClockIcon } from '../shared/Icons.tsx';
+import { SparklesIcon, BeakerIcon, LightBulbIcon, ArrowPathIcon, QuestionMarkCircleIcon, HelixIcon, SaveDiskIcon, ClipboardIcon, CheckIcon, PaperAirplaneIcon, ArrowsPointingOutIcon, AcademicCapIcon, ChatBubbleLeftRightIcon, KeyIcon, NewspaperIcon, DocumentTextIcon, UsersIcon, GlobeAltIcon, CheckBadgeIcon, NoSymbolIcon, Bars3BottomLeftIcon, DiceIcon, TableCellsIcon, ChevronDownIcon, PencilIcon, TrashIcon, MicrophoneIcon, FingerPrintIcon, WrenchScrewdriverIcon, ClockIcon, ChartBarIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, ShieldCheckIcon, MegaphoneIcon } from '../shared/Icons.tsx';
 import FileUploader from './FileUploader.tsx';
 import CanvasModal from '../shared/CanvasModal.tsx';
 import QualityAnalysisModal from '../shared/QualityAnalysisModal.tsx';
@@ -112,6 +112,15 @@ interface WorkflowPanelProps {
     agentPlanningMode: boolean;
     searchRecency: 'any'|'day'|'week'|'month'|'year';
     groundingThreshold: number;
+
+    // New Header Actions
+    onOpenHistory: () => void;
+    onOpenMetrics: () => void;
+    onOpenSkills: () => void;
+    onOpenArena: () => void;
+    onOpenBatch: () => void;
+    isAutoSaveEnabled: boolean;
+    onToggleAutoSave: () => void;
 }
 
 // Consolidated list of all frameworks
@@ -166,17 +175,17 @@ const OPTIMIZATION_STYLE_DESCRIPTIONS: { [key: string]: string } = {
 };
 
 const StepIndicator: React.FC<{ step: number; title: string; isActive: boolean }> = ({ step, title, isActive }) => {
-    // Cycle colors: 1=Blue, 2=SkyBlue, 3=Orange
+    // Professional muted tones
     const activeColors = {
-        1: 'bg-blue-500/20 border-blue-400 text-blue-300 shadow-blue-500/30',
-        2: 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-cyan-500/30',
-        3: 'bg-orange-500/20 border-orange-400 text-orange-300 shadow-orange-500/30',
+        1: 'bg-teal-900/40 border-teal-500/50 text-teal-300 shadow-lg',
+        2: 'bg-slate-800/40 border-slate-500/50 text-slate-300 shadow-lg',
+        3: 'bg-teal-900/40 border-teal-500/50 text-teal-300 shadow-lg',
     };
     
     const activeTextColors = {
-        1: 'text-blue-300',
-        2: 'text-cyan-300',
-        3: 'text-orange-300',
+        1: 'text-teal-300',
+        2: 'text-slate-300',
+        3: 'text-teal-300',
     };
 
     return (
@@ -265,6 +274,15 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         promptAutoRefine,
         verificationLoop,
         
+        // New Header Actions
+        onOpenHistory,
+        onOpenMetrics,
+        onOpenSkills,
+        onOpenArena,
+        onOpenBatch,
+        isAutoSaveEnabled,
+        onToggleAutoSave,
+
         ...modelSettings
     } = props;
     
@@ -916,7 +934,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     }
 
     const toolButtonClass = "p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-teal-400 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg";
-    const headerToolButtonClass = "glass-button px-4 py-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 hover:border-white/20 shadow-lg flex items-center gap-2 text-sm font-semibold group active:scale-95";
+    const headerToolButtonClass = "px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:border-white/40 shadow-lg flex items-center gap-2 text-sm font-semibold group active:scale-95 transition-all";
 
     return (
         <div className="glass-panel rounded-3xl p-8 flex flex-col gap-8 relative shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-t border-white/20">
@@ -963,57 +981,24 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             )}
 
             {/* --- STATUS HEADER FOR ITERATION CONTEXT --- */}
-            <div className="bg-slate-900/50 rounded-2xl p-4 border border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${promptToIterateId ? 'bg-indigo-500/20 text-indigo-300' : 'bg-teal-500/20 text-teal-300'}`}>
-                        {promptToIterateId ? <PencilIcon className="w-5 h-5" /> : <SparklesIcon className="w-5 h-5" />}
+            <div className="bg-gradient-to-r from-teal-900/40 to-slate-900/40 rounded-3xl p-6 border border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl">
+                <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-2xl ${promptToIterateId ? 'bg-indigo-500/20 text-indigo-300' : 'bg-teal-500/20 text-teal-300'}`}>
+                        {promptToIterateId ? <PencilIcon className="w-6 h-6" /> : <SparklesIcon className="w-6 h-6" />}
                     </div>
                     <div>
-                        <h3 className="font-bold text-white text-sm">
+                        <h3 className="font-bold text-white text-lg">
                             {promptToIterateId ? `Editando Sesión: ${promptToIterate?.name || promptToIterate?.baseIdea || 'Sin Título'}` : 'Nueva Sesión (Borrador)'}
                         </h3>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-sm text-gray-400">
                             {promptToIterateId 
                                 ? `Versión Actual: ${currentVersionIndex} • Modificaciones se auto-guardan` 
-                                : 'Comienza describiendo tu idea abajo'}
+                                : 'Comienza describiendo tu idea abajo para empezar'}
                         </p>
                     </div>
                 </div>
                 
-                {!promptToIterateId && (
-                    <div className="flex flex-wrap items-center gap-2 justify-end">
-                        <span className="text-xs text-gray-500 mr-1 hidden md:inline-block">Nuevas Categorías:</span>
-                        {[
-                            { name: 'Ciberseguridad', icon: '🛡️' },
-                            { name: 'Ingeniería de Contexto', icon: '🧠' },
-                            { name: 'Operaciones de IA', icon: '⚙️' },
-                            { name: 'Marketing y Growth', icon: '📈' },
-                            { name: 'Educación y Aprendizaje', icon: '📚' }
-                        ].map(cat => (
-                            <button
-                                key={cat.name}
-                                onClick={() => {
-                                    const useCaseObj = CATEGORIZED_USE_CASES.find(c => c.category === cat.name);
-                                    if (useCaseObj && useCaseObj.useCases.length > 0) {
-                                        onUseCaseChange(useCaseObj.useCases[0]);
-                                        const recommended = FRAMEWORK_RECOMMENDATIONS_BY_CATEGORY[cat.name];
-                                        if (recommended) {
-                                            setSelectedFrameworkAcronym(recommended);
-                                        }
-                                        // Scroll to the framework selector
-                                        document.getElementById('framework-select')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    }
-                                }}
-                                className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
-                                title={`Seleccionar categoría: ${cat.name}`}
-                            >
-                                <span>{cat.icon}</span>
-                                <span className="hidden sm:inline-block">{cat.name}</span>
-                            </button>
-                        ))}
-                    </div>
-                )}
-
+                {/* Category buttons removed as requested */}
                 {promptToIterateId && (
                     <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
                         <button 
@@ -1046,15 +1031,17 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             </div>
 
             {draftNotification && (
-                <div className="bg-indigo-500/20 border border-indigo-400/50 shadow-lg backdrop-blur-md rounded-xl p-4 flex justify-between items-center animate-fade-in text-sm">
-                    <p className="text-indigo-200 font-medium">{draftNotification}</p>
+                <div className="bg-slate-800/40 border border-white/5 shadow-lg backdrop-blur-md rounded-xl p-4 flex justify-between items-center animate-fade-in text-sm">
+                    <p className="text-gray-400 font-medium">{draftNotification}</p>
                     {draftNotification.includes("restaurarlo") && (
-                         <button onClick={handleRestoreDraft} className="glass-button bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg font-semibold">Restaurar</button>
+                         <button onClick={handleRestoreDraft} className="glass-button bg-teal-600/20 hover:bg-teal-600/30 text-teal-100 px-4 py-1.5 rounded-lg font-semibold border border-teal-500/20">Restaurar</button>
                     )}
                 </div>
             )}
             
             <div className="flex flex-col gap-14 mt-4">
+                {/* GLOBAL WORKFLOW HEADER REMOVED - NOW IN TOPHEADER */}
+
                 <div className="flex flex-col gap-6" onFocus={() => setActiveStep(1)} onMouseEnter={() => setActiveStep(1)}>
                     
                     {/* Step 1 Header with Tools */}
@@ -1202,11 +1189,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                         className="glass-input w-full text-sm rounded-xl px-4 py-3 text-gray-300"
                                         title="Elige un framework para guiar cómo la IA debe expandir tu idea inicial."
                                     >
-                                        <option value="auto" className="bg-indigo-950 text-white">Automático (Recomendado)</option>
+                                        <option value="auto" className="bg-[#020617] text-white">Automático (Recomendado)</option>
                                         {frameworksByCategory.map(group => (
-                                            <optgroup key={group.category} label={group.category} className="bg-indigo-950 text-white">
+                                            <optgroup key={group.category} label={group.category} className="bg-[#020617] text-white">
                                                 {group.frameworks.map(fw => (
-                                                    <option key={fw.id} value={fw.acronym} className="bg-indigo-950 text-white">{fw.acronym}</option>
+                                                    <option key={fw.id} value={fw.acronym} className="bg-[#020617] text-white">{fw.acronym}</option>
                                                 ))}
                                             </optgroup>
                                         ))}
@@ -1214,10 +1201,10 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     <button 
                                         onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'expand' })} 
                                         disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
-                                        className="glass-button flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500/80 to-purple-500/80 border border-indigo-400 text-white hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                                        className="glass-button flex items-center justify-center gap-2 bg-slate-800 border border-white/10 text-gray-300 hover:bg-slate-700 px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                                         title="Amplía tu idea breve en un borrador más detallado usando IA."
                                     >
-                                        <LightBulbIcon className="w-5 h-5" /> 
+                                        <LightBulbIcon className="w-5 h-5 text-yellow-500/70" /> 
                                         Expandir
                                     </button>
                                 </div>
@@ -1225,12 +1212,14 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                             <button 
                                 onClick={handleAutoRunWorkflow} 
                                 disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
-                                className="glass-button w-full text-sm flex items-center justify-center gap-2 bg-teal-500/20 border-teal-400/30 hover:bg-teal-500/30 text-teal-100 px-4 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg" 
+                                className="glass-button w-full text-sm flex items-center justify-center gap-2 bg-teal-900/20 border-teal-500/20 hover:bg-teal-900/30 text-teal-400 px-4 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg mb-4" 
                                 title="Ejecuta automáticamente la sugerencia de caso de uso, framework y la optimización en secuencia."
                             >
                                 <PaperAirplaneIcon className="w-5 h-5" />
                                 {isAutoRunningWorkflow ? 'Ejecutando...' : 'Correr Flujo Automático'}
                             </button>
+
+                            {/* NEW ACTIONS GRID REMOVED */}
                             <div className="border-t border-white/10 my-3"></div>
                              <div className="grid grid-cols-2 gap-3">
                                 <button 
@@ -1318,8 +1307,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     title="Selecciona la categoría que mejor describa el propósito de tu prompt."
                                 >
                                     {CATEGORIZED_USE_CASES.map(category => (
-                                        <optgroup key={category.category} label={category.category} className="bg-indigo-950 text-white">
-                                            {category.useCases.map(uc => <option key={uc} value={uc} className="bg-indigo-950 text-white">{uc}</option>)}
+                                        <optgroup key={category.category} label={category.category} className="bg-[#020617] text-white">
+                                            {category.useCases.map(uc => <option key={uc} value={uc} className="bg-[#020617] text-white">{uc}</option>)}
                                         </optgroup>
                                     ))}
                                 </select>
@@ -1365,11 +1354,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                             disabled={anyLoading}
                                             title="Define a quién va dirigido el resultado (ej. expertos, niños)."
                                         >
-                                            <option className="bg-indigo-950 text-white" value="general">General</option>
-                                            <option className="bg-indigo-950 text-white" value="principiantes">Principiantes</option>
-                                            <option className="bg-indigo-950 text-white" value="expertos">Expertos</option>
-                                            <option className="bg-indigo-950 text-white" value="niños">Niños</option>
-                                            <option className="bg-indigo-950 text-white" value="ejecutivos">Ejecutivos</option>
+                                            <option className="bg-[#020617] text-white" value="general">General</option>
+                                            <option className="bg-[#020617] text-white" value="principiantes">Principiantes</option>
+                                            <option className="bg-[#020617] text-white" value="expertos">Expertos</option>
+                                            <option className="bg-[#020617] text-white" value="niños">Niños</option>
+                                            <option className="bg-[#020617] text-white" value="ejecutivos">Ejecutivos</option>
                                         </select>
                                     </div>
                                     <div>
@@ -1382,11 +1371,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                             disabled={anyLoading}
                                             title="Idioma en el que la IA generará la respuesta final."
                                         >
-                                            <option className="bg-indigo-950 text-white" value="es">Español</option>
-                                            <option className="bg-indigo-950 text-white" value="en">Inglés</option>
-                                            <option className="bg-indigo-950 text-white" value="fr">Francés</option>
-                                            <option className="bg-indigo-950 text-white" value="de">Alemán</option>
-                                            <option className="bg-indigo-950 text-white" value="pt">Portugués</option>
+                                            <option className="bg-[#020617] text-white" value="es">Español</option>
+                                            <option className="bg-[#020617] text-white" value="en">Inglés</option>
+                                            <option className="bg-[#020617] text-white" value="fr">Francés</option>
+                                            <option className="bg-[#020617] text-white" value="de">Alemán</option>
+                                            <option className="bg-[#020617] text-white" value="pt">Portugués</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1448,7 +1437,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     disabled={anyLoading}
                                     title="Estructura base que organizará tu prompt."
                                 >
-                                {allFrameworks.sort((a,b) => a.acronym.localeCompare(b.acronym)).map(fw => <option className="bg-indigo-950 text-white" key={fw.id} value={fw.acronym}>{fw.acronym}</option>)}
+                                {allFrameworks.sort((a,b) => a.acronym.localeCompare(b.acronym)).map(fw => <option className="bg-[#020617] text-white" key={fw.id} value={fw.acronym}>{fw.acronym}</option>)}
                                 </select>
                                 <button 
                                     onClick={() => handleSuggest('framework')} 
@@ -1476,48 +1465,48 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     disabled={anyLoading}
                                     title="Define el tono, formato y longitud del prompt resultante."
                                 >
-                                <option className="bg-indigo-950 text-white" value="default">Default (Equilibrado)</option>
-                                <optgroup className="bg-indigo-950 text-white" label="Longitud">
-                                    <option value="brief" className="bg-indigo-950 text-white">Breve</option>
-                                    <option value="short" className="bg-indigo-950 text-white">Corto</option>
-                                    <option value="medium" className="bg-indigo-950 text-white">Medio</option>
-                                    <option value="long" className="bg-indigo-950 text-white">Largo</option>
-                                    <option value="very_long" className="bg-indigo-950 text-white">Muy Largo</option>
-                                    <option value="max_length" className="bg-indigo-950 text-white">Extremo</option>
+                                <option className="bg-[#020617] text-white" value="default">Default (Equilibrado)</option>
+                                <optgroup className="bg-[#020617] text-white" label="Longitud">
+                                    <option value="brief" className="bg-[#020617] text-white">Breve</option>
+                                    <option value="short" className="bg-[#020617] text-white">Corto</option>
+                                    <option value="medium" className="bg-[#020617] text-white">Medio</option>
+                                    <option value="long" className="bg-[#020617] text-white">Largo</option>
+                                    <option value="very_long" className="bg-[#020617] text-white">Muy Largo</option>
+                                    <option value="max_length" className="bg-[#020617] text-white">Extremo</option>
                                 </optgroup>
-                                <optgroup className="bg-indigo-950 text-white" label="Formato de Salida">
-                                    <option value="markdown" className="bg-indigo-950 text-white">Markdown</option>
-                                    <option value="json" className="bg-indigo-950 text-white">JSON</option>
-                                    <option value="xml" className="bg-indigo-950 text-white">XML</option>
-                                    <option value="yaml" className="bg-indigo-950 text-white">YAML</option>
-                                    <option value="step_by_step" className="bg-indigo-950 text-white">Paso a Paso</option>
-                                    <option value="table" className="bg-indigo-950 text-white">Tabla</option>
-                                    <option value="script" className="bg-indigo-950 text-white">Guion</option>
+                                <optgroup className="bg-[#020617] text-white" label="Formato de Salida">
+                                    <option value="markdown" className="bg-[#020617] text-white">Markdown</option>
+                                    <option value="json" className="bg-[#020617] text-white">JSON</option>
+                                    <option value="xml" className="bg-[#020617] text-white">XML</option>
+                                    <option value="yaml" className="bg-[#020617] text-white">YAML</option>
+                                    <option value="step_by_step" className="bg-[#020617] text-white">Paso a Paso</option>
+                                    <option value="table" className="bg-[#020617] text-white">Tabla</option>
+                                    <option value="script" className="bg-[#020617] text-white">Guion</option>
                                 </optgroup>
-                                <optgroup className="bg-indigo-950 text-white" label="Tono">
-                                    <option value="formal" className="bg-indigo-950 text-white">Formal</option>
-                                    <option value="casual" className="bg-indigo-950 text-white">Casual</option>
-                                    <option value="persuasive" className="bg-indigo-950 text-white">Persuasivo</option>
-                                    <option value="empathetic" className="bg-indigo-950 text-white">Empático</option>
-                                    <option value="creative" className="bg-indigo-950 text-white">Creativo</option>
-                                    <option value="technical" className="bg-indigo-950 text-white">Técnico</option>
-                                    <option value="socratic" className="bg-indigo-950 text-white">Socrático</option>
-                                    <option value="simple" className="bg-indigo-950 text-white">Simple (ELi5)</option>
+                                <optgroup className="bg-[#020617] text-white" label="Tono">
+                                    <option value="formal" className="bg-[#020617] text-white">Formal</option>
+                                    <option value="casual" className="bg-[#020617] text-white">Casual</option>
+                                    <option value="persuasive" className="bg-[#020617] text-white">Persuasivo</option>
+                                    <option value="empathetic" className="bg-[#020617] text-white">Empático</option>
+                                    <option value="creative" className="bg-[#020617] text-white">Creativo</option>
+                                    <option value="technical" className="bg-[#020617] text-white">Técnico</option>
+                                    <option value="socratic" className="bg-[#020617] text-white">Socrático</option>
+                                    <option value="simple" className="bg-[#020617] text-white">Simple (ELi5)</option>
                                 </optgroup>
-                                <optgroup className="bg-indigo-950 text-white" label="Enfoque Analítico">
-                                    <option value="deep_analysis" className="bg-indigo-950 text-white">Análisis Profundo</option>
-                                    <option value="cot" className="bg-indigo-950 text-white">Chain of Thought (CoT)</option>
-                                    <option value="multi_perspective" className="bg-indigo-950 text-white">Múltiples Perspectivas</option>
-                                    <option value="problem_solving" className="bg-indigo-950 text-white">Resolución de Problemas</option>
+                                <optgroup className="bg-[#020617] text-white" label="Enfoque Analítico">
+                                    <option value="deep_analysis" className="bg-[#020617] text-white">Análisis Profundo</option>
+                                    <option value="cot" className="bg-[#020617] text-white">Chain of Thought (CoT)</option>
+                                    <option value="multi_perspective" className="bg-[#020617] text-white">Múltiples Perspectivas</option>
+                                    <option value="problem_solving" className="bg-[#020617] text-white">Resolución de Problemas</option>
                                 </optgroup>
-                                <optgroup className="bg-indigo-950 text-white" label="Audiencia">
-                                    <option value="for_beginners" className="bg-indigo-950 text-white">Principiantes</option>
-                                    <option value="for_experts" className="bg-indigo-950 text-white">Expertos</option>
-                                    <option value="for_kids" className="bg-indigo-950 text-white">Niños</option>
-                                    <option value="for_executives" className="bg-indigo-950 text-white">Ejecutivos (TL;DR)</option>
+                                <optgroup className="bg-[#020617] text-white" label="Audiencia">
+                                    <option value="for_beginners" className="bg-[#020617] text-white">Principiantes</option>
+                                    <option value="for_experts" className="bg-[#020617] text-white">Expertos</option>
+                                    <option value="for_kids" className="bg-[#020617] text-white">Niños</option>
+                                    <option value="for_executives" className="bg-[#020617] text-white">Ejecutivos (TL;DR)</option>
                                 </optgroup>
-                                <optgroup className="bg-indigo-950 text-white" label="Especializado">
-                                    <option value="code_generation" className="bg-indigo-950 text-white">Generación de Código</option>
+                                <optgroup className="bg-[#020617] text-white" label="Especializado">
+                                    <option value="code_generation" className="bg-[#020617] text-white">Generación de Código</option>
                                 </optgroup>
                                 </select>
                             </div>
@@ -1535,7 +1524,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                         <button
                             onClick={handleGeneratePrompt}
                             disabled={anyLoading || !ideaText.trim()}
-                            className="glass-button w-full flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500/80 via-cyan-500/80 to-teal-500/80 border border-blue-400 text-white font-bold py-4 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_25px_rgba(76,201,240,0.4)] hover:shadow-[0_0_40px_rgba(76,201,240,0.6)] hover:scale-[1.01]"
+                            className="glass-button w-full flex items-center justify-center gap-3 bg-teal-600/20 border border-teal-500/30 text-teal-100 font-bold py-4 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:bg-teal-600/30 hover:scale-[1.01]"
                             title="Transforma tu idea y configuración en un prompt de ingeniería profesional usando Gemini."
                         >
                             {isLoading ? (

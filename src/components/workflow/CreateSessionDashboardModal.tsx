@@ -251,15 +251,15 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
                                     onClick={() => setSelectedTemplateId(template.id)}
                                     className={`w-full text-left p-4 rounded-xl flex items-start gap-4 transition-all ${
                                         selectedTemplateId === template.id 
-                                            ? 'bg-sky-500/20 border border-sky-500/50 shadow-[0_0_15px_rgba(56,189,248,0.15)]' 
+                                            ? 'bg-teal-500/20 border border-teal-500/50 shadow-lg' 
                                             : 'hover:bg-white/5 border border-transparent'
                                     }`}
                                 >
-                                    <div className={`p-2 rounded-lg shrink-0 ${selectedTemplateId === template.id ? 'bg-sky-500/30 text-sky-400' : 'bg-white/5 text-gray-400'}`}>
+                                    <div className={`p-2 rounded-lg shrink-0 ${selectedTemplateId === template.id ? 'bg-teal-500/30 text-teal-400' : 'bg-white/5 text-gray-400'}`}>
                                         {template.icon}
                                     </div>
                                     <div>
-                                        <h4 className={`font-bold ${selectedTemplateId === template.id ? 'text-sky-300' : 'text-gray-200'}`}>
+                                        <h4 className={`font-bold ${selectedTemplateId === template.id ? 'text-teal-300' : 'text-gray-200'}`}>
                                             {template.title}
                                         </h4>
                                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">
@@ -283,7 +283,7 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
                             return (
                                 <div className="flex-1 flex flex-col p-8 overflow-y-auto custom-scrollbar">
                                     <div className="flex items-center gap-4 mb-6">
-                                        <div className="p-4 bg-sky-500/20 rounded-2xl text-sky-400">
+                                        <div className="p-4 bg-teal-500/20 rounded-2xl text-teal-400">
                                             {selectedTemplate.icon}
                                         </div>
                                         <div>
@@ -295,7 +295,7 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
                                     {selectedTemplate.id !== 'empty' && (
                                         <div className="space-y-6">
                                             <div className="bg-black/40 border border-white/10 rounded-2xl p-6">
-                                                <h4 className="text-sm font-bold text-sky-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <h4 className="text-sm font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                                                     <UserIcon className="w-4 h-4" /> Instrucción del Sistema (Rol)
                                                 </h4>
                                                 <p className="text-sm text-gray-300 leading-relaxed">
@@ -327,7 +327,7 @@ const CreateSessionDashboardModal: React.FC<CreateSessionDashboardModalProps> = 
                                     <div className="mt-auto pt-8 flex justify-end">
                                         <button
                                             onClick={handleCreate}
-                                            className="flex items-center gap-2 px-8 py-4 text-base font-bold rounded-2xl bg-sky-500 text-white hover:bg-sky-400 hover:shadow-[0_0_30px_rgba(56,189,248,0.4)] transition-all duration-300 active:scale-95"
+                                            className="flex items-center gap-2 px-8 py-4 text-base font-bold rounded-2xl bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 hover:shadow-lg transition-all duration-300 active:scale-95"
                                         >
                                             <SparklesIcon className="w-6 h-6" />
                                             Crear Sesión con esta Plantilla

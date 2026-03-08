@@ -10,6 +10,7 @@ interface AgentSkillsDashboardProps {
     agentSkills: AgentSkill[];
     setAgentSkills: (skills: AgentSkill[]) => void;
     apiKey: string | null;
+    inlineMode?: boolean;
 }
 
 const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
@@ -17,7 +18,8 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
     onClose,
     agentSkills,
     setAgentSkills,
-    apiKey
+    apiKey,
+    inlineMode = false
 }) => {
     const [editingSkill, setEditingSkill] = useState<Partial<AgentSkill> | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -149,9 +151,9 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
         URL.revokeObjectURL(url);
     };
 
-    return createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-            <div className="bg-slate-900 w-full max-w-5xl h-[85vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+    const content = (
+        <div className={`${inlineMode ? 'h-full flex flex-col' : 'fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in'}`}>
+            <div className={`${inlineMode ? 'flex-1 flex flex-col overflow-hidden' : 'bg-slate-900 w-full max-w-5xl h-[85vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col'}`}>
                 {/* Header */}
                 <div className="p-6 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-teal-500/10 to-transparent">
                     <div className="flex items-center gap-3">
@@ -265,7 +267,7 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
                                         <button 
                                             onClick={saveSkill}
                                             disabled={!editingSkill.name || !editingSkill.content}
-                                            className="px-6 py-2 rounded-xl text-sm font-bold bg-teal-500 text-slate-900 hover:bg-teal-400 disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(20,184,166,0.2)]"
+                                            className="px-6 py-2 rounded-xl text-sm font-bold bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 disabled:opacity-50 transition-all shadow-lg"
                                         >
                                             Save Changes
                                         </button>
@@ -377,9 +379,11 @@ const AgentSkillsDashboard: React.FC<AgentSkillsDashboardProps> = ({
                     </div>
                 </div>
             </div>
-        </div>,
-        document.body
+        </div>
     );
+
+    if (inlineMode) return content;
+    return createPortal(content, document.body);
 };
 
 export default AgentSkillsDashboard;
