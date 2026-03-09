@@ -120,10 +120,28 @@ const App: React.FC = () => {
     
     // Knowledge Panel & History Interaction State
     const [activeTab, setActiveTab] = useState<'promptFrameworks' | 'contextFrameworks' | 'agentFrameworks' | 'codingFrameworks' | 'businessFrameworks' | 'dataFrameworks' | 'cybersecurityFrameworks' | 'contextEngineeringFrameworks' | 'aiOpsFrameworks' | 'marketingFrameworks' | 'educationFrameworks'>('promptFrameworks');
+    const [initialLibraryCategory, setInitialLibraryCategory] = useState<string | undefined>(undefined);
     const [frameworksToCompare, setFrameworksToCompare] = useState<Framework[]>([]);
     const [builderCanvasState, setBuilderCanvasState] = useState<{ isOpen: boolean; framework: Framework | null }>({ isOpen: false, framework: null });
     const [exportModalState, setExportModalState] = useState<{ isOpen: boolean; prompt: SavedPrompt | null }>({ isOpen: false, prompt: null });
     const [isHistoryDashboardOpen, setIsHistoryDashboardOpen] = useState(false);
+    
+    const handleCategoryClick = (category: string) => {
+        if (CATEGORIES.includes(category)) setActiveTab('promptFrameworks');
+        else if (CONTEXT_CATEGORIES.includes(category)) setActiveTab('contextFrameworks');
+        else if (AGENT_CATEGORIES.includes(category)) setActiveTab('agentFrameworks');
+        else if (CODING_CATEGORIES.includes(category)) setActiveTab('codingFrameworks');
+        else if (BUSINESS_CATEGORIES.includes(category)) setActiveTab('businessFrameworks');
+        else if (DATA_CATEGORIES.includes(category)) setActiveTab('dataFrameworks');
+        else if (category === 'Ciberseguridad') setActiveTab('cybersecurityFrameworks');
+        else if (category === 'Ingeniería de Contexto') setActiveTab('contextEngineeringFrameworks');
+        else if (category === 'Operaciones de IA') setActiveTab('aiOpsFrameworks');
+        else if (category === 'Marketing y Growth') setActiveTab('marketingFrameworks');
+        else if (category === 'Educación y Aprendizaje') setActiveTab('educationFrameworks');
+        
+        setInitialLibraryCategory(category);
+        setCurrentView('library');
+    };
     
     // Batch Testing State
     const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
@@ -942,10 +960,14 @@ const App: React.FC = () => {
                                                         const count = frameworkCounts[category] || 0;
                                                         if (count === 0) return null;
                                                         return (
-                                                            <span key={category} className="text-xs text-gray-400 flex items-center gap-1.5">
-                                                                <span className="text-gray-300">{category}</span>
+                                                            <button 
+                                                                key={category} 
+                                                                onClick={() => handleCategoryClick(category)}
+                                                                className="text-xs text-gray-400 flex items-center gap-1.5 hover:text-teal-300 transition-colors cursor-pointer"
+                                                            >
+                                                                <span className="text-gray-300 hover:text-teal-300">{category}</span>
                                                                 <span className="text-teal-500 font-mono bg-teal-500/10 px-1.5 py-0.5 rounded-md">{count}</span>
-                                                            </span>
+                                                            </button>
                                                         );
                                                     })}
                                                 </div>
@@ -954,10 +976,14 @@ const App: React.FC = () => {
                                                         const count = frameworkCounts[category] || 0;
                                                         if (count === 0) return null;
                                                         return (
-                                                            <span key={`${category}-dup`} className="text-xs text-gray-400 flex items-center gap-1.5">
-                                                                <span className="text-gray-300">{category}</span>
+                                                            <button 
+                                                                key={`${category}-dup`} 
+                                                                onClick={() => handleCategoryClick(category)}
+                                                                className="text-xs text-gray-400 flex items-center gap-1.5 hover:text-teal-300 transition-colors cursor-pointer"
+                                                            >
+                                                                <span className="text-gray-300 hover:text-teal-300">{category}</span>
                                                                 <span className="text-teal-500 font-mono bg-teal-500/10 px-1.5 py-0.5 rounded-md">{count}</span>
-                                                            </span>
+                                                            </button>
                                                         );
                                                     })}
                                                 </div>
@@ -1032,7 +1058,10 @@ const App: React.FC = () => {
                                     <div className="xl:col-span-5 space-y-6 md:space-y-8">
                                         <KnowledgePanel 
                                             activeTab={activeTab} 
-                                            onTabChange={setActiveTab} 
+                                            onTabChange={(tab) => {
+                                                setActiveTab(tab);
+                                                setInitialLibraryCategory(undefined);
+                                            }}
                                             savedPrompts={savedPrompts}
                                             customFrameworks={customFrameworks}
                                             onAddCustomFramework={handleAddCustomFramework}
@@ -1046,6 +1075,7 @@ const App: React.FC = () => {
                                             currentModel={selectedModel}
                                             onTokenUsageReceived={handleTokenUsage}
                                             onRenamePrompt={handleRenameSession}
+                                            initialCategory={initialLibraryCategory}
                                         />
                                     </div>
                                     </div>
@@ -1172,7 +1202,10 @@ const App: React.FC = () => {
                                 </div>
                                 <KnowledgePanel 
                                     activeTab={activeTab} 
-                                    onTabChange={setActiveTab} 
+                                    onTabChange={(tab) => {
+                                        setActiveTab(tab);
+                                        setInitialLibraryCategory(undefined);
+                                    }}
                                     savedPrompts={savedPrompts}
                                     customFrameworks={customFrameworks}
                                     onAddCustomFramework={handleAddCustomFramework}
@@ -1186,6 +1219,7 @@ const App: React.FC = () => {
                                     currentModel={selectedModel}
                                     onTokenUsageReceived={handleTokenUsage}
                                     onRenamePrompt={handleRenameSession}
+                                    initialCategory={initialLibraryCategory}
                                 />
                             </motion.div>
                         )}

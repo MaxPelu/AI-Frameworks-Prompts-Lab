@@ -35,6 +35,7 @@ interface KnowledgePanelProps {
     currentModel: GeminiModel;
     onTokenUsageReceived?: (usage: TokenUsage) => void;
     onRenamePrompt: (id: string) => void; 
+    initialCategory?: string;
 }
 
 const DIFFICULTY_LEVELS = [
@@ -120,13 +121,26 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
     frameworksInCompareList,
     currentModel,
     onTokenUsageReceived,
+    initialCategory
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeepResearchOpen, setIsDeepResearchOpen] = useState(false);
   const [isMetaForgeOpen, setIsMetaForgeOpen] = useState(false);
+
+  useEffect(() => {
+    if (initialCategory) {
+        setSelectedCategory(initialCategory);
+    }
+  }, [initialCategory]);
+
+  useEffect(() => {
+    if (!initialCategory) {
+        setSelectedCategory('all');
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     setCurrentPage(1);
