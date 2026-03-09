@@ -24,8 +24,45 @@ import CreateSessionDashboardModal, { SessionTemplate } from '../components/work
 import { Toast, ToastType } from '../components/shared/Toast.tsx';
 import { SavedPrompt, PromptVersion, Framework, UploadedFile, GeminiModel, SafetySettings, ModelConfig, ArenaBattleConfig, TokenUsage, AgentSkill } from '../types/index.ts';
 import { summarizeChanges, generateSessionTitle } from '../lib/geminiService.ts';
-import { FRAMEWORKS } from '../config/constants.ts';
-import { CATEGORIES, CATEGORIZED_USE_CASES } from '../config/constants.ts';
+import { FRAMEWORKS, CATEGORIES, CATEGORIZED_USE_CASES } from '../config/constants.ts';
+import { CONTEXT_FRAMEWORKS, CONTEXT_CATEGORIES } from '../config/contextConstants.ts';
+import { CODING_FRAMEWORKS, CODING_CATEGORIES } from '../config/codingConstants.ts';
+import { CYBERSECURITY_FRAMEWORKS } from '../config/cybersecurityConstants.ts';
+import { AI_OPS_FRAMEWORKS } from '../config/aiOpsConstants.ts';
+import { CONTEXT_ENGINEERING_FRAMEWORKS } from '../config/contextEngineeringConstants.ts';
+import { EDUCATION_FRAMEWORKS } from '../config/educationConstants.ts';
+import { BUSINESS_FRAMEWORKS, BUSINESS_CATEGORIES } from '../config/businessConstants.ts';
+import { MARKETING_FRAMEWORKS } from '../config/marketingConstants.ts';
+import { AGENT_FRAMEWORKS, AGENT_CATEGORIES } from '../config/agentConstants.ts';
+import { DATA_FRAMEWORKS, DATA_CATEGORIES } from '../config/dataConstants.ts';
+
+const ALL_FRAMEWORKS = [
+    ...FRAMEWORKS,
+    ...CONTEXT_FRAMEWORKS,
+    ...CODING_FRAMEWORKS,
+    ...CYBERSECURITY_FRAMEWORKS,
+    ...AI_OPS_FRAMEWORKS,
+    ...CONTEXT_ENGINEERING_FRAMEWORKS,
+    ...EDUCATION_FRAMEWORKS,
+    ...BUSINESS_FRAMEWORKS,
+    ...MARKETING_FRAMEWORKS,
+    ...AGENT_FRAMEWORKS,
+    ...DATA_FRAMEWORKS
+];
+
+const ALL_CATEGORIES = Array.from(new Set([
+    ...CATEGORIES,
+    ...CONTEXT_CATEGORIES,
+    ...CODING_CATEGORIES,
+    'Ciberseguridad',
+    'Operaciones de IA',
+    'Ingeniería de Contexto',
+    'Educación y Aprendizaje',
+    ...BUSINESS_CATEGORIES,
+    'Marketing y Growth',
+    ...AGENT_CATEGORIES,
+    ...DATA_CATEGORIES
+]));
 import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon, XMarkIcon } from '../components/shared/Icons.tsx';
 
 const App: React.FC = () => {
@@ -66,10 +103,10 @@ const App: React.FC = () => {
 
     const { frameworkCounts, totalFrameworks } = useMemo(() => {
         const counts: Record<string, number> = {};
-        FRAMEWORKS.forEach(f => {
+        ALL_FRAMEWORKS.forEach(f => {
             counts[f.category] = (counts[f.category] || 0) + 1;
         });
-        return { frameworkCounts: counts, totalFrameworks: FRAMEWORKS.length };
+        return { frameworkCounts: counts, totalFrameworks: ALL_FRAMEWORKS.length };
     }, []);
 
     // Arena State
@@ -899,9 +936,9 @@ const App: React.FC = () => {
                                             {totalFrameworks} Frameworks:
                                         </div>
                                         <div className="flex-1 overflow-hidden relative">
-                                            <div className="flex animate-marquee whitespace-nowrap w-max">
+                                            <div className="flex animate-marquee whitespace-nowrap w-max hover:[animation-play-state:paused]">
                                                 <div className="flex gap-6 pr-6">
-                                                    {CATEGORIES.map(category => {
+                                                    {ALL_CATEGORIES.map(category => {
                                                         const count = frameworkCounts[category] || 0;
                                                         if (count === 0) return null;
                                                         return (
@@ -913,7 +950,7 @@ const App: React.FC = () => {
                                                     })}
                                                 </div>
                                                 <div className="flex gap-6 pr-6">
-                                                    {CATEGORIES.map(category => {
+                                                    {ALL_CATEGORIES.map(category => {
                                                         const count = frameworkCounts[category] || 0;
                                                         if (count === 0) return null;
                                                         return (
@@ -926,6 +963,13 @@ const App: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
+                                        <button 
+                                            onClick={() => setCurrentView('library')}
+                                            className="flex items-center gap-2 px-3 py-1.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shrink-0"
+                                        >
+                                            <BookOpenIcon className="w-4 h-4" />
+                                            Explorar
+                                        </button>
                                     </div>
 
                                     <div className="w-full bg-gradient-to-r from-teal-900/20 via-purple-900/20 to-orange-900/20 border border-white/10 rounded-2xl p-4 flex items-center justify-between backdrop-blur-sm shadow-lg">
