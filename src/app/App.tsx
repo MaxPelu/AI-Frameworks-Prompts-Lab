@@ -64,6 +64,14 @@ const App: React.FC = () => {
     const [selectedFrameworkAcronym, setSelectedFrameworkAcronym] = useState<string>(FRAMEWORKS[0].acronym);
     const [generatedSources, setGeneratedSources] = useState<any[]>([]);
 
+    const { frameworkCounts, totalFrameworks } = useMemo(() => {
+        const counts: Record<string, number> = {};
+        FRAMEWORKS.forEach(f => {
+            counts[f.category] = (counts[f.category] || 0) + 1;
+        });
+        return { frameworkCounts: counts, totalFrameworks: FRAMEWORKS.length };
+    }, []);
+
     // Arena State
     const [isArenaOpen, setIsArenaOpen] = useState(false);
     const [arenaTestPrompt, setArenaTestPrompt] = useState('');
@@ -805,7 +813,7 @@ const App: React.FC = () => {
             />
 
             {/* Main Content Area */}
-            <div className="flex-1 w-full transition-all duration-300 pt-24">
+            <div className="flex-1 w-full transition-all duration-300 pt-[76px]">
                 <AnimatePresence>
                 {isCommandPaletteOpen && (
                     <motion.div 
@@ -873,7 +881,7 @@ const App: React.FC = () => {
                 )}
                 </AnimatePresence>
 
-                <div className="max-w-[1920px] mx-auto px-4 py-6 md:px-8 md:py-8">
+                <div className="max-w-[1920px] mx-auto px-4 py-4 md:px-8 md:py-6">
                     <main className="animate-fade-in min-h-[90vh]">
                         <AnimatePresence mode="wait">
                             {currentView === 'home' && (
@@ -882,8 +890,57 @@ const App: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
-                                    className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8"
+                                    className="flex flex-col gap-6"
                                 >
+                                    {/* Frameworks Count Marquee */}
+                                    <div className="w-full overflow-hidden bg-black/20 border border-white/5 rounded-xl py-2 px-4 flex items-center gap-4">
+                                        <div className="text-teal-400 font-bold text-sm whitespace-nowrap flex items-center gap-2">
+                                            <SparklesIcon className="w-4 h-4" />
+                                            {totalFrameworks} Frameworks:
+                                        </div>
+                                        <div className="flex-1 overflow-hidden relative">
+                                            <div className="flex animate-marquee whitespace-nowrap w-max">
+                                                <div className="flex gap-6 pr-6">
+                                                    {CATEGORIES.map(category => {
+                                                        const count = frameworkCounts[category] || 0;
+                                                        if (count === 0) return null;
+                                                        return (
+                                                            <span key={category} className="text-xs text-gray-400 flex items-center gap-1.5">
+                                                                <span className="text-gray-300">{category}</span>
+                                                                <span className="text-teal-500 font-mono bg-teal-500/10 px-1.5 py-0.5 rounded-md">{count}</span>
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <div className="flex gap-6 pr-6">
+                                                    {CATEGORIES.map(category => {
+                                                        const count = frameworkCounts[category] || 0;
+                                                        if (count === 0) return null;
+                                                        return (
+                                                            <span key={`${category}-dup`} className="text-xs text-gray-400 flex items-center gap-1.5">
+                                                                <span className="text-gray-300">{category}</span>
+                                                                <span className="text-teal-500 font-mono bg-teal-500/10 px-1.5 py-0.5 rounded-md">{count}</span>
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full bg-gradient-to-r from-teal-900/20 via-purple-900/20 to-orange-900/20 border border-white/10 rounded-2xl p-4 flex items-center justify-between backdrop-blur-sm shadow-lg">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                                            <span className="text-teal-300 font-mono text-xs uppercase tracking-widest">Sistema Operativo: SOTA Ready</span>
+                                        </div>
+                                        <div className="flex gap-4 text-gray-400 font-mono text-xs">
+                                            <span>LATENCIA: 42ms</span>
+                                            <span>MODELO: GEMINI 3.1 FLASH</span>
+                                            <span>TOKENS: ACTIVO</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8">
                                     {/* Left Column: Workflow (Idea, Use Case, Files) */}
                                     <div className="xl:col-span-7 space-y-6 md:space-y-8">
                                         <WorkflowPanel
@@ -946,6 +1003,7 @@ const App: React.FC = () => {
                                             onTokenUsageReceived={handleTokenUsage}
                                             onRenamePrompt={handleRenameSession}
                                         />
+                                    </div>
                                     </div>
                                 </motion.div>
                             )}

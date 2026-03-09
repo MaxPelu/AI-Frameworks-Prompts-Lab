@@ -14,7 +14,14 @@
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
 
-## 🚀 Características SOTA v4.2.2 (UI & Header Restoration)
+## 🚀 Características SOTA v4.2.3 (UI & Frameworks Update)
+
+### 0. Actualización de UI y Expansión de Frameworks 🛠️
+*   **Expansión de la Biblioteca**: Se añadieron nuevos frameworks avanzados (Strategic Game Theory, Multi-Modal Anchoring, Prompt Routing, Semantic Compression, Adversarial Training, Cross-Lingual Transfer, Temporal Reasoning, Causal Discovery, Creative Synthesis, Ethical Dilemma Resolution, Continuous Learning, Viral Growth Modeling) alcanzando un total de 178 metodologías.
+*   **Corrección de Categorías**: Se incluyó la categoría "Evaluación y Seguridad de Agentes" en el conteo principal.
+*   **Optimización de Layout**: Se mejoró la estética de la introducción (`AppDescription`), estirando el contenedor de texto para usar todo el ancho disponible y ajustando la cuadrícula de categorías de 5 a 6 columnas para un diseño más compacto y equilibrado.
+
+### v4.2.2 (UI & Header Restoration)
 
 ### 0. Restauración de UI y Estabilidad 🛠️
 *   **Header Global**: Se reintrodujo un header persistente en el panel de trabajo con acceso rápido a herramientas clave.

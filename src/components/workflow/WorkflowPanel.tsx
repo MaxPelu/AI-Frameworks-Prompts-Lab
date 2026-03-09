@@ -990,10 +990,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                         <h3 className="font-bold text-white text-lg">
                             {promptToIterateId ? `Editando Sesión: ${promptToIterate?.name || promptToIterate?.baseIdea || 'Sin Título'}` : 'Nueva Sesión (Borrador)'}
                         </h3>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-teal-400 font-mono text-xs uppercase tracking-widest mt-1">WORKBENCH DE INGENIERÍA DE PROMPTS</p>
+                        <p className="text-sm text-gray-400 mt-2 max-w-2xl">
                             {promptToIterateId 
                                 ? `Versión Actual: ${currentVersionIndex} • Modificaciones se auto-guardan` 
-                                : 'Comienza describiendo tu idea abajo para empezar'}
+                                : 'Entorno avanzado para diseñar, probar y optimizar estrategias de interacción con Modelos de Lenguaje (LLMs) mediante metodologías científicas.'}
                         </p>
                     </div>
                 </div>

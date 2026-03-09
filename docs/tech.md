@@ -1,7 +1,7 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.2.0
+# Especificaciones Técnicas: Laboratorio de Prompts v4.2.3
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.2.0 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.2.3 del Laboratorio de Prompts.
 
 ## 1. Integración de IA Avanzada (`src/lib/geminiService.ts`)
 

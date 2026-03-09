@@ -40,6 +40,11 @@ Para facilitar la navegación rápida y el reconocimiento cognitivo en la Biblio
 *   **Controles de Modelo**: Sliders y toggles estilizados para configurar la temperatura, top-k, y el selector de "Thinking Level" con 4 niveles de intensidad (Low, Medium, High, Super High).
 *   **Feedback Visual**: Spinners y mensajes de estado claros durante las llamadas a la API de Gemini.
 
+#### 6. Layout de Inicio (Home View)
+*   **Encabezado Descriptivo**: Se ha incorporado una sección introductoria prominente debajo del Header principal y antes del área de trabajo.
+*   **Tipografía**: Título "Workbench de Ingeniería & Estrategia de AI" con gradiente (Orange-Pink) y estilo itálico/uppercase para impacto visual.
+*   **Propósito**: Clarificar la propuesta de valor de la herramienta ("Suite integral para diseñar, optimizar y evaluar sistemas de IA") de inmediato al usuario.
+
 ### Micro-Interacciones y Animaciones
 *   **Hover Glow**: Las tarjetas de frameworks y los botones principales emiten un resplandor sutil al pasar el mouse, mejorando la affordance.
 *   **Loading States**: Spinners específicos por contexto (ej. un cubo giratorio para Codificación, destellos para Prompting) para mantener al usuario informado durante esperas largas.

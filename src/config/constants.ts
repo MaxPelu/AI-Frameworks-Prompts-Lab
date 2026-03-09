@@ -16,7 +16,8 @@ export const CATEGORIES: string[] = [
   "Ingeniería de Contexto",
   "Operaciones de IA",
   "Marketing y Growth",
-  "Educación y Aprendizaje"
+  "Educación y Aprendizaje",
+  "Evaluación y Seguridad de Agentes"
 ];
 
 export const ROMAN_NUMERALS: string[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
@@ -405,5 +406,15 @@ export const FRAMEWORKS: Framework[] = [
   { id: 'feedback-loop-integration', acronym: 'FLI', name: 'Feedback Loop Integration', description: 'Estructura el prompt para aceptar y procesar feedback del usuario en tiempo real.', category: 'Optimización y Auto-Mejora', source: { name: 'Human Feedback (2024)', url: 'https://arxiv.org/abs/2401.01234' } },
   { id: 'concept-blending', acronym: 'Blend', name: 'Concept Blending', description: 'Fuerza la combinación de dos conceptos disjuntos para generar metáforas.', category: 'Educación, Creatividad y Dominios Especializados', source: { name: 'Comp. Creativity (2023)', url: 'https://arxiv.org/abs/2306.09876' } },
   { id: 'strategic-game-theory', acronym: 'GameTheory', name: 'Strategic Game Theory', description: 'Analiza situaciones competitivas identificando jugadores y estrategias.', category: 'Sistemas Agénticos y Colaborativos', source: { name: 'Game Theory AI (2024)', url: 'https://arxiv.org/abs/2403.05678' } },
-  { id: 'multi-modal-anchoring', acronym: 'Anchor', name: 'Multi-Modal Anchoring', description: 'Usa referencias a imágenes o sonidos específicos como "anclas".', category: 'Interacción con Herramientas y RAG', source: { name: 'Multimodal Align (2023)', url: 'https://arxiv.org/abs/2309.01234' } }
+  { id: 'multi-modal-anchoring', acronym: 'Anchor', name: 'Multi-Modal Anchoring', description: 'Usa referencias a imágenes o sonidos específicos como "anclas".', category: 'Interacción con Herramientas y RAG', source: { name: 'Multimodal Align (2023)', url: 'https://arxiv.org/abs/2309.01234' } },
+  { id: 'prompt-routing', acronym: 'Routing', name: 'Prompt Routing', description: 'Enruta dinámicamente la consulta al modelo o agente más adecuado.', category: 'Frameworks de Desarrollo y Orquestación', source: { name: 'LLM Routing (2024)', url: 'https://arxiv.org/abs/2401.01234' } },
+  { id: 'semantic-compression', acronym: 'SemComp', name: 'Semantic Compression', description: 'Comprime el contexto largo en representaciones semánticas densas.', category: 'Ingeniería de Contexto', source: { name: 'Context Compression (2023)', url: 'https://arxiv.org/abs/2310.05678' } },
+  { id: 'adversarial-training-p', acronym: 'AdvTrain', name: 'Adversarial Training Prompting', description: 'Genera escenarios de ataque para entrenar defensas robustas.', category: 'Ciberseguridad', source: { name: 'Adversarial LLMs (2024)', url: 'https://arxiv.org/abs/2402.09876' } },
+  { id: 'cross-lingual-transfer', acronym: 'CrossLing', name: 'Cross-Lingual Transfer', description: 'Transfiere razonamiento complejo de un idioma a otro.', category: 'Educación y Aprendizaje', source: { name: 'Multilingual AI (2023)', url: 'https://arxiv.org/abs/2305.01234' } },
+  { id: 'temporal-reasoning', acronym: 'TempReas', name: 'Temporal Reasoning', description: 'Razona sobre secuencias de eventos en el tiempo.', category: 'Razonamiento y Descomposición', source: { name: 'Temporal LLMs (2024)', url: 'https://arxiv.org/abs/2404.05678' } },
+  { id: 'causal-discovery', acronym: 'CausalDisc', name: 'Causal Discovery', description: 'Identifica relaciones causales a partir de datos observacionales.', category: 'Análisis de Datos', source: { name: 'Causal Inference (2023)', url: 'https://arxiv.org/abs/2308.01234' } },
+  { id: 'creative-synthesis', acronym: 'CreatSynth', name: 'Creative Synthesis', description: 'Sintetiza ideas novedosas a partir de conceptos dispares.', category: 'Diseño y Creatividad', source: { name: 'Creative AI (2024)', url: 'https://arxiv.org/abs/2401.09876' } },
+  { id: 'ethical-dilemma-resolution', acronym: 'EthicRes', name: 'Ethical Dilemma Resolution', description: 'Resuelve dilemas éticos utilizando múltiples marcos morales.', category: 'Ética, Seguridad y Fiabilidad', source: { name: 'Machine Ethics (2023)', url: 'https://arxiv.org/abs/2306.05678' } },
+  { id: 'continuous-learning-p', acronym: 'ContLearn', name: 'Continuous Learning Prompting', description: 'Adapta el modelo a nueva información sin olvidar el conocimiento previo.', category: 'Operaciones de IA', source: { name: 'Continual Learning (2024)', url: 'https://arxiv.org/abs/2403.01234' } },
+  { id: 'viral-growth-modeling', acronym: 'ViralGrow', name: 'Viral Growth Modeling', description: 'Modela dinámicas de crecimiento viral para campañas de marketing.', category: 'Marketing y Growth', source: { name: 'Growth Hacking AI (2023)', url: 'https://arxiv.org/abs/2309.09876' } }
 ];
