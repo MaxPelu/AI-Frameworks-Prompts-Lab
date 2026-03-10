@@ -1,25 +1,30 @@
 
-# Especificaciones de Diseño (UI/UX): Liquid Glass v4.2.0
+# Especificaciones de Diseño (UI/UX): Liquid Glass v4.3.1
 
 ## Concepto Visual: "Omni-Forge"
 La interfaz se expande para acomodar múltiples dominios de conocimiento sin perder la coherencia estética. El diseño "Liquid Glass" busca transmitir una sensación de tecnología avanzada, limpieza y enfoque profesional, utilizando transparencias, desenfoques de fondo (backdrop-blur) y bordes sutiles.
 
-### Sistema de Colores por Dominio
-Para facilitar la navegación rápida y el reconocimiento cognitivo en la Biblioteca de Conocimiento, cada dominio tiene asignado un color temático:
+### Sistema de Colores por Dominio & Dashboard
+Para facilitar la navegación rápida y el reconocimiento cognitivo, se han asignado colores temáticos a los nuevos dashboards:
 
-1.  **Prompting (Teal)**: `#2DD4BF`. El núcleo de la aplicación, representa claridad y estructura.
-2.  **Contexto/RAG (Púrpura)**: `#A855F7`. Conexión, memoria y profundidad semántica.
-3.  **Agentes (Rosa)**: `#EC4899`. Autonomía, simulación y sistemas dinámicos.
-4.  **Codificación (Azul)**: `#3B82F6`. Estructura, lógica técnica y precisión.
-5.  **Negocios (Amarillo/Oro)**: `#EAB308`. Estrategia, valor y metodologías corporativas.
-6.  **Data/SOTA (Verde)**: `#22C55E`. Datos crudos, estado del arte y flujos de información.
+1.  **Guía (Teal)**: `#2DD4BF`. Representa aprendizaje, claridad y soporte.
+2.  **Datos & RAG (Azul)**: `#3B82F6`. Representa flujo, almacenamiento y profundidad.
+3.  **Evaluación (Esmeralda)**: `#10B981`. Representa precisión, éxito y validación.
+4.  **Agentes (Naranja)**: `#F97316`. Representa acción, autonomía y energía.
+5.  **Seguridad (Rojo)**: `#EF4444`. Representa protección, alerta y límites.
 
 ### Componentes de UX Críticos
 
-#### 1. Panel de Conocimiento Tabulado (`KnowledgePanel`)
-*   **Navegación**: Barra de pestañas superior con indicador de actividad deslizante para una transición suave entre dominios.
-*   **Filtros**: Dropdown de categorías dinámico que cambia según la pestaña activa (ej. muestra categorías de "Negocios" solo cuando la pestaña de Negocios está activa).
-*   **Tarjetas (`FrameworkCard`)**: Diseño unificado que soporta metadatos ricos (fuente, ejemplo, descripción). Utilizan un efecto de "glassmorphism" con bordes que se iluminan al hacer hover con el color del dominio correspondiente.
+#### 0. Guía de Usuario Interactiva (v4.3.1)
+*   **Sidebar de Navegación**: Menú vertical izquierdo con iconos minimalistas y etiquetas en mayúsculas para una navegación rápida entre secciones de aprendizaje.
+*   **Contenido Enriquecido**: Uso de grids, tablas de atajos y tarjetas de pasos para presentar información densa de forma digerible.
+*   **Modo Dual**: Capacidad de visualizarse como un modal centralizado o como un panel integrado en el flujo de trabajo.
+*   **Controles de Salida**: Botón de cierre (X) en el encabezado y botón de "Cerrar Guía" en la base del sidebar con acento de color rojo sutil para indicar salida.
+
+#### 1. Dashboards de Ingeniería (Modales 2.0 - v4.3.0)
+*   **Layout de Doble Panel**: Sidebar izquierdo para navegación por categorías y área principal derecha para visualización de datos y controles.
+*   **Micro-Dashboard de Status**: Grid de 3 columnas en la parte superior de cada modal para mostrar KPIs rápidos (ej. "Tests Pasados", "Documentos Subidos").
+*   **Tabs de Navegación**: Pestañas horizontales con bordes inferiores animados para cambiar entre sub-vistas (ej. de "Archivos" a "Vector DB").
 
 #### 2. Modales de Creación (Meta-Alquimia & Deep Research)
 *   **Meta-Alquimia**: Estética "Mística/Tecnológica" con gradientes Púrpura-Rosa profundos. Input grande para descripción de problemas de nicho, enfatizando la creación de algo nuevo.

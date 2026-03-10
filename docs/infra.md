@@ -1,5 +1,5 @@
 
-# Infraestructura y Seguridad (v4.2.0)
+# Infraestructura y Seguridad (v4.3.1)
 
 ## Arquitectura del Sistema
 

@@ -63,11 +63,22 @@ const ALL_CATEGORIES = Array.from(new Set([
     ...AGENT_CATEGORIES,
     ...DATA_CATEGORIES
 ]));
-import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon, XMarkIcon } from '../components/shared/Icons.tsx';
+import { ChevronDownIcon, CodeBracketIcon, BookOpenIcon, WrenchScrewdriverIcon, SaveDiskIcon, CheckIcon, SparklesIcon, DocumentTextIcon, ChartBarIcon, CloudArrowUpIcon, PauseCircleIcon, TableCellsIcon, BeakerIcon, SearchIcon, PlusIcon, ClockIcon, FingerPrintIcon, XMarkIcon, FolderIcon, AdjustmentsHorizontalIcon, ArrowPathIcon, CpuChipIcon, CircleStackIcon, ScaleIcon, ShieldCheckIcon } from '../components/shared/Icons.tsx';
+import WorkspaceModal from '../components/shared/WorkspaceModal.tsx';
+import DataModal from '../components/shared/DataModal.tsx';
+import EvalModal from '../components/shared/EvalModal.tsx';
+import AgentsModal from '../components/shared/AgentsModal.tsx';
+import SecurityModal from '../components/shared/SecurityModal.tsx';
 
 const App: React.FC = () => {
     // Workspace View State
     const [currentView, setCurrentView] = useState<'home' | 'arena' | 'batch' | 'metrics' | 'history' | 'skills' | 'library' | 'guide' | 'redteam' | 'forensic'>('home');
+    const [currentWorkspace, setCurrentWorkspace] = useState('DEFAULT');
+    const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
+    const [isDataModalOpen, setIsDataModalOpen] = useState(false);
+    const [isEvalModalOpen, setIsEvalModalOpen] = useState(false);
+    const [isAgentsModalOpen, setIsAgentsModalOpen] = useState(false);
+    const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
     
     // Global App State
     const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
@@ -999,13 +1010,96 @@ const App: React.FC = () => {
                                     </div>
 
                                     <div className="w-full bg-gradient-to-r from-teal-900/20 via-purple-900/20 to-orange-900/20 border border-white/10 rounded-2xl p-4 flex items-center justify-between backdrop-blur-sm shadow-lg">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3 shrink-0">
                                             <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                                            <span className="text-teal-300 font-mono text-xs uppercase tracking-widest">Sistema Operativo: SOTA Ready</span>
+                                            <span className="text-teal-300 font-mono text-xs uppercase tracking-widest hidden md:inline">Sistema Operativo: SOTA Ready</span>
+                                            <span className="text-teal-300 font-mono text-xs uppercase tracking-widest md:hidden">SOTA Ready</span>
                                         </div>
-                                        <div className="flex gap-4 text-gray-400 font-mono text-xs">
+
+                                        <div className="flex items-center gap-3 flex-1 justify-center overflow-x-auto hide-scrollbar px-4">
+                                            {/* New Button: Datos & RAG */}
+                                            <button 
+                                                onClick={() => setIsDataModalOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <CircleStackIcon className="w-3.5 h-3.5 text-blue-400" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Datos</span>
+                                            </button>
+
+                                            {/* New Button: Evaluación */}
+                                            <button 
+                                                onClick={() => setIsEvalModalOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <ScaleIcon className="w-3.5 h-3.5 text-emerald-400" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Eval</span>
+                                            </button>
+
+                                            {/* 1. Context Usage (Visualization) */}
+                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 rounded-lg border border-white/5 whitespace-nowrap">
+                                                <ChartBarIcon className="w-3.5 h-3.5 text-gray-500" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Contexto:</span>
+                                                <span className="text-gray-300 font-mono text-[10px]">0 / 1M</span>
+                                            </div>
+
+                                            {/* 2. Model Settings (Button -> Dashboard) */}
+                                            <button 
+                                                onClick={() => setIsSettingsOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <AdjustmentsHorizontalIcon className="w-3.5 h-3.5 text-gray-500" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Ajustes:</span>
+                                                <span className="text-teal-300 font-mono text-[10px]">T {temperature} | P {topP}</span>
+                                            </button>
+
+                                            {/* 3. Workspace (Button -> Dashboard) */}
+                                            <button 
+                                                onClick={() => setIsWorkspaceModalOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <FolderIcon className="w-3.5 h-3.5 text-gray-500" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Espacio:</span>
+                                                <span className="text-purple-300 font-mono text-[10px]">{currentWorkspace}</span>
+                                            </button>
+
+                                            {/* 4. Autosave (Visualization) */}
+                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 rounded-lg border border-white/5 whitespace-nowrap">
+                                                <ArrowPathIcon className="w-3.5 h-3.5 text-gray-500" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Autosave:</span>
+                                                <span className={`font-mono text-[10px] ${isAutoSaveEnabled ? 'text-emerald-400' : 'text-gray-400'}`}>
+                                                    {isAutoSaveEnabled ? 'ON' : 'OFF'}
+                                                </span>
+                                            </div>
+
+                                            {/* 5. Mode (Visualization) */}
+                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 rounded-lg border border-white/5 whitespace-nowrap">
+                                                <CpuChipIcon className="w-3.5 h-3.5 text-gray-500" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Modo:</span>
+                                                <span className="text-orange-300 font-mono text-[10px]">{currentView.toUpperCase()}</span>
+                                            </div>
+
+                                            {/* New Button: Agentes */}
+                                            <button 
+                                                onClick={() => setIsAgentsModalOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <CpuChipIcon className="w-3.5 h-3.5 text-orange-400" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Agentes</span>
+                                            </button>
+
+                                            {/* New Button: Seguridad */}
+                                            <button 
+                                                onClick={() => setIsSecurityModalOpen(true)} 
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-white/5 rounded-lg border border-white/5 transition-colors cursor-pointer whitespace-nowrap"
+                                            >
+                                                <ShieldCheckIcon className="w-3.5 h-3.5 text-red-400" />
+                                                <span className="text-gray-500 font-mono text-[10px] uppercase">Seguridad</span>
+                                            </button>
+                                        </div>
+
+                                        <div className="flex gap-4 text-gray-400 font-mono text-xs shrink-0 hidden lg:flex">
                                             <span>LATENCIA: 42ms</span>
-                                            <span>MODELO: GEMINI 3.1 FLASH</span>
+                                            <span>MODELO: {selectedModel?.name?.toUpperCase() || 'GEMINI 3.1 FLASH'}</span>
                                             <span>TOKENS: ACTIVO</span>
                                         </div>
                                     </div>
@@ -1276,6 +1370,35 @@ const App: React.FC = () => {
             </div>
 
             {/* Modals & Overlays */}
+            <WorkspaceModal
+                isOpen={isWorkspaceModalOpen}
+                onClose={() => setIsWorkspaceModalOpen(false)}
+                currentWorkspace={currentWorkspace}
+                onWorkspaceChange={setCurrentWorkspace}
+                savedPrompts={savedPrompts}
+                onNavigateToLibrary={() => setCurrentView('library')}
+            />
+
+            <DataModal
+                isOpen={isDataModalOpen}
+                onClose={() => setIsDataModalOpen(false)}
+            />
+
+            <EvalModal
+                isOpen={isEvalModalOpen}
+                onClose={() => setIsEvalModalOpen(false)}
+            />
+
+            <AgentsModal
+                isOpen={isAgentsModalOpen}
+                onClose={() => setIsAgentsModalOpen(false)}
+            />
+
+            <SecurityModal
+                isOpen={isSecurityModalOpen}
+                onClose={() => setIsSecurityModalOpen(false)}
+            />
+
             {isSettingsOpen && (
                 <ModelSettingsPanel
                     isOpen={isSettingsOpen}

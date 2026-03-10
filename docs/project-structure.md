@@ -1,5 +1,5 @@
 
-# Estructura del Proyecto: Laboratorio de Prompts v4.2.0
+# Estructura del Proyecto: Laboratorio de Prompts v4.3.1
 
 La arquitectura del proyecto está diseñada para ser escalable, modular y fácil de mantener, separando claramente la interfaz de usuario, la lógica de negocio (IA) y la base de conocimiento estática.
 
@@ -13,36 +13,16 @@ La arquitectura del proyecto está diseñada para ser escalable, modular y fáci
 │   │   ├── styles/           # Archivos CSS globales (Neon Aurora y Liquid Glass)
 │   │   └── App.tsx           # Componente raíz, gestión de estado global y enrutamiento básico
 │   ├── components/           # Componentes React organizados por dominio funcional
-│   │   ├── arena/            # Entorno de pruebas y ejecución de prompts
-│   │   │   ├── ArenaModal.tsx
-│   │   │   └── ArenaPanel.tsx
-│   │   ├── batch/            # Módulo para pruebas masivas (Batch Testing) con CSV
-│   │   │   └── BatchTestingModal.tsx
-│   │   ├── genui/            # Motor de Generative UI (Renderizado dinámico)
-│   │   │   ├── GenerativeRenderer.tsx
-│   │   │   └── widgets/      # Componentes visuales específicos
-│   │   │       ├── LiveCodeWidget.tsx
-│   │   │       ├── MermaidWidget.tsx
-│   │   │       └── SmartChartWidget.tsx
-│   │   ├── knowledge/        # Interfaz de la Biblioteca de Conocimiento Omni-Dominio
-│   │   │   ├── DeepResearchModal.tsx
-│   │   │   ├── MetaFrameworkModal.tsx
-│   │   │   ├── FrameworkCard.tsx
-│   │   │   ├── KnowledgePanel.tsx
-│   │   │   └── SavedPromptCard.tsx
-│   │   ├── metrics/          # Módulo de Tokenomics y análisis de uso
-│   │   │   └── TokenUsageDashboard.tsx
-│   │   ├── shared/           # Componentes UI reutilizables (Botones, Modales, Dropdowns)
+│   │   ├── shared/           # Componentes UI reutilizables y Dashboards de Ingeniería
+│   │   │   ├── AgentsModal.tsx      # Dashboard de Orquestación de Agentes
+│   │   │   ├── DataModal.tsx        # Dashboard de Gestión de Datos y RAG
+│   │   │   ├── EvalModal.tsx        # Dashboard de Evaluación y Métricas
+│   │   │   ├── SecurityModal.tsx    # Dashboard de Guardrails y Seguridad
+│   │   │   ├── WorkspaceModal.tsx   # Dashboard de Gestión de Espacios de Trabajo
+│   │   │   ├── GuideDashboard.tsx   # Dashboard de Guía Interactiva (v4.3.1)
 │   │   │   ├── BuilderCanvas.tsx
-│   │   │   ├── CanvasModal.tsx
-│   │   │   ├── ComparisonTray.tsx
-│   │   │   ├── ExportModal.tsx
 │   │   │   ├── Icons.tsx
-│   │   │   ├── LengthModifierDropdown.tsx
-│   │   │   ├── ModelSettingsPanel.tsx
-│   │   │   ├── QualityAnalysisModal.tsx
-│   │   │   ├── SafetySettingsModal.tsx
-│   │   │   └── Toast.tsx
+│   │   │   └── ...
 │   │   ├── skills/           # Módulo para gestión de habilidades de agentes
 │   │   │   └── AgentSkillsDashboard.tsx
 │   │   └── workflow/         # Pipeline principal de creación y refinamiento de prompts

@@ -1,12 +1,29 @@
 
-# Documento de Requisitos del Producto (PRD): v4.2.0
+# Documento de Requisitos del Producto (PRD): v4.3.1
 
 ## 1. Visión del Producto
 Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería de IA** completa y definitiva para 2026. El objetivo ya no es solo escribir prompts, sino arquitecturar sistemas de IA complejos, diseñar flujos de datos, evaluar el rendimiento de los modelos y definir estrategias de negocio asistidas por modelos SOTA (State of the Art) de Google.
 
 ## 2. Requisitos Funcionales (Q1-Q2 2026)
 
-### 2.1 Biblioteca de Conocimiento Expandida (Omni-Dominio)
+### 2.0 Onboarding e Instrucción (v4.3.1)
+*   **Guía de Usuario Interactiva**: Dashboard multi-sección con navegación lateral que explica los flujos de trabajo clave (Prompting, RAG, Agentes, Evaluación).
+*   **Glosario de Ingeniería**: Centro de terminología para estandarizar el lenguaje de IA dentro de la plataforma.
+*   **Atajos de Productividad**: Documentación interactiva de comandos rápidos para acelerar el flujo de trabajo del ingeniero.
+*   **Accesibilidad de Navegación**: Implementación de controles de salida rápidos (tecla Escape y botones de cierre redundantes) para garantizar que el Hub de instrucción no interrumpa el flujo de trabajo creativo.
+
+### 2.1 Dashboards de Ingeniería Especializados (v4.3.0)
+*   **Módulo de Datos & RAG**: Sistema de gestión de conocimiento que permita la carga de archivos, visualización de chunks y configuración de infraestructura vectorial.
+*   **Módulo de Evaluación**: Laboratorio para ejecutar suites de pruebas contra prompts, utilizando modelos de lenguaje como jueces para obtener puntuaciones cualitativas y cuantitativas.
+*   **Módulo de Agentes**: Interfaz para la definición de agentes autónomos, asignación de herramientas (Function Calling) y selección de patrones de orquestación.
+*   **Módulo de Seguridad (Guardrails)**: Implementación de capas de seguridad para prevenir inyecciones de prompts y filtrar información sensible.
+
+### 2.2 Gestión de Espacios de Trabajo (Workspaces)
+*   **Dashboard de Espacio**: Cada espacio debe proporcionar una vista general de su salud (prompts, tokens, frameworks).
+*   **Scratchpad Contextual**: Bloc de notas persistente y único para cada espacio de trabajo.
+*   **Exportación de Espacio**: Capacidad de descargar todo el contexto de un espacio en un solo archivo portable.
+
+### 2.3 Biblioteca de Conocimiento Expandida (Omni-Dominio)
 *   **Soporte Multi-Dominio**: La biblioteca debe soportar, categorizar y filtrar eficientemente más de 500 frameworks divididos en: Prompting, Contexto/RAG, Agentes, Codificación, Negocios y Datos.
 *   **Búsqueda Semántica Local**: Capacidad de filtrar frameworks por acrónimo, nombre, descripción o categoría en tiempo real sin latencia perceptible.
 *   **Niveles de Dificultad**: Clasificación visual de frameworks desde "Fundamentos" hasta "Frontier/SOTA", permitiendo a los usuarios escalar su aprendizaje.

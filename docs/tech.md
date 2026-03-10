@@ -1,9 +1,28 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.2.3
+# Especificaciones Técnicas: Laboratorio de Prompts v4.3.1
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.2.3 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.1 del Laboratorio de Prompts.
 
-## 1. Integración de IA Avanzada (`src/lib/geminiService.ts`)
+## 1. Módulo de Guía Interactiva (v4.3.1)
+Se ha implementado un nuevo sistema de instrucción integrado (`GuideDashboard.tsx`) que utiliza:
+*   **Internal Routing**: Un sistema de navegación basado en estados de React para manejar múltiples secciones de contenido sin recargar la página.
+*   **AnimatePresence**: Uso de `framer-motion` para transiciones suaves entre secciones de la guía.
+*   **Responsive Layout**: Diseño adaptable que funciona tanto en modo modal (pantalla completa) como en modo inline (dentro de otros dashboards).
+*   **Event Handling**: Implementación de un listener de teclado global para la tecla `Escape` y botones de cierre redundantes (Header y Sidebar) para mejorar la UX de navegación.
+
+## 2. Arquitectura de Dashboards Modulares (v4.3.0)
+Se han implementado cuatro nuevos dashboards especializados (`DataModal`, `EvalModal`, `AgentsModal`, `SecurityModal`) que utilizan un patrón de diseño común:
+*   **Sidebar Navigation**: Navegación interna por pestañas para organizar la alta densidad de funciones.
+*   **Contextual State**: Cada dashboard mantiene su propio estado de pestaña activa y filtros.
+*   **Shared UI Components**: Uso intensivo de `FeatureCard` y `Icons` para mantener la consistencia visual.
+
+## 2. Gestión de Espacios de Trabajo (Workspaces)
+La lógica de espacios de trabajo se ha centralizado en `App.tsx` y se consume en `WorkspaceModal.tsx`.
+*   **Métricas Dinámicas**: Cálculo en tiempo real de tokens y frameworks mediante el filtrado de `savedPrompts` por el ID del espacio actual.
+*   **Persistencia de Notas**: El estado `workspaceNotes` utiliza un mapeo `Record<string, string>` para aislar las notas de cada proyecto.
+*   **Exportación JSON**: Implementación de generación de Blobs en el cliente para permitir la descarga de datos del espacio sin intervención del servidor.
+
+## 3. Integración de IA Avanzada (`src/lib/geminiService.ts`)
 
 El núcleo de la aplicación es la integración con la API de Google Gemini a través del SDK `@google/genai`.
 

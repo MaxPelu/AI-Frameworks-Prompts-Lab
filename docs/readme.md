@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
 ![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.2.2-purple)
+![Version](https://img.shields.io/badge/Version-4.3.1-purple)
 
 ## 🌟 Visión General
 
@@ -14,9 +14,26 @@
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
 
-## 🚀 Características SOTA v4.2.3 (UI & Frameworks Update)
+## 🚀 Características SOTA v4.3.1 (Interactive Guide Hub Update) 🛠️
 
-### 0. Actualización de UI y Expansión de Frameworks 🛠️
+### 0. Guía del Usuario Interactiva (v4.3.1) 📖
+*   **Dashboard de Instrucción**: Nuevo centro de aprendizaje integrado con navegación lateral para dominar los flujos de trabajo de la plataforma.
+*   **Secciones Especializadas**: Guías paso a paso para Prompting, RAG, Agentes AI, Evaluación y Gestión de Espacios de Trabajo.
+*   **Atajos de Teclado**: Tabla interactiva de comandos rápidos (Cmd+K) para maximizar la productividad.
+*   **Navegación Fluida**: Soporte para cierre rápido mediante la tecla `Esc` y botones de salida redundantes para una experiencia sin fricciones.
+
+### 1. Nuevos Dashboards de Ingeniería (v4.3.0) 🛠️
+*   **Gestor de Datos & RAG**: Interfaz avanzada para la ingesta de documentos (PDF, MD, TXT), configuración de bases de datos vectoriales (Pinecone, ChromaDB) y modelos de embeddings.
+*   **Laboratorio de Evaluación**: Suite de pruebas automatizadas con métricas *LLM-as-a-judge* (Gemini 3.1 Pro) para medir relevancia, fidelidad y formato.
+*   **Orquestación de Agentes**: Configuración de sistemas multi-agente, gestión de herramientas (Function Calling) y arquitecturas cognitivas (ReAct, Plan-and-Solve).
+*   **Guardrails & Seguridad**: Políticas anti-jailbreak, filtros de PII (datos personales) y validación de salida estructurada.
+
+### 1. Workspace Dashboard 2.0 📂
+*   **Métricas en Tiempo Real**: Visualización de prompts guardados, consumo de tokens y frameworks utilizados por espacio de trabajo.
+*   **Gestión de Activos**: Scratchpad persistente por espacio y sistema de exportación de datos en formato JSON.
+*   **Control de Ciclo de Vida**: Funcionalidades para archivar y eliminar espacios de trabajo con protecciones para el entorno por defecto.
+
+### v4.2.3 (UI & Frameworks Update)
 *   **Expansión de la Biblioteca**: Se añadieron nuevos frameworks avanzados (Strategic Game Theory, Multi-Modal Anchoring, Prompt Routing, Semantic Compression, Adversarial Training, Cross-Lingual Transfer, Temporal Reasoning, Causal Discovery, Creative Synthesis, Ethical Dilemma Resolution, Continuous Learning, Viral Growth Modeling) alcanzando un total de 178 metodologías.
 *   **Corrección de Categorías**: Se incluyó la categoría "Evaluación y Seguridad de Agentes" en el conteo principal.
 *   **Optimización de Layout**: Se mejoró la estética de la introducción (`AppDescription`), estirando el contenedor de texto para usar todo el ancho disponible y ajustando la cuadrícula de categorías de 5 a 6 columnas para un diseño más compacto y equilibrado.
