@@ -981,33 +981,70 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             )}
 
             {/* --- STATUS HEADER FOR ITERATION CONTEXT --- */}
-            <div className="bg-gradient-to-r from-teal-900/40 to-slate-900/40 rounded-3xl p-6 border border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xl">
-                <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-2xl ${promptToIterateId ? 'bg-indigo-500/20 text-indigo-300' : 'bg-teal-500/20 text-teal-300'}`}>
-                        {promptToIterateId ? <PencilIcon className="w-6 h-6" /> : <SparklesIcon className="w-6 h-6" />}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#022c22] rounded-3xl p-6 border border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl group">
+                {/* Animated Background Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                
+                <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
+                    {/* Icon Container with Status Ring */}
+                    <div className="relative shrink-0">
+                        <div className={`absolute inset-0 rounded-2xl blur-md opacity-50 ${promptToIterateId ? 'bg-indigo-500' : 'bg-teal-500'} animate-pulse`} />
+                        <div className={`relative p-4 rounded-2xl border border-white/10 backdrop-blur-sm ${promptToIterateId ? 'bg-indigo-500/20 text-indigo-300' : 'bg-teal-500/20 text-teal-300'}`}>
+                            {promptToIterateId ? <PencilIcon className="w-6 h-6" /> : <SparklesIcon className="w-6 h-6" />}
+                        </div>
+                        {/* Auto-save Indicator Ring */}
+                        <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-[#0f172a] ${isAutoSaveEnabled ? 'bg-emerald-400' : 'bg-amber-400'}`} title={isAutoSaveEnabled ? 'Auto-guardado activo' : 'Auto-guardado pausado'} />
                     </div>
-                    <div>
-                        <h3 className="font-bold text-white text-lg">
-                            {promptToIterateId ? `Editando Sesión: ${promptToIterate?.name || promptToIterate?.baseIdea || 'Sin Título'}` : 'Nueva Sesión (Borrador)'}
-                        </h3>
-                        <p className="text-teal-400 font-mono text-xs uppercase tracking-widest mt-1">WORKBENCH DE INGENIERÍA DE PROMPTS</p>
-                        <p className="text-sm text-gray-400 mt-2 max-w-2xl">
-                            {promptToIterateId 
-                                ? `Versión Actual: ${currentVersionIndex} • Modificaciones se auto-guardan` 
-                                : 'Entorno avanzado para diseñar, probar y optimizar estrategias de interacción con Modelos de Lenguaje (LLMs) mediante metodologías científicas.'}
-                        </p>
+
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                            <h3 className="font-black text-white text-xl tracking-tight truncate">
+                                {promptToIterateId ? (promptToIterate?.name || 'Sesión sin título') : 'Nueva Sesión de Trabajo'}
+                            </h3>
+                            {promptToIterateId && (
+                                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase tracking-wider border border-indigo-500/30 shrink-0">
+                                    v{currentVersionIndex}
+                                </span>
+                            )}
+                            {!promptToIterateId && (
+                                <span className="px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 text-[10px] font-bold uppercase tracking-wider border border-teal-500/30 shrink-0">
+                                    Borrador
+                                </span>
+                            )}
+                        </div>
+                        
+                        <div className="flex items-center gap-3 text-xs font-mono">
+                            <span className="text-teal-400 uppercase tracking-widest font-semibold shrink-0">Workbench</span>
+                            <span className="text-gray-600 shrink-0">•</span>
+                            <span className="text-gray-400 flex items-center gap-1 shrink-0">
+                                <BeakerIcon className="w-3.5 h-3.5" />
+                                {modelSettings.selectedModel.replace('gemini-', '').replace('-preview', '')}
+                            </span>
+                            <span className="text-gray-600 hidden sm:inline shrink-0">•</span>
+                            <span className="text-gray-400 hidden sm:flex items-center gap-1 truncate max-w-[150px]">
+                                <CheckBadgeIcon className="w-3.5 h-3.5 shrink-0" />
+                                <span className="truncate">{selectedFrameworkAcronym !== 'auto' ? selectedFrameworkAcronym : 'Auto-Framework'}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 
-                {/* Category buttons removed as requested */}
+                {/* App Description */}
+                <div className="hidden md:flex flex-1 items-center justify-end relative z-10 pl-6 border-l border-white/10 ml-2">
+                    <p className="text-sm text-gray-400 max-w-lg text-right leading-relaxed">
+                        Entorno profesional de <span className="text-teal-300 font-medium">AI Engineering</span>. Diseña, evalúa y optimiza prompts y agentes con metodologías estructuradas, integrando múltiples frameworks en un solo flujo de trabajo.
+                    </p>
+                </div>
+                
+                {/* Action Controls */}
                 {promptToIterateId && (
-                    <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
+                    <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10 relative z-10 w-full md:w-auto justify-center md:justify-end backdrop-blur-md shrink-0">
                         <button 
                             onClick={() => onRenameSession(promptToIterateId)}
-                            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all group/btn"
                             title="Renombrar sesión"
                         >
-                            <PencilIcon className="w-4 h-4" />
+                            <PencilIcon className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                         </button>
                         <button 
                             onClick={() => {
@@ -1015,21 +1052,35 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     onDeleteSession(promptToIterateId);
                                 }
                             }}
-                            className="p-2 text-gray-400 hover:text-red-400 hover:bg-white/10 rounded-lg transition-all"
+                            className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all group/btn"
                             title="Eliminar sesión"
                         >
-                            <TrashIcon className="w-4 h-4" />
+                            <TrashIcon className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                         </button>
-                        <div className="w-px h-4 bg-white/10 mx-1"></div>
+                        <div className="w-px h-6 bg-white/10 mx-1"></div>
                         <button 
                             onClick={onCancelIteration} 
-                            className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            className="px-4 py-2 text-xs font-bold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 hover:border-white/20"
                         >
-                            Salir
+                            Cerrar Sesión
                         </button>
                     </div>
                 )}
             </div>
+
+            {/* Guardar Borrador Button Container */}
+            {!promptToIterateId && (
+                <div className="bg-[#0f172a]/60 border border-white/5 rounded-2xl p-2 flex justify-center mt-2 shadow-inner">
+                    <button 
+                        onClick={handleSaveDraftStep1}
+                        disabled={!ideaText.trim() || isDraftSaving}
+                        className="px-6 py-2 text-sm font-medium text-teal-400 hover:text-teal-300 bg-teal-500/10 hover:bg-teal-500/20 rounded-xl transition-all border border-teal-500/20 hover:border-teal-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {isDraftSaving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <ArrowDownTrayIcon className="w-4 h-4" />}
+                        Guardar Borrador
+                    </button>
+                </div>
+            )}
 
             {draftNotification && (
                 <div className="bg-slate-800/40 border border-white/5 shadow-lg backdrop-blur-md rounded-xl p-4 flex justify-between items-center animate-fade-in text-sm">
