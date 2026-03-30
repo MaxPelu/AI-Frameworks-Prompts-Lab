@@ -82,8 +82,8 @@ const WorkspaceModal: React.FC<WorkspaceModalProps> = ({ isOpen, onClose, curren
     );
 
     // Calculate stats
-    const totalTokens = workspacePrompts.reduce((acc, p) => acc + (p.versions[0]?.metrics?.totalTokens || 0), 0);
-    const uniqueFrameworks = new Set(workspacePrompts.map(p => p.framework.acronym)).size;
+    const totalTokens = workspacePrompts.reduce((acc, p) => acc + (p.versions[0]?.usage?.totalTokens || 0), 0);
+    const uniqueFrameworks = new Set(workspacePrompts.map(p => p.versions[0]?.frameworkAcronym).filter(Boolean)).size;
 
     if (!isOpen) return null;
 
@@ -237,11 +237,11 @@ const WorkspaceModal: React.FC<WorkspaceModalProps> = ({ isOpen, onClose, curren
                                         workspacePrompts.slice(0, 5).map(prompt => (
                                             <div key={prompt.id} className="bg-black/40 border border-white/10 rounded-xl p-4 flex justify-between items-center hover:border-purple-500/50 transition-colors cursor-pointer">
                                                 <div>
-                                                    <h4 className="text-white font-medium">{prompt.title}</h4>
-                                                    <p className="text-sm text-gray-400 mt-1">Framework: {prompt.framework.acronym} | Modelo: {prompt.versions[0]?.model?.name || 'Desconocido'}</p>
+                                                    <h4 className="text-white font-medium">{prompt.name || prompt.baseIdea || 'Sin Título'}</h4>
+                                                    <p className="text-sm text-gray-400 mt-1">Framework: {prompt.versions?.[0]?.frameworkAcronym || 'N/A'} | Modelo: {prompt.versions?.[0]?.model || 'Desconocido'}</p>
                                                 </div>
                                                 <div className="text-xs font-mono text-gray-500">
-                                                    {new Date(prompt.updatedAt).toLocaleDateString()}
+                                                    {new Date(prompt.createdAt).toLocaleDateString()}
                                                 </div>
                                             </div>
                                         ))

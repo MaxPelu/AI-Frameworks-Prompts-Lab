@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Framework, GeminiModel, UploadedFile, TokenUsage, ALL_GEMINI_MODELS } from '../../types/index.ts';
 import { XCircleIcon, SparklesIcon, CheckCircleIcon, ArrowPathIcon, DocumentTextIcon, CpuChipIcon, ListBulletIcon, PlayIcon, ArrowsPointingOutIcon, WrenchScrewdriverIcon, GlobeAltIcon, TableCellsIcon, SaveDiskIcon, ClipboardIcon, CloudArrowUpIcon, BookOpenIcon, ArrowDownTrayIcon, ArrowsRightLeftIcon, ClockIcon, AdjustmentsHorizontalIcon, BeakerIcon } from '../shared/Icons.tsx';
-import { optimizePrompt, expandIdea, ModelSettings, quickRefine, modifyContentLength } from '../../lib/geminiService.ts';
+import { optimizePrompt, expandIdea, ModelSettings, quickRefine, modifyContentLength, expandIdeaStream, optimizePromptStream, quickRefineStream, modifyContentLengthStream } from '../../lib/geminiService.ts';
 
 export type DashboardActionType = 'expand' | 'optimize' | 'magic' | 'fix' | 'translate' | 'simplify' | 'save' | 'copy' | 'create_session';
 
@@ -65,6 +65,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
     const [showCompare, setShowCompare] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
     const logsEndRef = useRef<HTMLDivElement>(null);
+    const resultEndRef = useRef<HTMLDivElement>(null);
 
     // Custom Parameters State
     const [customInstructions, setCustomInstructions] = useState('');
@@ -95,6 +96,12 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
     }, [logs]);
 
     useEffect(() => {
+        if (status === 'running' && resultEndRef.current) {
+            resultEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [result, status]);
+
+    useEffect(() => {
         if (isOpen && status === 'idle') {
             runProcess();
         }
@@ -102,7 +109,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
 
     const getActionDetails = () => {
         switch (actionType) {
-            case 'expand': return { title: 'Expansión de Idea', icon: <ArrowsPointingOutIcon className="w-6 h-6" />, color: 'teal' };
+            case 'expand': return { title: 'Robustecimiento Estratégico', icon: <ArrowsPointingOutIcon className="w-6 h-6" />, color: 'indigo' };
             case 'optimize': return { title: 'Optimización de Prompt', icon: <SparklesIcon className="w-6 h-6" />, color: 'teal' };
             case 'magic': return { title: 'Mejora Mágica', icon: <SparklesIcon className="w-6 h-6" />, color: 'teal' };
             case 'fix': return { title: 'Corrección Ortográfica', icon: <WrenchScrewdriverIcon className="w-6 h-6" />, color: 'slate' };
@@ -148,18 +155,22 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                 modifiedSettings.systemInstruction = `${modifiedSettings.systemInstruction || ''}\n\nIMPORTANTE: Traduce el texto al idioma: ${targetLang}.`;
             }
             
+            const onChunk = (chunk: string) => {
+                setResult(prev => prev + chunk);
+            };
+
             if (actionType === 'expand') {
-                addLog('Generando expansión de contenido y enriquecimiento...', 'info');
-                response = await expandIdea(ideaText, files, framework, modifiedSettings);
+                addLog('Generando expansión de contenido y enriquecimiento (Streaming)...', 'info');
+                response = await expandIdeaStream(ideaText, files, framework, modifiedSettings, onChunk);
             } else if (actionType === 'optimize') {
-                addLog('Aplicando técnicas de Prompt Engineering...', 'info');
-                response = await optimizePrompt(ideaText, useCase, framework!, files, optimizationStyle, targetAudience, outputLanguage, keyInfo, negativeConstraints, modifiedSettings);
+                addLog('Aplicando técnicas de Prompt Engineering (Streaming)...', 'info');
+                response = await optimizePromptStream(ideaText, useCase, framework!, files, optimizationStyle, targetAudience, outputLanguage, keyInfo, negativeConstraints, modifiedSettings, onChunk);
             } else if (actionType === 'magic' || actionType === 'fix' || actionType === 'translate') {
-                addLog(`Aplicando refinamiento rápido: ${actionType}...`, 'info');
-                response = await quickRefine(ideaText, actionType as any, modifiedSettings);
+                addLog(`Aplicando refinamiento rápido: ${actionType} (Streaming)...`, 'info');
+                response = await quickRefineStream(ideaText, actionType as any, modifiedSettings, onChunk);
             } else if (actionType === 'simplify') {
-                addLog('Simplificando el contenido...', 'info');
-                response = await modifyContentLength(ideaText, 'simple', modifiedSettings);
+                addLog('Simplificando el contenido (Streaming)...', 'info');
+                response = await modifyContentLengthStream(ideaText, 'simple', modifiedSettings, onChunk);
             } else if (actionType === 'save') {
                 addLog('Preparando guardado de sesión...', 'info');
                 if (localAction) {
@@ -168,6 +179,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                 }
                 await new Promise(resolve => setTimeout(resolve, 1200));
                 response = { text: 'Tu trabajo ha sido guardado exitosamente en el historial. Puedes acceder a él desde la biblioteca en cualquier momento.', usage: undefined };
+                setResult(response.text);
             } else {
                 // Local actions
                 addLog('Ejecutando acción local...', 'info');
@@ -176,6 +188,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                 }
                 await new Promise(resolve => setTimeout(resolve, 800)); // Fake delay for UX
                 response = { text: ideaText, usage: undefined };
+                setResult(response.text);
             }
 
             addLog('Proceso completado con éxito.', 'success');
@@ -425,30 +438,25 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                     </div>
 
                     {/* Main Content - Result */}
-                    <div className="flex-1 flex flex-col bg-slate-900/50 relative">
-                        {status === 'running' ? (
-                            <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                                <div className="w-24 h-24 relative mb-6">
-                                    <div className={`absolute inset-0 border-4 border-${details.color}-500/10 rounded-full`}></div>
-                                    <div className={`absolute inset-0 border-4 border-${details.color}-500 rounded-full border-t-transparent animate-spin`}></div>
-                                    <BeakerIcon className={`w-10 h-10 text-${details.color}-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`} />
-                                </div>
-                                <h3 className="text-2xl font-black text-white mb-2">Procesando con IA</h3>
-                                <p className="text-gray-400 max-w-md">
-                                    Estamos aplicando los parámetros seleccionados para obtener el mejor resultado posible.
-                                </p>
-                                <div className="mt-8 w-64 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                    <div className={`h-full bg-${details.color}-500 animate-progress-indefinite`}></div>
-                                </div>
-                            </div>
-                        ) : status === 'completed' ? (
+                    <div className="flex-1 flex flex-col bg-slate-900/50 relative overflow-hidden">
+                        {(status === 'running' || status === 'completed') ? (
                             <div className="flex-1 flex flex-col p-6 overflow-hidden">
                                 <div className="flex justify-between items-center mb-4">
                                     <div className="flex items-center gap-4">
                                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                            <CheckCircleIcon className="w-5 h-5 text-green-400" /> Resultado
+                                            {status === 'running' ? (
+                                                <>
+                                                    <ArrowPathIcon className="w-5 h-5 text-blue-400 animate-spin" /> 
+                                                    <span className="animate-pulse">Generando...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CheckCircleIcon className="w-5 h-5 text-green-400" /> 
+                                                    <span>Resultado</span>
+                                                </>
+                                            )}
                                         </h3>
-                                        {usage && (
+                                        {usage && status === 'completed' && (
                                             <div className="flex items-center gap-3 text-[10px] text-gray-500 font-mono">
                                                 <span className="flex items-center gap-1"><CpuChipIcon className="w-3 h-3" /> {usage.totalTokens} tokens</span>
                                                 <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
@@ -463,7 +471,8 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={handleCopy}
-                                            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group"
+                                            disabled={status === 'running' && !result}
+                                            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group disabled:opacity-30"
                                             title="Copiar resultado"
                                         >
                                             {isCopied ? <CheckCircleIcon className="w-5 h-5 text-green-400" /> : <ClipboardIcon className="w-5 h-5" />}
@@ -471,7 +480,8 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                         </button>
                                         <button 
                                             onClick={handleDownload}
-                                            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+                                            disabled={status === 'running' && !result}
+                                            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30"
                                             title="Descargar como .txt"
                                         >
                                             <ArrowDownTrayIcon className="w-5 h-5" />
@@ -480,13 +490,28 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                         {onRunAutoFlow && ['expand', 'optimize'].includes(actionType) && (
                                             <button 
                                                 onClick={() => onRunAutoFlow(result)}
-                                                className={`px-4 py-2 rounded-xl text-sm font-bold bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 transition-all flex items-center gap-2 shadow-lg`}
+                                                disabled={status === 'running'}
+                                                className={`px-4 py-2 rounded-xl text-sm font-bold bg-teal-600/20 border border-teal-500/30 text-teal-100 hover:bg-teal-600/30 transition-all flex items-center gap-2 shadow-lg disabled:opacity-30`}
                                             >
                                                 <PlayIcon className="w-4 h-4" /> Correr Flujo
                                             </button>
                                         )}
                                     </div>
                                 </div>
+
+                                {actionType === 'expand' && (
+                                    <div className="mb-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-start gap-4 animate-fade-in">
+                                        <div className="p-2 bg-indigo-500/20 rounded-xl text-indigo-400 shrink-0">
+                                            <CpuChipIcon className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-indigo-300">Modo de Robustecimiento Activo</h4>
+                                            <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                                                Este motor no intenta "responder" a tu idea, sino que la desglosa, identifica capas ocultas y expande su arquitectura conceptual para hacerla 10 veces más sólida antes de la optimización final.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                                 
                                 <div className="flex-1 flex gap-4 overflow-hidden">
                                     {showCompare && (
@@ -500,7 +525,8 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
                                     <div className="flex-1 flex flex-col gap-2 overflow-hidden">
                                         <label className="text-[10px] text-gray-500 font-bold uppercase">{showCompare ? 'Texto Mejorado' : ''}</label>
                                         <div className="flex-1 bg-black/40 border border-white/10 rounded-2xl p-6 overflow-y-auto custom-scrollbar text-gray-200 whitespace-pre-wrap text-base leading-relaxed selection:bg-purple-500/30">
-                                            {result || 'Acción completada exitosamente sin output de texto.'}
+                                            {result || (status === 'running' ? 'Iniciando generación...' : 'Acción completada exitosamente sin output de texto.')}
+                                            <div ref={resultEndRef} />
                                         </div>
                                     </div>
                                 </div>

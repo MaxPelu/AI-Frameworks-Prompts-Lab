@@ -1,9 +1,16 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.3.1
+# Especificaciones Técnicas: Laboratorio de Prompts v4.3.3
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.1 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.3 del Laboratorio de Prompts.
 
-## 1. Módulo de Guía Interactiva (v4.3.1)
+## 1. Módulo de Robustecimiento Estratégico (v4.3.2)
+Se ha implementado un nuevo motor de expansión conceptual (`expandIdea`) que introduce:
+*   **Prompt Engineering de Arquitectura**: El sistema utiliza directivas de sistema avanzadas que instruyen al modelo a actuar como un arquitecto de soluciones, desglosando la idea en componentes, capas y requisitos en lugar de simplemente responder al prompt.
+*   **Preservación de Contexto**: Implementación de un algoritmo de inyección de contexto que asegura que la expansión no pierda el hilo original de la idea del usuario.
+*   **PII Scrubbing Engine**: Un sistema de limpieza de datos personales (emails, teléfonos) basado en expresiones regulares optimizadas que se ejecuta en el cliente antes de enviar cualquier dato a la API de Gemini.
+*   **Voice-to-Text Integration**: Integración con la Web Speech API para permitir la entrada de ideas mediante dictado por voz, mejorando la accesibilidad y la velocidad de captura de ideas.
+
+## 2. Módulo de Guía Interactiva (v4.3.1)
 Se ha implementado un nuevo sistema de instrucción integrado (`GuideDashboard.tsx`) que utiliza:
 *   **Internal Routing**: Un sistema de navegación basado en estados de React para manejar múltiples secciones de contenido sin recargar la página.
 *   **AnimatePresence**: Uso de `framer-motion` para transiciones suaves entre secciones de la guía.
@@ -70,7 +77,15 @@ El sistema de métricas intercepta las respuestas de la API para extraer el obje
 *   **Local Storage**: Se mantiene el enfoque *local-first*. Los frameworks personalizados creados por el usuario (`customFrameworks`), el historial de sesiones (`savedPrompts`), las habilidades de agentes (`agentSkills`) y las configuraciones del modelo (`modelSettings`) se serializan y guardan en el `localStorage` del navegador.
 *   **Gestión de Estado React**: Se utiliza una combinación de `useState` para el estado local de los componentes y elevación del estado (Lifting State Up) hacia `App.tsx` para el estado global de la sesión activa, evitando la complejidad innecesaria de librerías externas como Redux para este caso de uso.
 
-## 6. Arquitectura de Interfaz Avanzada
+## 7. Optimización de Rendimiento y Streaming (v4.3.3)
+Se ha implementado una arquitectura de streaming y optimización de llamadas para mejorar la responsividad de la IA:
+*   **Streaming de Contenido**: Implementación de `*Stream` para funciones críticas (`expandIdeaStream`, `optimizePromptStream`, `evolvePromptStream`). Esto permite que la UI se actualice palabra por palabra, reduciendo la percepción de latencia.
+*   **Manejo de Reintentos con Backoff Exponencial**: Refinamiento de `callGeminiStreamWithRetry` para asegurar que las conexiones de streaming sean resilientes a errores transitorios de red o límites de cuota (429).
+*   **Resolución Dinámica de Modelos**: Optimización de `resolveModel` para mapear alias amigables a los nombres técnicos de la API de Gemini (ej. `gemini-3-flash-preview`).
+*   **Seguridad y Robustez en UI**: Implementación de comprobaciones de seguridad (null checks) en componentes críticos como `WorkflowPanel.tsx` para prevenir errores de tipo al acceder a propiedades de frameworks.
+*   **Optimización de Utilidades (Fast Settings)**: Se implementaron configuraciones ligeras (`getFastSettings` y `getTransformationSettings`) para funciones de utilidad (ej. `suggestUseCase`, `formatText`, `quickRefine`). Estas configuraciones fuerzan el uso de modelos rápidos (como `gemini-3-flash-preview`) y desactivan características pesadas (Google Search, Thinking Mode) cuando no son necesarias, reduciendo drásticamente la latencia de estas operaciones secundarias sin afectar las tareas principales del usuario.
+
+## 8. Arquitectura de Interfaz Avanzada
 
 *   **React Portals**: Todos los modales y dashboards de alta densidad (Arena, Tokenomics, Skills Hub, etc.) se renderizan utilizando `createPortal`. Esto garantiza que los elementos superpuestos se monten directamente en el `body`, evitando problemas de apilamiento (z-index) y recortes por contenedores con `overflow: hidden`.
 *   **Liquid Glass UI System**: Implementación de un sistema de diseño basado en Tailwind CSS 4 que utiliza variables de tema dinámicas para cambiar la estética de la aplicación según el dominio activo, manteniendo una coherencia visual a través de efectos de cristal líquido y neón.

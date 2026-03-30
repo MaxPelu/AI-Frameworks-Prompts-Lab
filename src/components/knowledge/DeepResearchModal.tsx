@@ -101,30 +101,30 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({ isOpen, onClose, 
                     {results.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in-up">
                             {results.map((fw) => (
-                                <div key={fw.id} className="bg-slate-900/60 border border-slate-700 p-5 rounded-lg hover:border-teal-500/50 transition-colors flex flex-col">
+                                <div key={fw?.id || Math.random()} className="bg-slate-900/60 border border-slate-700 p-5 rounded-lg hover:border-teal-500/50 transition-colors flex flex-col">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-lg font-bold text-teal-300">{fw.acronym}</h3>
-                                        <span className="text-[10px] uppercase tracking-wider bg-slate-800 px-2 py-1 rounded text-gray-400 border border-slate-700">{fw.category?.split(' ')[0] || 'Framework'}</span>
+                                        <h3 className="text-lg font-bold text-teal-300">{fw?.acronym}</h3>
+                                        <span className="text-[10px] uppercase tracking-wider bg-slate-800 px-2 py-1 rounded text-gray-400 border border-slate-700">{fw?.category?.split(' ')[0] || 'Framework'}</span>
                                     </div>
-                                    <h4 className="font-semibold text-gray-200 mb-2 text-sm">{fw.name}</h4>
-                                    <p className="text-sm text-gray-400 mb-4 flex-grow">{fw.description}</p>
+                                    <h4 className="font-semibold text-gray-200 mb-2 text-sm">{fw?.name}</h4>
+                                    <p className="text-sm text-gray-400 mb-4 flex-grow">{fw?.description}</p>
                                     
-                                    {fw.source && (
+                                    {fw?.source && (
                                         <a href={fw.source.url} target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline mb-4 block truncate">
                                             Fuente: {fw.source.name}
                                         </a>
                                     )}
 
                                     <button
-                                        onClick={() => handleAdd(fw)}
-                                        disabled={addedIds.has(fw.id)}
+                                        onClick={() => fw && handleAdd(fw)}
+                                        disabled={!fw || addedIds.has(fw.id)}
                                         className={`w-full py-2 rounded-md font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-                                            addedIds.has(fw.id) 
+                                            !fw || addedIds.has(fw.id) 
                                             ? 'bg-green-900/30 text-green-400 border border-green-800 cursor-default'
                                             : 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-900/20'
                                         }`}
                                     >
-                                        {addedIds.has(fw.id) ? (
+                                        {!fw || addedIds.has(fw.id) ? (
                                             <>
                                                 <CheckIcon className="w-4 h-4" /> Añadido
                                             </>

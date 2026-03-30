@@ -25,7 +25,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
     setTimeout(() => setCopiedVersionId(null), 2000);
   };
 
-  const latestVersion = prompt.versions[0];
+  const latestVersion = prompt.versions?.[0];
   
   // Use custom name if available, otherwise use baseIdea (truncated if necessary)
   const displayTitle = prompt.name || prompt.baseIdea || "Sin Título";
@@ -46,19 +46,21 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt, onDelete, onD
                 <p className="text-xs text-gray-500 mb-2 line-clamp-1 italic">"{displaySubtitle}"</p>
             )}
 
-            <p className="text-xs text-gray-400 flex items-center gap-2 mt-1">
-              <span>{new Date(latestVersion.createdAt).toLocaleDateString()}</span>
-              <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-              <span className="font-semibold text-teal-400 drop-shadow-sm">{latestVersion.frameworkAcronym}</span>
-              <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-              <span className="font-semibold text-teal-300 drop-shadow-sm">{latestVersion.model}</span>
-              {latestVersion.isDraft && (
-                  <span className="ml-2 px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-md text-[10px] font-black uppercase tracking-tighter">Borrador</span>
-              )}
-              {prompt.versions.length > 1 && (
-                   <span className="ml-2 px-1.5 py-0.5 bg-white/10 rounded-md text-[10px] text-gray-300 border border-white/5">{prompt.versions.length} versiones</span>
-              )}
-            </p>
+            {latestVersion && (
+                <p className="text-xs text-gray-400 flex items-center gap-2 mt-1">
+                  <span>{new Date(latestVersion.createdAt).toLocaleDateString()}</span>
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  <span className="font-semibold text-teal-400 drop-shadow-sm">{latestVersion.frameworkAcronym || 'N/A'}</span>
+                  <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                  <span className="font-semibold text-teal-300 drop-shadow-sm">{latestVersion.model || 'Desconocido'}</span>
+                  {latestVersion.isDraft && (
+                      <span className="ml-2 px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-md text-[10px] font-black uppercase tracking-tighter">Borrador</span>
+                  )}
+                  {prompt.versions.length > 1 && (
+                       <span className="ml-2 px-1.5 py-0.5 bg-white/10 rounded-md text-[10px] text-gray-300 border border-white/5">{prompt.versions.length} versiones</span>
+                  )}
+                </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
              <button onClick={() => onRename(prompt.id)} title="Renombrar sesión" className="p-2 text-gray-500 hover:text-teal-400 hover:bg-white/10 rounded-full transition-all">

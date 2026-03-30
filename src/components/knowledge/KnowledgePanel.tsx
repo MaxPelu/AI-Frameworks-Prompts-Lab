@@ -174,6 +174,7 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
 
   const filteredFrameworks = useMemo(() => {
     return baseFrameworks.filter(framework => {
+      if (!framework) return false;
       const matchesCategory = selectedCategory === 'all' || framework.category === selectedCategory;
       if (!matchesCategory) return false;
 
@@ -181,9 +182,9 @@ const KnowledgePanel: React.FC<KnowledgePanelProps> = ({
       if (!matchesDifficulty) return false;
 
       const matchesSearch = lowerCaseQuery === '' ||
-                            framework.acronym.toLowerCase().includes(lowerCaseQuery) ||
-                            framework.name.toLowerCase().includes(lowerCaseQuery) ||
-                            framework.description.toLowerCase().includes(lowerCaseQuery);
+                            (framework?.acronym || '').toLowerCase().includes(lowerCaseQuery) ||
+                            (framework?.name || '').toLowerCase().includes(lowerCaseQuery) ||
+                            (framework?.description || '').toLowerCase().includes(lowerCaseQuery);
       return matchesSearch;
     });
   }, [baseFrameworks, selectedCategory, selectedDifficulty, lowerCaseQuery]);

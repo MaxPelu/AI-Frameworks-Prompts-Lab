@@ -1,5 +1,5 @@
 
-# Estructura del Proyecto: Laboratorio de Prompts v4.3.1
+# Estructura del Proyecto: Laboratorio de Prompts v4.3.3
 
 La arquitectura del proyecto está diseñada para ser escalable, modular y fácil de mantener, separando claramente la interfaz de usuario, la lógica de negocio (IA) y la base de conocimiento estática.
 
@@ -36,7 +36,7 @@ La arquitectura del proyecto está diseñada para ser escalable, modular y fáci
 │   │   ├── businessConstants.ts  # Estrategia Corporativa, Innovación y Negocios
 │   │   └── dataConstants.ts      # Data Engineering, Analytics y Arquitectura de Datos
 │   ├── lib/                  # Lógica de negocio, servicios externos y utilidades
-│   │   ├── geminiService.ts  # Cliente principal para la API de Google GenAI (Incluye lógica de reintentos)
+│   │   ├── geminiService.ts  # Cliente principal para la API de Google GenAI (Streaming, Reintentos, Fast Settings)
 │   │   └── batchUtils.ts     # Utilidades para el procesamiento de archivos CSV y plantillas
 │   └── types/                # Definiciones de tipos TypeScript (Interfaces, Enums)
 │       └── index.ts          # Tipos globales compartidos en toda la aplicación
@@ -49,6 +49,6 @@ La arquitectura del proyecto está diseñada para ser escalable, modular y fáci
 ## Módulos Clave y Patrones de Diseño
 
 *   **`config/*Constants.ts`**: Estos archivos actúan como la "Base de Datos" de la aplicación. Contienen más de 500 frameworks estructurados como objetos TypeScript. Esta separación por dominios evita tener un único archivo monolítico inmanejable.
-*   **`lib/geminiService.ts`**: Centraliza todas las llamadas a la API de Gemini. Implementa un patrón de "Wrapper" (`callGeminiWithRetry`) para manejar de forma robusta los errores de red y los límites de tasa (HTTP 429) mediante Exponential Backoff.
+*   **`lib/geminiService.ts`**: Centraliza todas las llamadas a la API de Gemini. Implementa un patrón de "Wrapper" (`callGeminiWithRetry`) para manejar de forma robusta los errores de red y los límites de tasa (HTTP 429) mediante Exponential Backoff. Además, incluye soporte para **Streaming** (`*Stream` functions) y configuraciones optimizadas (`getFastSettings`, `getTransformationSettings`) para reducir la latencia en tareas específicas.
 *   **Gestión de Estado**: La aplicación utiliza un enfoque híbrido. El estado global complejo (sesiones, configuraciones) se gestiona en `App.tsx` y se pasa mediante props o Context, mientras que el estado local de la UI se mantiene dentro de los componentes específicos.
 *   **Componentes Modulares**: La carpeta `components/shared/` contiene elementos agnósticos al dominio que garantizan la consistencia visual (Liquid Glass UI) en toda la aplicación.

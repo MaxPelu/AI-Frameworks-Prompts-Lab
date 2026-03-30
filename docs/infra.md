@@ -1,5 +1,5 @@
 
-# Infraestructura y Seguridad (v4.3.1)
+# Infraestructura y Seguridad (v4.3.3)
 
 ## Arquitectura del Sistema
 
@@ -8,6 +8,7 @@ El Laboratorio de Prompts 2026 está diseñado con una arquitectura "Edge-First 
 ### 1. Despliegue SPA (Client-Side)
 *   **Sin Backend Propio**: La aplicación se sirve como un conjunto de archivos estáticos (HTML, CSS, JS). No hay un servidor Node.js o Python intermedio gestionando el estado de la aplicación.
 *   **Llamadas Directas a API**: Todas las interacciones con los modelos de IA se realizan directamente desde el navegador del usuario hacia la API de Google Gemini, utilizando el SDK `@google/genai`.
+*   **Arquitectura de Streaming**: Soporte nativo para respuestas en tiempo real (`generateContentStream`), permitiendo a la UI renderizar el texto a medida que se genera, reduciendo drásticamente la latencia percibida en procesos largos.
 
 ### 2. Gestión de Datos y Estado
 Con la introducción de **+500 frameworks** en múltiples dominios:
@@ -26,8 +27,10 @@ Para garantizar la privacidad y la soberanía de los datos del usuario:
 ## Integración de Servicios Externos (SOTA)
 
 1.  **Google Gemini API (v3.1 / v2.5)**: El motor de inteligencia principal.
+    *   **Resolución Dinámica de Modelos**: El sistema selecciona automáticamente el modelo más adecuado. Utiliza `gemini-3.1-pro-preview` para tareas complejas de razonamiento y `gemini-3-flash-preview` para tareas rápidas (Fast Settings).
     *   **Thinking Tokens**: La infraestructura soporta la configuración y recepción de tokens de pensamiento (razonamiento oculto) con niveles de intensidad (Low, Medium, High, Super High), crucial para tareas complejas.
     *   **Grounding (Google Search)**: Se utiliza la herramienta `googleSearch` nativa de la API para habilitar la función de "Deep Research", permitiendo al modelo acceder a información en tiempo real.
+    *   **Fast Settings & Transformation Settings**: Perfiles de configuración predefinidos que desactivan características pesadas (como búsqueda o modo pensamiento) y fuerzan modelos rápidos para utilidades secundarias, minimizando la latencia.
 2.  **Mermaid.ink**: Servicio externo sin estado utilizado para renderizar diagramas de arquitectura basados en la sintaxis de Mermaid.js generada por la IA.
 
 ## Seguridad y Privacidad
@@ -41,4 +44,5 @@ Para garantizar la privacidad y la soberanía de los datos del usuario:
 ## Gestión de Cuotas y Costos
 
 *   **Client-Side Metering (Tokenomics)**: Debido al uso intensivo de modelos avanzados (Gemini 3.1 Pro) y la habilitación del "Thinking Budget", el consumo de tokens puede ser significativo.
+*   **Resiliencia (Exponential Backoff)**: El servicio de Gemini incluye una capa de reintentos automáticos que intercepta errores 429 (Too Many Requests) y 503 (Service Unavailable), reintentando la llamada con un retraso exponencial para asegurar la entrega sin interrumpir al usuario.
 *   El dashboard de Tokenomics intercepta las respuestas de la API para extraer los metadatos de uso (`usageMetadata`) y calcula estimaciones de costo basadas en los precios públicos de la API de Gemini, ayudando al usuario a mantener el control sobre su facturación.

@@ -182,6 +182,7 @@ export interface SavedPrompt {
     baseIdea: string;
     createdAt: string;
     versions: PromptVersion[];
+    workspace?: string;
 }
 
 export interface UploadedFile {

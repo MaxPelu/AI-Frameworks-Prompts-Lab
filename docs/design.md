@@ -1,5 +1,5 @@
 
-# Especificaciones de Diseño (UI/UX): Liquid Glass v4.3.1
+# Especificaciones de Diseño (UI/UX): Liquid Glass v4.3.3
 
 ## Concepto Visual: "Omni-Forge"
 La interfaz se expande para acomodar múltiples dominios de conocimiento sin perder la coherencia estética. El diseño "Liquid Glass" busca transmitir una sensación de tecnología avanzada, limpieza y enfoque profesional, utilizando transparencias, desenfoques de fondo (backdrop-blur) y bordes sutiles.
@@ -15,7 +15,19 @@ Para facilitar la navegación rápida y el reconocimiento cognitivo, se han asig
 
 ### Componentes de UX Críticos
 
-#### 0. Guía de Usuario Interactiva (v4.3.1)
+#### 0. Optimización de Rendimiento y Streaming (v4.3.3)
+*   **Streaming UI**: Visualización progresiva del texto generado (efecto máquina de escribir) para mantener al usuario enganchado durante procesos largos (ej. evolución de prompts).
+*   **Botones de Acción Rápida (Fast Settings)**: Botones secundarios (como "Sugerir Framework" o "Sugerir Caso de Uso") que responden casi instantáneamente gracias a la optimización de latencia en el backend, mejorando la fluidez del flujo de trabajo.
+*   **Indicadores de Reintento**: Feedback visual sutil cuando una llamada a la API falla y se está reintentando automáticamente en segundo plano (Exponential Backoff).
+
+#### 1. Robustecimiento Estratégico (v4.3.2)
+*   **Motor de Robustez UI**: Panel con gradiente Indigo-Teal y borde sutil de cristal líquido. Incluye un indicador de estado animado ("SOTA v5.1") para transmitir precisión técnica.
+*   **Botón de Acción "Robustecer"**: Botón de alto impacto con gradiente Teal-Indigo, efecto de brillo al pasar el mouse (hover shine) y animación de escala al hacer clic.
+*   **Selectores de Framework**: Dropdown estilizado con iconos integrados (CpuChipIcon) y agrupamiento por categorías para facilitar la selección de la metodología de expansión.
+*   **Feedback de Proceso**: Modal de dashboard especializado que muestra el progreso del robustecimiento con una barra de progreso indefinida y mensajes de estado contextuales.
+*   **Indicadores de Entrada**: Iconos de micrófono (voz) y escudo (PII) integrados en el área de texto para una experiencia de entrada multimodal y segura.
+
+#### 1. Guía de Usuario Interactiva (v4.3.1)
 *   **Sidebar de Navegación**: Menú vertical izquierdo con iconos minimalistas y etiquetas en mayúsculas para una navegación rápida entre secciones de aprendizaje.
 *   **Contenido Enriquecido**: Uso de grids, tablas de atajos y tarjetas de pasos para presentar información densa de forma digerible.
 *   **Modo Dual**: Capacidad de visualizarse como un modal centralizado o como un panel integrado en el flujo de trabajo.

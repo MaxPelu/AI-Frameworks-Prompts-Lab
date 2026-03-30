@@ -247,7 +247,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
     const defaultSettings = {
         temperature: 0.8, topP: 0.95, topK: 40, frequencyPenalty: 0, presencePenalty: 0, maxOutputTokens: 8192,
         systemInstruction: '', stopSequences: [], seed: null, thinkingBudget: 0, isThinkingMode: false,
-        useGoogleSearch: false, isStructuredOutputEnabled: false, responseSchema: '',
+        useGoogleSearch: true, isStructuredOutputEnabled: false, responseSchema: '',
         isCodeExecutionEnabled: false, isFunctionCallingEnabled: false
     };
 

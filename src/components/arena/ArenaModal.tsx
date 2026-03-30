@@ -107,9 +107,9 @@ const ArenaModal: React.FC<ArenaModalProps> = ({
                         ))
                     ) : isComparisonMode ? (
                         compareConfig.frameworks.map((fw, index) => (
-                            <div key={fw.id} className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 animate-fade-in-up" style={{ animationDelay: `${index * 150}ms` }}>
+                            <div key={fw?.id || index} className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 animate-fade-in-up" style={{ animationDelay: `${index * 150}ms` }}>
                                 <ArenaPanel 
-                                    title={`${String.fromCharCode(65 + index)}: ${fw.acronym}`}
+                                    title={`${String.fromCharCode(65 + index)}: ${fw?.acronym || 'N/A'}`}
                                     framework={fw}
                                     idea={compareConfig.idea}
                                     useCase={compareConfig.useCase}

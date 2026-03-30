@@ -12,8 +12,8 @@ import { CONTEXT_ENGINEERING_FRAMEWORKS } from '../../config/contextEngineeringC
 import { AI_OPS_FRAMEWORKS } from '../../config/aiOpsConstants.ts';
 import { MARKETING_FRAMEWORKS } from '../../config/marketingConstants.ts';
 import { EDUCATION_FRAMEWORKS } from '../../config/educationConstants.ts';
-import { optimizePrompt, expandIdea, suggestUseCase, suggestFramework, IS_API_KEY_AVAILABLE, evolvePrompt, evaluatePromptQuality, suggestRelatedIdeas, extractKeyEntities, generateTitles, summarizeContext, improvePromptBasedOnAnalysis, formatText, FormatType, generateRandomIdea, evaluateIdeaQuality, modifyContentLength, LengthModifier, quickRefine } from '../../lib/geminiService.ts';
-import { SparklesIcon, BeakerIcon, LightBulbIcon, ArrowPathIcon, QuestionMarkCircleIcon, HelixIcon, SaveDiskIcon, ClipboardIcon, CheckIcon, PaperAirplaneIcon, ArrowsPointingOutIcon, AcademicCapIcon, ChatBubbleLeftRightIcon, KeyIcon, NewspaperIcon, DocumentTextIcon, UsersIcon, GlobeAltIcon, CheckBadgeIcon, NoSymbolIcon, Bars3BottomLeftIcon, DiceIcon, TableCellsIcon, ChevronDownIcon, PencilIcon, TrashIcon, MicrophoneIcon, FingerPrintIcon, WrenchScrewdriverIcon, ClockIcon, ChartBarIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, ShieldCheckIcon, MegaphoneIcon } from '../shared/Icons.tsx';
+import { optimizePrompt, expandIdea, suggestUseCase, suggestFramework, IS_API_KEY_AVAILABLE, evolvePrompt, evaluatePromptQuality, suggestRelatedIdeas, extractKeyEntities, generateTitles, summarizeContext, improvePromptBasedOnAnalysis, formatText, FormatType, generateRandomIdea, evaluateIdeaQuality, modifyContentLength, LengthModifier, quickRefine, optimizePromptStream, evolvePromptStream } from '../../lib/geminiService.ts';
+import { SparklesIcon, BeakerIcon, LightBulbIcon, ArrowPathIcon, QuestionMarkCircleIcon, HelixIcon, SaveDiskIcon, ClipboardIcon, CheckIcon, PaperAirplaneIcon, ArrowsPointingOutIcon, AcademicCapIcon, ChatBubbleLeftRightIcon, KeyIcon, NewspaperIcon, DocumentTextIcon, UsersIcon, GlobeAltIcon, CheckBadgeIcon, NoSymbolIcon, Bars3BottomLeftIcon, DiceIcon, TableCellsIcon, ChevronDownIcon, PencilIcon, TrashIcon, MicrophoneIcon, FingerPrintIcon, WrenchScrewdriverIcon, ClockIcon, ChartBarIcon, MagnifyingGlassIcon, ArrowDownTrayIcon, ShieldCheckIcon, MegaphoneIcon, CpuChipIcon } from '../shared/Icons.tsx';
 import FileUploader from './FileUploader.tsx';
 import CanvasModal from '../shared/CanvasModal.tsx';
 import QualityAnalysisModal from '../shared/QualityAnalysisModal.tsx';
@@ -493,11 +493,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setError('');
         try {
             if (type === 'useCase') {
-                const suggested = await suggestUseCase(ideaText, modelSettings.selectedModel);
+                const suggested = await suggestUseCase(ideaText, modelSettings);
                 onUseCaseChange(suggested.text);
                 if (suggested.usage && onTokenUsageReceived) onTokenUsageReceived(suggested.usage);
             } else {
-                const suggested = await suggestFramework(ideaText, modelSettings.selectedModel);
+                const suggested = await suggestFramework(ideaText, modelSettings);
                 setSelectedFrameworkAcronym(suggested.text);
                 if (suggested.usage && onTokenUsageReceived) onTokenUsageReceived(suggested.usage);
             }
@@ -531,7 +531,12 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
             };
 
-            const evolved = await evolvePrompt(generatedPrompt, currentSettings);
+            let streamedText = "";
+            const evolved = await evolvePromptStream(generatedPrompt, currentSettings, (chunk) => {
+                streamedText += chunk;
+                setGeneratedPrompt(streamedText);
+            });
+            
             setGeneratedPrompt(evolved.text);
             if (evolved.usage && onTokenUsageReceived) onTokenUsageReceived(evolved.usage);
         } catch (err: any) {
@@ -554,17 +559,17 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
 
         try {
             setGeneratedPrompt('Paso 1/3: Sugiriendo caso de uso...');
-            const suggestedUseCase = await suggestUseCase(ideaText, modelSettings.selectedModel);
+            const suggestedUseCase = await suggestUseCase(ideaText, modelSettings);
             onUseCaseChange(suggestedUseCase.text);
             if (suggestedUseCase.usage && onTokenUsageReceived) onTokenUsageReceived(suggestedUseCase.usage);
 
             setGeneratedPrompt('Paso 2/3: Sugiriendo framework...');
-            const suggestedFramework = await suggestFramework(ideaText, modelSettings.selectedModel);
+            const suggestedFramework = await suggestFramework(ideaText, modelSettings);
             setSelectedFrameworkAcronym(suggestedFramework.text);
             if (suggestedFramework.usage && onTokenUsageReceived) onTokenUsageReceived(suggestedFramework.usage);
 
             setGeneratedPrompt('Paso 3/3: Optimizando el prompt...');
-            const selectedFramework = allFrameworks.find(f => f.acronym === suggestedFramework.text);
+            const selectedFramework = allFrameworks.find(f => f?.acronym === suggestedFramework.text);
             if (!selectedFramework) {
                 throw new Error("El framework sugerido no es válido.");
             }
@@ -579,7 +584,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 systemInstruction: modelSettings.systemInstruction, systemInstructionFiles: modelSettings.systemInstructionFiles,
                 stopSequences: modelSettings.stopSequences, seed: modelSettings.seed,
                 thinkingBudget: modelSettings.thinkingBudget, isThinkingMode: modelSettings.isThinkingMode,
-                useGoogleSearch: false, // Disable for optimization unless needed
+                useGoogleSearch: modelSettings.useGoogleSearch,
                 isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
                 responseSchema: modelSettings.responseSchema,
                 isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled, isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
@@ -587,11 +592,27 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 toneShift, outputVerbosity, draftMode, promptAutoRefine, verificationLoop
             };
 
-            const result = await optimizePrompt(ideaText, suggestedUseCase.text, selectedFramework, files, 'default', 'general', 'es', '', '', currentSettings);
+            let streamedText = "";
+            const result = await optimizePromptStream(
+                ideaText, 
+                suggestedUseCase.text, 
+                selectedFramework, 
+                files, 
+                'default', 
+                'general', 
+                'es', 
+                '', 
+                '', 
+                currentSettings,
+                (chunk) => {
+                    streamedText += chunk;
+                    setGeneratedPrompt(streamedText);
+                }
+            );
             
             setGeneratedPrompt(result.text);
-            setGeneratedThought(result.thought);
-            setGeneratedSources(result.sources);
+            setGeneratedThought(undefined); // Stream doesn't support thought yet in this simplified impl
+            setGeneratedSources([]);
             if (result.usage && onTokenUsageReceived) {
                 onTokenUsageReceived(result.usage);
             }
@@ -618,7 +639,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             source: source,
         });
         try {
-            const result = await evaluatePromptQuality(textToAnalyze, modelSettings.selectedModel);
+            const result = await evaluatePromptQuality(textToAnalyze, modelSettings);
             setQualityAnalysisState(prev => ({ ...prev, analysisResult: result, isLoading: false }));
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -636,7 +657,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
             const improvedPrompt = await improvePromptBasedOnAnalysis(
                 qualityAnalysisState.promptText,
                 qualityAnalysisState.analysisResult,
-                modelSettings.selectedModel
+                modelSettings
             );
             
             if (qualityAnalysisState.source === 'idea') {
@@ -662,7 +683,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setGeneratedSources([]);
         setGeneratedPrompt('Buscando ideas relacionadas...');
         try {
-            const result = await suggestRelatedIdeas(ideaText, files, modelSettings.selectedModel, modelSettings.maxOutputTokens);
+            const result = await suggestRelatedIdeas(ideaText, files, modelSettings);
             setGeneratedPrompt(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -680,7 +701,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setGeneratedSources([]);
         setGeneratedPrompt('Extrayendo entidades clave...');
         try {
-            const result = await extractKeyEntities(ideaText, files, modelSettings.selectedModel, modelSettings.maxOutputTokens);
+            const result = await extractKeyEntities(ideaText, files, modelSettings);
             setGeneratedPrompt(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -698,7 +719,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setGeneratedSources([]);
         setGeneratedPrompt('Generando títulos atractivos...');
         try {
-            const result = await generateTitles(ideaText, modelSettings.selectedModel, modelSettings.maxOutputTokens);
+            const result = await generateTitles(ideaText, modelSettings);
             setGeneratedPrompt(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -716,7 +737,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setGeneratedSources([]);
         setGeneratedPrompt('Resumiendo el contexto...');
         try {
-            const result = await summarizeContext(ideaText, files, modelSettings.selectedModel, modelSettings.maxOutputTokens);
+            const result = await summarizeContext(ideaText, files, modelSettings);
             setGeneratedPrompt(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any)
@@ -733,7 +754,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setIsGettingIdeaFeedback(true);
         setError('');
         try {
-            const feedback = await evaluateIdeaQuality(ideaText, modelSettings.selectedModel, modelSettings.maxOutputTokens);
+            const feedback = await evaluateIdeaQuality(ideaText, modelSettings);
             setIdeaFeedback(feedback.text);
             if (feedback.usage && onTokenUsageReceived) onTokenUsageReceived(feedback.usage);
         } catch (err: any) {
@@ -748,7 +769,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setIsFormatting(target);
         setError('');
         try {
-            const result = await formatText(text, formatType, modelSettings.selectedModel);
+            const result = await formatText(text, formatType, modelSettings);
             if (target === 'idea') {
                 onIdeaChange(result.text);
             } else {
@@ -767,7 +788,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setIsModifyingLength(true);
         setError('');
         try {
-            const result = await modifyContentLength(generatedPrompt, modifier, modelSettings.selectedModel);
+            const result = await modifyContentLength(generatedPrompt, modifier, modelSettings);
             setGeneratedPrompt(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -781,7 +802,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         setIsGeneratingIdea(true);
         setError('');
         try {
-            const result = await generateRandomIdea(modelSettings.selectedModel);
+            const result = await generateRandomIdea(modelSettings);
             onIdeaChange(result.text);
             if (result.usage && onTokenUsageReceived) onTokenUsageReceived(result.usage);
         } catch (err: any) {
@@ -799,8 +820,12 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     }, []);
     
     const handleRandomizeOptimization = useCallback(() => {
-        const randomFramework = allFrameworks[Math.floor(Math.random() * allFrameworks.length)];
-        setSelectedFrameworkAcronym(randomFramework.acronym);
+        if (allFrameworks.length > 0) {
+            const randomFramework = allFrameworks[Math.floor(Math.random() * allFrameworks.length)];
+            if (randomFramework && randomFramework.acronym) {
+                setSelectedFrameworkAcronym(randomFramework.acronym);
+            }
+        }
         
         const styleKeys = Object.keys(OPTIMIZATION_STYLE_DESCRIPTIONS).filter(k => k !== 'default');
         const randomStyle = styleKeys[Math.floor(Math.random() * styleKeys.length)];
@@ -808,7 +833,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     }, [setSelectedFrameworkAcronym]);
 
     const handleSave = () => {
-        const selectedFramework = allFrameworks.find(f => f.acronym === selectedFrameworkAcronym);
+        const selectedFramework = allFrameworks.find(f => f?.acronym === selectedFrameworkAcronym);
         if (generatedPrompt && selectedFramework) {
             onSavePrompt({
                 idea: ideaText,
@@ -847,18 +872,18 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
     const recommendedFramework = useMemo(() => {
         const category = CATEGORIZED_USE_CASES.find(cat => cat.useCases.includes(useCase))?.category || 'Default';
         const recommendedAcronym = FRAMEWORK_RECOMMENDATIONS_BY_CATEGORY[category] || FRAMEWORK_RECOMMENDATIONS_BY_CATEGORY['Default'];
-        return allFrameworks.find(f => f.acronym.toLowerCase() === recommendedAcronym.toLowerCase()) || null;
+        return allFrameworks.find(f => f?.acronym?.toLowerCase() === recommendedAcronym.toLowerCase()) || null;
     }, [useCase]);
 
     const selectedFramework = useMemo(() => {
-        return allFrameworks.find(f => f.acronym === selectedFrameworkAcronym) || null;
+        return allFrameworks.find(f => f?.acronym === selectedFrameworkAcronym) || null;
     }, [selectedFrameworkAcronym]);
     
     const frameworksByCategory = useMemo(() => {
         const allCategories = [...new Set(allFrameworks.map(f => f.category))];
         return allCategories.map(category => ({
             category,
-            frameworks: allFrameworks.filter(fw => fw.category === category).sort((a,b) => a.acronym.localeCompare(b.acronym))
+            frameworks: allFrameworks.filter(fw => fw?.category === category).sort((a,b) => (a?.acronym || '').localeCompare(b?.acronym || ''))
         }));
     }, []);
 
@@ -1181,6 +1206,56 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="flex flex-col gap-4">
+                            <div className="bg-gradient-to-br from-indigo-900/20 to-teal-900/20 rounded-2xl p-4 border border-white/5 shadow-inner">
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label htmlFor="expansion-framework-select" className="text-xs font-bold text-teal-400 uppercase tracking-widest">Motor de Robustez</label>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                                            <span className="text-[10px] text-gray-500 font-mono uppercase">SOTA v5.1</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <select
+                                                id="expansion-framework-select"
+                                                value={expansionFrameworkAcronym}
+                                                onChange={(e) => setExpansionFrameworkAcronym(e.target.value)}
+                                                disabled={anyLoading || !IS_API_KEY_AVAILABLE}
+                                                className="glass-input w-full text-sm rounded-xl pl-10 pr-4 py-3 text-gray-300 appearance-none focus:ring-2 focus:ring-teal-500/30 transition-all cursor-pointer"
+                                                title="Elige un framework para guiar cómo la IA debe expandir tu idea inicial."
+                                            >
+                                                <option value="auto" className="bg-[#020617] text-white">Estructura Automática</option>
+                                                {frameworksByCategory.map(group => (
+                                                    <optgroup key={group.category} label={group.category} className="bg-[#020617] text-white">
+                                                        {group.frameworks.map(fw => (
+                                                            <option key={fw?.id || Math.random()} value={fw?.acronym} className="bg-[#020617] text-white">{fw?.acronym}</option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-500/50">
+                                                <CpuChipIcon className="w-5 h-5" />
+                                            </div>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'expand' })} 
+                                            disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
+                                            className="group relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-black text-sm uppercase tracking-wider shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            title="Transforma tu idea en un framework robusto y detallado sin perder el hilo original."
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out skew-x-[-20deg]" />
+                                            <ArrowsPointingOutIcon className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
+                                            Robustecer
+                                        </button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 italic px-1">
+                                        * No responde al prompt, expande la arquitectura de la idea.
+                                    </p>
+                                </div>
+                            </div>
                             <div className="relative group flex-grow">
                                 <textarea
                                     id="idea-input"
@@ -1229,42 +1304,11 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 <FileUploader files={files} onFilesChange={handleFileChange} />
                             </div>
                         </div>
-                         <div className="flex flex-col gap-4 justify-center">
-                            <div className="flex flex-col gap-2">
-                                <label htmlFor="expansion-framework-select" className="text-sm font-semibold text-gray-400 ml-1">Guía de Expansión (Opcional)</label>
-                                <div className="flex gap-3">
-                                    <select
-                                        id="expansion-framework-select"
-                                        value={expansionFrameworkAcronym}
-                                        onChange={(e) => setExpansionFrameworkAcronym(e.target.value)}
-                                        disabled={anyLoading || !IS_API_KEY_AVAILABLE}
-                                        className="glass-input w-full text-sm rounded-xl px-4 py-3 text-gray-300"
-                                        title="Elige un framework para guiar cómo la IA debe expandir tu idea inicial."
-                                    >
-                                        <option value="auto" className="bg-[#020617] text-white">Automático (Recomendado)</option>
-                                        {frameworksByCategory.map(group => (
-                                            <optgroup key={group.category} label={group.category} className="bg-[#020617] text-white">
-                                                {group.frameworks.map(fw => (
-                                                    <option key={fw.id} value={fw.acronym} className="bg-[#020617] text-white">{fw.acronym}</option>
-                                                ))}
-                                            </optgroup>
-                                        ))}
-                                    </select>
-                                    <button 
-                                        onClick={() => setProcessDashboardState({ isOpen: true, actionType: 'expand' })} 
-                                        disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
-                                        className="glass-button flex items-center justify-center gap-2 bg-slate-800 border border-white/10 text-gray-300 hover:bg-slate-700 px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                                        title="Amplía tu idea breve en un borrador más detallado usando IA."
-                                    >
-                                        <LightBulbIcon className="w-5 h-5 text-yellow-500/70" /> 
-                                        Expandir
-                                    </button>
-                                </div>
-                            </div>
+                        <div className="flex flex-col gap-4 justify-center">
                             <button 
                                 onClick={handleAutoRunWorkflow} 
                                 disabled={!ideaText || anyLoading || !IS_API_KEY_AVAILABLE} 
-                                className="glass-button w-full text-sm flex items-center justify-center gap-2 bg-teal-900/20 border-teal-500/20 hover:bg-teal-900/30 text-teal-400 px-4 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg mb-4" 
+                                className="glass-button w-full text-sm flex items-center justify-center gap-2 bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 px-4 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg mb-4" 
                                 title="Ejecuta automáticamente la sugerencia de caso de uso, framework y la optimización en secuencia."
                             >
                                 <PaperAirplaneIcon className="w-5 h-5" />
@@ -1489,7 +1533,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     disabled={anyLoading}
                                     title="Estructura base que organizará tu prompt."
                                 >
-                                {allFrameworks.sort((a,b) => a.acronym.localeCompare(b.acronym)).map(fw => <option className="bg-[#020617] text-white" key={fw.id} value={fw.acronym}>{fw.acronym}</option>)}
+                                {allFrameworks.sort((a,b) => (a?.acronym || '').localeCompare(b?.acronym || '')).map(fw => <option className="bg-[#020617] text-white" key={fw?.id || Math.random()} value={fw?.acronym}>{fw?.acronym}</option>)}
                                 </select>
                                 <button 
                                     onClick={() => handleSuggest('framework')} 
@@ -1727,8 +1771,8 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                 useCase={useCase}
                 framework={
                     processDashboardState.actionType === 'optimize' 
-                        ? allFrameworks.find(f => f.acronym === selectedFrameworkAcronym) || null
-                        : expansionFrameworkAcronym === 'auto' ? null : allFrameworks.find(f => f.acronym === expansionFrameworkAcronym) || null
+                        ? allFrameworks.find(f => f?.acronym === selectedFrameworkAcronym) || null
+                        : expansionFrameworkAcronym === 'auto' ? null : allFrameworks.find(f => f?.acronym === expansionFrameworkAcronym) || null
                 }
                 files={files}
                 optimizationStyle={optimizationStyle}

@@ -65,7 +65,9 @@ const resolveModel = (model: string): string => {
         'imagen-4.0-generate-001': 'imagen-4.0-generate-001',
         'veo-3.1-generate-preview': 'veo-3.1-generate-preview',
         'gemini-flash': 'gemini-3-flash-preview',
-        'gemini-pro': 'gemini-3-pro-preview'
+        'gemini-pro': 'gemini-3-pro-preview',
+        'gemini-3-flash': 'gemini-3-flash-preview',
+        'gemini-3-pro': 'gemini-3-pro-preview'
     };
     return modelMap[model] || model;
 };
@@ -78,6 +80,22 @@ const fileToPart = (file: UploadedFile): Part => {
 };
 
 // --- RETRY WRAPPER ---
+const getFastSettings = (settings: ModelSettings): ModelSettings => ({
+    ...settings,
+    selectedModel: 'gemini-3-flash-preview',
+    useGoogleSearch: false,
+    isThinkingMode: false,
+    temperature: 0.1,
+    topK: 1,
+    topP: 0.1
+});
+
+const getTransformationSettings = (settings: ModelSettings): ModelSettings => ({
+    ...settings,
+    useGoogleSearch: false,
+    isThinkingMode: false,
+});
+
 const callGeminiWithRetry = async (params: any, retries = 3, initialDelay = 1000): Promise<any> => {
     if (!ai) throw new Error("API Key no disponible");
     let delay = initialDelay;
@@ -378,16 +396,18 @@ const extractUsage = (
     return undefined;
 };
 
-export const generateSessionTitle = async (text: string, model: GeminiModel = 'gemini-3-flash-preview'): Promise<{text: string}> => {
+export const generateSessionTitle = async (text: string, settings: ModelSettings): Promise<{text: string}> => {
     if (!ai) return { text: "Sesión sin Título" };
     const fastModel = 'gemini-3-flash-preview'; 
     const prompt = `Tarea: Genera un TÍTULO corto (3-5 palabras) para este texto. Solo el título, sin comillas ni intro. Texto: "${text.substring(0, 500)}"`;
 
     try {
+        const transformSettings = getTransformationSettings(settings);
+        const baseConfig = buildConfig(transformSettings, true);
         const response = await callGeminiWithRetry({
             model: resolveModel(fastModel),
             contents: prompt,
-            config: { temperature: 0.3, maxOutputTokens: 20 }
+            config: { ...baseConfig, temperature: 0.3, maxOutputTokens: 20 }
         });
         return { text: (response.text || 'Nueva Sesión').trim() };
     } catch (e) {
@@ -408,7 +428,8 @@ export const quickRefine = async (text: string, action: 'magic' | 'fix' | 'trans
     const prompt = `${instruction}\n\n[INPUT TEXT START]\n"${text}"\n[INPUT TEXT END]`;
 
     // Force override JSON mode to ensure we get text back
-    const config = buildConfig(settings, true);
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
 
     const response = await callGeminiWithRetry({ 
         model: resolveModel(settings.selectedModel), 
@@ -416,7 +437,50 @@ export const quickRefine = async (text: string, action: 'magic' | 'fix' | 'trans
         config: config 
     });
     
-    return { text: response.text || text, usage: extractUsage(response, settings.selectedModel, 'generation', settings, text) };
+    return { text: response.text || text, usage: extractUsage(response, settings.selectedModel, 'generation', transformSettings, text) };
+};
+
+export const quickRefineStream = async (
+    text: string, 
+    action: 'magic' | 'fix' | 'translate', 
+    settings: ModelSettings,
+    onChunk: (chunk: string) => void
+): Promise<{text: string, usage?: TokenUsage}> => {
+    if (!ai) throw new Error("API Key no disponible");
+    
+    let instruction = "";
+    switch (action) {
+        case 'magic': instruction = "Goal: Elevate the writing. Make it clear, impactful, and professional while keeping the original intent."; break;
+        case 'fix': instruction = "Goal: Strictly correct grammar, spelling, and punctuation. Do not change style."; break;
+        case 'translate': instruction = "Goal: Translate accurately between English and Spanish, maintaining tone."; break;
+    }
+
+    const prompt = `${instruction}\n\n[INPUT TEXT START]\n"${text}"\n[INPUT TEXT END]`;
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
+
+    try {
+        const stream = await callGeminiStreamWithRetry({ 
+            model: resolveModel(settings.selectedModel), 
+            contents: prompt,
+            config: config
+        });
+        
+        let fullText = "";
+        let finalResponse: any = null;
+
+        for await (const chunk of stream) {
+            const chunkText = chunk.text || "";
+            fullText += chunkText;
+            onChunk(chunkText);
+            finalResponse = chunk;
+        }
+        
+        return { text: fullText, usage: extractUsage(finalResponse, settings.selectedModel, 'generation', transformSettings, text) };
+    } catch (error) {
+        console.error("Quick Refine Stream Error", error);
+        throw error;
+    }
 };
 
 export const optimizePrompt = async (
@@ -435,13 +499,17 @@ export const optimizePrompt = async (
   
   const base64Files = files.filter(f => f.base64);
   
+  const frameworkName = framework?.name || "General Optimization";
+  const frameworkAcronym = framework?.acronym || "GO";
+  const frameworkDescription = framework?.description || "Apply general prompt engineering principles like clarity, specificity, and context.";
+
   const systemInstruction = `
   **TASK: PROMPT ENGINEERING OPTIMIZATION**
   
-  Act as a World-Class Prompt Engineer. Apply the ${framework.name} (${framework.acronym}) framework to the user's idea.
+  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea.
   
   **FRAMEWORK INSTRUCTION:**
-  ${framework.description}
+  ${frameworkDescription}
   
   **OUTPUT INSTRUCTION:**
   Generate ONLY the optimized prompt. No preamble. Ensure the result is ready to use.
@@ -490,6 +558,79 @@ export const optimizePrompt = async (
   }
 };
 
+export const optimizePromptStream = async (
+    idea: string, 
+    useCase: string, 
+    framework: Framework, 
+    files: UploadedFile[],
+    optimizationStyle: string,
+    targetAudience: string,
+    outputLanguage: string,
+    keyInfo: string,
+    negativeConstraints: string,
+    settings: ModelSettings,
+    onChunk: (text: string) => void
+): Promise<{ text: string; usage?: TokenUsage }> => {
+  if (!ai) throw new Error(getErrorMessage("Optimizar Prompt"));
+  
+  const base64Files = files.filter(f => f.base64);
+  
+  const frameworkName = framework?.name || "General Optimization";
+  const frameworkAcronym = framework?.acronym || "GO";
+  const frameworkDescription = framework?.description || "Apply general prompt engineering principles like clarity, specificity, and context.";
+
+  const systemInstruction = `
+  **TASK: PROMPT ENGINEERING OPTIMIZATION**
+  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea.
+  **FRAMEWORK INSTRUCTION:**
+  ${frameworkDescription}
+  **OUTPUT INSTRUCTION:**
+  Generate ONLY the optimized prompt. No preamble. Ensure the result is ready to use.
+  `;
+
+  let promptContent = `
+  **INPUT DATA:**
+  - Original Idea: "${idea}"
+  - Use Case: ${useCase}
+  - Optimization Style: ${optimizationStyle}
+  ${targetAudience !== 'general' ? `- Target Audience: ${targetAudience}` : ''}
+  ${outputLanguage !== 'es' ? `- Output Language: ${outputLanguage}` : ''}
+  ${keyInfo ? `- Key Info to Include: ${keyInfo}` : ''}
+  ${negativeConstraints ? `- Negative Constraints: ${negativeConstraints}` : ''}
+  `;
+
+  const textPart = { text: promptContent };
+  const fileParts = base64Files.map(fileToPart).filter(p => p.inlineData);
+  
+  const config = buildConfig(settings, true);
+  config.systemInstruction = config.systemInstruction ? `${config.systemInstruction}\n\n${systemInstruction}` : systemInstruction;
+
+  try {
+    const stream = await callGeminiStreamWithRetry({
+      model: resolveModel(settings.selectedModel),
+      contents: { parts: [textPart, ...fileParts] }, 
+      config: config
+    });
+
+    let fullText = "";
+    let finalResponse: any = null;
+
+    for await (const chunk of stream) {
+      const text = chunk.text || "";
+      fullText += text;
+      onChunk(text);
+      finalResponse = chunk;
+    }
+
+    const usage = extractUsage(finalResponse, settings.selectedModel, 'optimization', settings, idea);
+    return { text: fullText, usage };
+
+  } catch (error) {
+    console.error("Optimize Stream Error", error);
+    throw new Error("Falló la comunicación con la API de Gemini.");
+  }
+};
+
 export const expandIdea = async (
     idea: string, 
     files: UploadedFile[], 
@@ -498,28 +639,35 @@ export const expandIdea = async (
 ): Promise<{ text: string; usage?: TokenUsage }> => {
     if (!ai) return { text: getErrorMessage("Expandir Idea") };
 
-    const availableFrameworksList = ALL_FRAMEWORKS_LIST.map(f => `- ${f.acronym}: ${f.name}`).join('\n');
+    const availableFrameworksList = ALL_FRAMEWORKS_LIST.map(f => `- ${f?.acronym || 'N/A'}: ${f?.name || 'N/A'}`).join('\n');
     
     const textBasedFiles = files.filter(f => f.textContent);
     const contextFromFiles = textBasedFiles.map(f => `[CONTEXT FILE: ${f.name}]\n${f.textContent?.substring(0, 8000)}`).join('\n\n');
 
     const systemInstruction = `
-        **TASK: CONTENT EXPANSION & ENRICHMENT**
+        **TASK: ADVANCED CONCEPTUAL EXPANSION & ROBUST ENRICHMENT**
         
-        You are a Master Content Architect. Your goal is to take a seed idea and expand it into a fully realized, detailed, and professional artifact.
+        You are a World-Class Strategy Architect and Concept Engineer. Your goal is to take a seed idea and transform it into a robust, multi-dimensional, and highly detailed conceptual framework.
         
-        **METHODOLOGY:**
-        1. **Intent Analysis**: Understand the user's core goal.
-        2. **Gap Filling**: Identify missing information and intelligently infer it based on best practices.
-        3. **Structuring**: Use Markdown. Use Headers. Use Lists.
+        **CORE DIRECTIVES:**
+        1. **DO NOT ANSWER THE PROMPT**: If the user's idea is a question or a task, do not perform the task yet. Instead, expand on the *concept* of the task, its implications, requirements, and potential branches.
+        2. **ROBUSTNESS & DEPTH**: Identify the hidden layers of the idea. What are the edge cases? What are the advanced components? What is the underlying logic?
+        3. **PRESERVE THE THREAD**: Stay strictly aligned with the original intent. Do not deviate into unrelated topics.
+        4. **STRUCTURAL EXCELLENCE**: Use Markdown with a clear hierarchy (H1, H2, H3). Use tables for comparisons or data structures. Use bullet points for high-density information.
+        
+        **EXPANSION MODULES (Apply where relevant):**
+        - **Contextual Anchoring**: Why does this idea matter? What is the current landscape?
+        - **Technical Blueprint**: What are the components, variables, or steps involved?
+        - **Strategic Implications**: What are the short-term and long-term consequences?
+        - **Advanced Nuances**: What are the subtle details that a novice would miss?
         
         ${framework 
-            ? `**MANDATORY FRAMEWORK:** Apply ${framework.acronym} structure.`
-            : `**AUTO-FRAMEWORK:** Select the best structure from this list: \n${availableFrameworksList.substring(0, 500)}...`
+            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || 'N/A'} structure to organize this expansion.`
+            : `**AUTO-FRAMEWORK:** Select the most robust structure from the following list to organize the content: \n${availableFrameworksList.substring(0, 500)}...`
         }
 
         **OUTPUT:**
-        Produce the FINAL expanded content. Ensure high density and value.
+        Produce a FINAL, high-density, professional document that makes the original idea 10x more robust.
     `;
 
     const textPart = {
@@ -553,7 +701,84 @@ export const expandIdea = async (
     }
 };
 
-export const evaluatePromptQuality = async (promptText: string, model: GeminiModel): Promise<QualityAnalysisResult> => {
+export const expandIdeaStream = async (
+    idea: string, 
+    files: UploadedFile[], 
+    framework: Framework | null,
+    settings: ModelSettings,
+    onChunk: (text: string) => void
+): Promise<{ text: string; usage?: TokenUsage }> => {
+    if (!ai) throw new Error(getErrorMessage("Expandir Idea"));
+
+    const availableFrameworksList = ALL_FRAMEWORKS_LIST.map(f => `- ${f?.acronym || 'N/A'}: ${f?.name || 'N/A'}`).join('\n');
+    const textBasedFiles = files.filter(f => f.textContent);
+    const contextFromFiles = textBasedFiles.map(f => `[CONTEXT FILE: ${f.name}]\n${f.textContent?.substring(0, 8000)}`).join('\n\n');
+
+    const systemInstruction = `
+        **TASK: ADVANCED CONCEPTUAL EXPANSION & ROBUST ENRICHMENT**
+        You are a World-Class Strategy Architect and Concept Engineer. Your goal is to take a seed idea and transform it into a robust, multi-dimensional, and highly detailed conceptual framework.
+        
+        **CORE DIRECTIVES:**
+        1. **DO NOT ANSWER THE PROMPT**: If the user's idea is a question or a task, do not perform the task yet. Instead, expand on the *concept* of the task, its implications, requirements, and potential branches.
+        2. **ROBUSTNESS & DEPTH**: Identify the hidden layers of the idea. What are the edge cases? What are the advanced components? What is the underlying logic?
+        3. **PRESERVE THE THREAD**: Stay strictly aligned with the original intent. Do not deviate into unrelated topics.
+        4. **STRUCTURAL EXCELLENCE**: Use Markdown with a clear hierarchy (H1, H2, H3). Use tables for comparisons or data structures. Use bullet points for high-density information.
+        
+        **EXPANSION MODULES (Apply where relevant):**
+        - **Contextual Anchoring**: Why does this idea matter? What is the current landscape?
+        - **Technical Blueprint**: What are the components, variables, or steps involved?
+        - **Strategic Implications**: What are the short-term and long-term consequences?
+        - **Advanced Nuances**: What are the subtle details that a novice would miss?
+        
+        ${framework 
+            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || 'N/A'} structure to organize this expansion.`
+            : `**AUTO-FRAMEWORK:** Select the most robust structure from the following list to organize the content: \n${availableFrameworksList.substring(0, 500)}...`
+        }
+
+        **OUTPUT:**
+        Produce a FINAL, high-density, professional document that makes the original idea 10x more robust.
+    `;
+
+    const textPart = {
+      text: `
+        **SEED IDEA:**
+        "${idea}"
+        ${contextFromFiles ? `**CONTEXT FILES:**\n${contextFromFiles}` : ''}
+      `
+    };
+    
+    const config = buildConfig(settings, true);
+    config.systemInstruction = config.systemInstruction ? `${config.systemInstruction}\n\n${systemInstruction}` : systemInstruction;
+    
+    const modelToUse = resolveModel(settings.selectedModel);
+    
+    try {
+        const stream = await callGeminiStreamWithRetry({
+            model: modelToUse, 
+            contents: { parts: [textPart, ...files.map(fileToPart).filter(p => p.inlineData)] },
+            config: config
+        });
+        
+        let fullText = "";
+        let finalResponse: any = null;
+
+        for await (const chunk of stream) {
+            const text = chunk.text || "";
+            fullText += text;
+            onChunk(text);
+            finalResponse = chunk;
+        }
+
+        const usage = extractUsage(finalResponse, modelToUse, 'expansion', settings, idea);
+        return { text: fullText, usage };
+
+    } catch (error) {
+        console.error("Error en expansión (Stream):", error);
+        throw new Error("La expansión ha fallado. Verifica tu conexión.");
+    }
+};
+
+export const evaluatePromptQuality = async (promptText: string, settings: ModelSettings): Promise<QualityAnalysisResult> => {
   if (!ai) throw new Error("API Key no disponible");
   
   const qualitySchema = {
@@ -583,10 +808,13 @@ export const evaluatePromptQuality = async (promptText: string, model: GeminiMod
   const prompt = `Prompt: "${promptText}"`;
 
   try {
+    const fastSettings = getFastSettings(settings);
+    const baseConfig = buildConfig(fastSettings, true);
     const result = await callGeminiWithRetry({
-      model: resolveModel(model),
+      model: resolveModel(fastSettings.selectedModel),
       contents: prompt, 
       config: { 
+          ...baseConfig,
           systemInstruction: systemInstruction,
           responseMimeType: "application/json",
           responseSchema: qualitySchema
@@ -594,25 +822,33 @@ export const evaluatePromptQuality = async (promptText: string, model: GeminiMod
     });
     
     const parsed = JSON.parse(result.text || '{}') as QualityAnalysisResult;
-    parsed.usage = extractUsage(result, model, 'analysis', undefined, promptText);
+    parsed.usage = extractUsage(result, fastSettings.selectedModel, 'analysis', undefined, promptText);
     return parsed;
   } catch (error) {
     throw new Error("Falló el análisis técnico de calidad.");
   }
 };
 
-export const suggestUseCase = async (idea: string, model: GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
+export const suggestUseCase = async (idea: string, settings: ModelSettings): Promise<{text: string, usage?: TokenUsage}> => {
     if (!ai) return { text: USE_CASES[0] };
     const prompt = `Basado en esta idea: "${idea}", sugiere la categoría de caso de uso más apropiada de esta lista: ${USE_CASES.join(', ')}. Responde solo con el nombre exacto de la categoría.`;
-    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
-    return { text: response.text?.trim() || USE_CASES[0], usage: extractUsage(response, model, 'analysis', undefined, idea) };
+    
+    // Usar una configuración ligera y rápida para esta tarea de clasificación simple
+    const fastSettings = getFastSettings(settings);
+    
+    const response = await callGeminiWithRetry({ model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true) });
+    return { text: response.text?.trim() || USE_CASES[0], usage: extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, idea) };
 };
 
-export const suggestFramework = async (idea: string, model: GeminiModel): Promise<{text: string, usage?: TokenUsage}> => {
-    if (!ai) return { text: FRAMEWORKS[0].acronym };
-    const prompt = `Basado en esta idea: "${idea}", sugiere el acrónimo del framework de prompting más adecuado de esta lista: ${ALL_FRAMEWORKS_LIST.map(f => f.acronym).join(', ')}. Responde solo con el acrónimo.`;
-    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
-    return { text: response.text?.trim() || FRAMEWORKS[0].acronym, usage: extractUsage(response, model, 'analysis', undefined, idea) };
+export const suggestFramework = async (idea: string, settings: ModelSettings): Promise<{text: string, usage?: TokenUsage}> => {
+    if (!ai) return { text: FRAMEWORKS?.[0]?.acronym || 'RACE' };
+    const prompt = `Basado en esta idea: "${idea}", sugiere el acrónimo del framework de prompting más adecuado de esta lista: ${ALL_FRAMEWORKS_LIST.map(f => f?.acronym).filter(Boolean).join(', ')}. Responde solo con el acrónimo.`;
+    
+    // Usar una configuración ligera y rápida para esta tarea de clasificación simple
+    const fastSettings = getFastSettings(settings);
+    
+    const response = await callGeminiWithRetry({ model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true) });
+    return { text: response.text?.trim() || FRAMEWORKS?.[0]?.acronym || 'RACE', usage: extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, idea) };
 };
 
 export const generateContent = async (p: string, s: any): Promise<{text: string, thought?: string, usage?: TokenUsage}> => {
@@ -652,14 +888,57 @@ export const modifyContentLength = async (text: string, modifier: LengthModifier
     const instruction = modifierConfig ? modifierConfig.prompt : "Modifica el siguiente texto:";
     const prompt = `${instruction}\n\n"${text}"`;
 
-    const config = buildConfig(settings, true);
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
     const response = await callGeminiWithRetry({ 
         model: resolveModel(model), 
         contents: prompt,
         config: config
     });
     
-    return { text: response.text || text, usage: extractUsage(response, model, 'generation', settings, text) };
+    return { text: response.text || text, usage: extractUsage(response, model, 'generation', transformSettings, text) };
+};
+
+export const modifyContentLengthStream = async (
+    text: string, 
+    modifier: LengthModifier, 
+    settingsOrModel: ModelSettings | GeminiModel,
+    onChunk: (chunk: string) => void
+): Promise<{text: string, usage?: TokenUsage}> => {
+    if (!ai) throw new Error("API Key no disponible");
+    
+    const settings = typeof settingsOrModel === 'string' ? { selectedModel: settingsOrModel } as ModelSettings : settingsOrModel;
+    const model = settings.selectedModel;
+    
+    const modifierConfig = LENGTH_MODIFIERS_CONFIG[modifier];
+    const instruction = modifierConfig ? modifierConfig.prompt : "Modifica el siguiente texto:";
+    const prompt = `${instruction}\n\n"${text}"`;
+
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
+    
+    try {
+        const stream = await callGeminiStreamWithRetry({ 
+            model: resolveModel(model), 
+            contents: prompt,
+            config: config
+        });
+        
+        let fullText = "";
+        let finalResponse: any = null;
+
+        for await (const chunk of stream) {
+            const chunkText = chunk.text || "";
+            fullText += chunkText;
+            onChunk(chunkText);
+            finalResponse = chunk;
+        }
+        
+        return { text: fullText, usage: extractUsage(finalResponse, model, 'generation', transformSettings, text) };
+    } catch (error) {
+        console.error("Modify Content Length Stream Error", error);
+        throw error;
+    }
 };
 
 export const generateMetaFramework = async (nicheProblem: string, model: GeminiModel): Promise<Framework> => {
@@ -703,7 +982,7 @@ export const generateMetaFramework = async (nicheProblem: string, model: GeminiM
 
 export type FormatType = 'organize' | 'markdown' | 'json';
 
-export const formatText = async (text: string, format: FormatType, model: GeminiModel) => {
+export const formatText = async (text: string, format: FormatType, settings: ModelSettings) => {
     if (!ai) throw new Error("API Key no disponible");
     let instruction = "";
     switch (format) {
@@ -712,43 +991,50 @@ export const formatText = async (text: string, format: FormatType, model: Gemini
         case 'json': instruction = "Convierte el contenido del siguiente texto a una estructura JSON válida:"; break;
     }
     const prompt = `${instruction}\n\n"${text}"`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt});
-    return { text: response.text || text, usage: extractUsage(response, model, 'generation', undefined, text) };
+    const transformSettings = getTransformationSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(transformSettings.selectedModel), contents: prompt, config: buildConfig(transformSettings, true)});
+    return { text: response.text || text, usage: extractUsage(response, transformSettings.selectedModel, 'generation', undefined, text) };
 }
 
-export const generateRandomIdea = async (model: GeminiModel) => {
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: 'Genera una idea creativa, única y específica para un prompt de IA útil. Solo la idea, sin introducción.'});
-    return { text: response.text || '', usage: extractUsage(response, model, 'generation') };
+export const generateRandomIdea = async (settings: ModelSettings) => {
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: 'Genera una idea creativa, única y específica para un prompt de IA útil. Solo la idea, sin introducción.', config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'generation') };
 }
 
-export const evaluateIdeaQuality = async (idea: string, model: GeminiModel, maxTokens: number) => {
+export const evaluateIdeaQuality = async (idea: string, settings: ModelSettings) => {
     const prompt = `Evalúa la siguiente idea para un prompt. Dame 3 puntos fuertes y 1 debilidad. Sé breve.\nIdea: "${idea}"`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
-    return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, idea) };
 }
 
-export const suggestRelatedIdeas = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
+export const suggestRelatedIdeas = async (idea: string, files: any[], settings: ModelSettings) => {
     const prompt = `Basado en la idea: "${idea}", sugiere 3 ideas alternativas o relacionadas que podrían ser interesantes de explorar.`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
-    return { text: response.text || '', usage: extractUsage(response, model, 'generation', undefined, idea) };
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'generation', undefined, idea) };
 }
 
-export const extractKeyEntities = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
+export const extractKeyEntities = async (idea: string, files: any[], settings: ModelSettings) => {
     const prompt = `Extrae las entidades clave (personas, lugares, conceptos técnicos) del siguiente texto en una lista separada por comas:\n"${idea}"`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
-    return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, idea) };
 }
 
-export const generateTitles = async (idea: string, model: GeminiModel, maxTokens: number) => {
+export const generateTitles = async (idea: string, settings: ModelSettings) => {
     const prompt = `Genera 5 títulos atractivos y cortos para esta idea:\n"${idea}"`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
-    return { text: response.text || '', usage: extractUsage(response, model, 'generation', undefined, idea) };
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'generation', undefined, idea) };
 }
 
-export const summarizeContext = async (idea: string, files: any[], model: GeminiModel, maxTokens: number) => {
+export const summarizeContext = async (idea: string, files: any[], settings: ModelSettings) => {
     const prompt = `Resume el siguiente texto en un párrafo conciso:\n"${idea}"`;
-    const response = await callGeminiWithRetry({model: resolveModel(model), contents: prompt, config: { maxOutputTokens: maxTokens }});
-    return { text: response.text || '', usage: extractUsage(response, model, 'analysis', undefined, idea) };
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true)});
+    return { text: response.text || '', usage: extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, idea) };
 }
 
 export const performDeepResearch = async (model: GeminiModel): Promise<Framework[]> => {
@@ -804,12 +1090,52 @@ export const evolvePrompt = async (currentPrompt: string, settings: ModelSetting
     Prompt Original:
     "${currentPrompt}"`;
 
-    const config = buildConfig(settings, true);
-    const response = await callGeminiWithRetry({ model: resolveModel(settings.selectedModel), contents: metaPrompt, config: config });
-    return { text: (response.text || '').trim(), usage: extractUsage(response, settings.selectedModel, 'optimization', settings, currentPrompt) };
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
+    const response = await callGeminiWithRetry({ model: resolveModel(transformSettings.selectedModel), contents: metaPrompt, config: config });
+    return { text: (response.text || '').trim(), usage: extractUsage(response, transformSettings.selectedModel, 'optimization', transformSettings, currentPrompt) };
 }
 
-export const critiqueResponse = async (p: string, r: string, model: GeminiModel) => {
+export const evolvePromptStream = async (
+    currentPrompt: string, 
+    settings: ModelSettings,
+    onChunk: (chunk: string) => void
+) => {
+    const metaPrompt = `Actúa como un optimizador de prompts experto.
+    Analiza el siguiente prompt y mejóralo aplicando técnicas avanzadas (CoT, delimitadores, especificidad).
+    Devuelve SOLO el prompt mejorado.
+    
+    Prompt Original:
+    "${currentPrompt}"`;
+
+    const transformSettings = getTransformationSettings(settings);
+    const config = buildConfig(transformSettings, true);
+    
+    try {
+        const stream = await callGeminiStreamWithRetry({ 
+            model: resolveModel(transformSettings.selectedModel), 
+            contents: metaPrompt, 
+            config: config 
+        });
+        
+        let fullText = "";
+        let finalResponse: any = null;
+
+        for await (const chunk of stream) {
+            const chunkText = chunk.text || "";
+            fullText += chunkText;
+            onChunk(chunkText);
+            finalResponse = chunk;
+        }
+        
+        return { text: fullText.trim(), usage: extractUsage(finalResponse, transformSettings.selectedModel, 'optimization', transformSettings, currentPrompt) };
+    } catch (error) {
+        console.error("Evolve Prompt Stream Error", error);
+        throw error;
+    }
+}
+
+export const critiqueResponse = async (p: string, r: string, settings: ModelSettings) => {
     const prompt = `Critica la siguiente respuesta de IA para el prompt dado.
     Prompt: "${p}"
     Respuesta: "${r}"
@@ -827,36 +1153,41 @@ export const critiqueResponse = async (p: string, r: string, model: GeminiModel)
         required: ["score", "pros", "cons", "suggestion"]
     };
 
+    const fastSettings = getFastSettings(settings);
+    const baseConfig = buildConfig(fastSettings, true);
     const response = await callGeminiWithRetry({ 
-        model: resolveModel(model), 
+        model: resolveModel(fastSettings.selectedModel), 
         contents: prompt, 
         config: { 
+            ...baseConfig,
             responseMimeType: "application/json",
             responseSchema: schema
         } 
     });
     const parsed = JSON.parse(response.text || '{}') as CritiqueResult;
-    parsed.usage = extractUsage(response, model, 'analysis', undefined, p);
+    parsed.usage = extractUsage(response, fastSettings.selectedModel, 'analysis', undefined, p);
     return parsed;
 }
 
-export const summarizeChanges = async (prev: string, current: string, model: GeminiModel) => {
+export const summarizeChanges = async (prev: string, current: string, settings: ModelSettings) => {
     const prompt = `Resume en una frase muy corta (max 10 palabras) qué cambió entre estas dos versiones del prompt.
     V1: "${prev}"
     V2: "${current}"`;
-    const response = await callGeminiWithRetry({ model: resolveModel(model), contents: prompt });
+    const fastSettings = getFastSettings(settings);
+    const response = await callGeminiWithRetry({ model: resolveModel(fastSettings.selectedModel), contents: prompt, config: buildConfig(fastSettings, true) });
     return (response.text || '').trim();
 }
 
-export const improvePromptBasedOnAnalysis = async (t: string, a: any, m: string) => {
+export const improvePromptBasedOnAnalysis = async (t: string, a: any, settings: ModelSettings) => {
     const prompt = `Mejora el siguiente prompt basándote en este análisis de calidad:
     Prompt: "${t}"
     Análisis: ${JSON.stringify(a)}
     
     Aplica las mejoras sugeridas y devuelve SOLO el prompt mejorado.`;
 
-    const response = await callGeminiWithRetry({ model: resolveModel(m), contents: prompt });
-    return { text: (response.text || '').trim(), usage: extractUsage(response, m, 'optimization', undefined, t) };
+    const transformSettings = getTransformationSettings(settings);
+    const response = await callGeminiWithRetry({ model: resolveModel(transformSettings.selectedModel), contents: prompt, config: buildConfig(transformSettings, true) });
+    return { text: (response.text || '').trim(), usage: extractUsage(response, transformSettings.selectedModel, 'optimization', undefined, t) };
 }
 
 export const generateStream = async (p: string, s: any) => {

@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
 ![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.3.1-purple)
+![Version](https://img.shields.io/badge/Version-4.3.3-purple)
 
 ## 🌟 Visión General
 
@@ -14,9 +14,22 @@
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
 
-## 🚀 Características SOTA v4.3.1 (Interactive Guide Hub Update) 🛠️
+## 🚀 Características SOTA v4.3.3 (Performance & Streaming Update) ⚡
 
-### 0. Guía del Usuario Interactiva (v4.3.1) 📖
+### 0. Optimización de Rendimiento (v4.3.3) ⚡
+*   **Arquitectura de Streaming**: Implementación de respuestas en tiempo real para expansión de ideas, optimización de prompts y evolución de los mismos, eliminando tiempos de espera prolongados.
+*   **Resiliencia de API**: Nuevo sistema de reintentos con backoff exponencial para manejar límites de cuota y errores de red de forma transparente.
+*   **Optimización de Latencia**: Reducción drástica del tiempo de procesamiento percibido mediante la entrega incremental de contenido.
+*   **Estabilidad de Tipos**: Corrección de errores críticos de acceso a propiedades en frameworks y mejora en la resolución de modelos de Gemini.
+*   **Optimización de Utilidades (Fast Settings)**: Aceleración significativa de funciones secundarias (sugerencia de casos de uso, formateo, refinamiento rápido) mediante el uso forzado de modelos ligeros (`gemini-3-flash-preview`) y la desactivación de características pesadas (búsqueda, modo pensamiento) cuando no son requeridas.
+
+### 0. Robustecimiento Estratégico (v4.3.2) 🧠
+*   **Motor de Expansión Conceptual**: Nuevo flujo de trabajo que no responde al prompt, sino que expande la arquitectura de la idea original, identificando capas ocultas y componentes críticos.
+*   **Preservación de Hilo**: Algoritmo optimizado para mantener la intención original mientras se añade profundidad técnica y estratégica.
+*   **Sanitización de PII**: Filtro automático de información sensible (emails, teléfonos) antes del procesamiento por IA.
+*   **Entrada Multimodal**: Soporte para dictado por voz integrado directamente en el área de entrada de ideas.
+
+### 1. Guía del Usuario Interactiva (v4.3.1) 📖
 *   **Dashboard de Instrucción**: Nuevo centro de aprendizaje integrado con navegación lateral para dominar los flujos de trabajo de la plataforma.
 *   **Secciones Especializadas**: Guías paso a paso para Prompting, RAG, Agentes AI, Evaluación y Gestión de Espacios de Trabajo.
 *   **Atajos de Teclado**: Tabla interactiva de comandos rápidos (Cmd+K) para maximizar la productividad.

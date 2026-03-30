@@ -13,8 +13,8 @@ interface BuilderCanvasProps {
 }
 
 const generateTemplate = (fw: Framework): string => {
-    const acronym = fw.acronym.toUpperCase();
-    let template = `Usa el framework ${acronym} (${fw.name}) para la siguiente tarea:\n\n`;
+    const acronym = (fw?.acronym || '').toUpperCase();
+    let template = `Usa el framework ${acronym} (${fw?.name || ''}) para la siguiente tarea:\n\n`;
     
     switch (acronym) {
         case 'RACE':
@@ -41,7 +41,7 @@ const generateTemplate = (fw: Framework): string => {
     return template;
 }
 
-const allFrameworks = [...FRAMEWORKS, ...CONTEXT_FRAMEWORKS, ...AGENT_FRAMEWORKS].sort((a,b) => a.acronym.localeCompare(b.acronym));
+const allFrameworks = [...FRAMEWORKS, ...CONTEXT_FRAMEWORKS, ...AGENT_FRAMEWORKS].sort((a,b) => (a?.acronym || '').localeCompare(b?.acronym || ''));
 
 const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSendToWorkflow }) => {
     const [promptText, setPromptText] = useState('');
@@ -105,7 +105,7 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
             <div className="bg-slate-950 w-full h-full flex flex-col">
                 <header className="flex justify-between items-center p-4 border-b border-white/10 flex-shrink-0">
                     <h2 className="text-xl font-bold text-gray-100">
-                        Constructor de Prompts: <span className="text-teal-400">{framework.acronym}</span>
+                        Constructor de Prompts: <span className="text-teal-400">{framework?.acronym}</span>
                     </h2>
                      <div className="flex items-center gap-4">
                         <button onClick={handleFullscreen} className="text-gray-400 hover:text-teal-400 transition-colors" title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
@@ -128,16 +128,16 @@ const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ framework, onClose, onSen
                                 className="appearance-none w-full bg-slate-900 border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
                             >
                                 {allFrameworks.map(fw => (
-                                    <option key={fw.id} value={fw.id}>{fw.acronym}: {fw.name}</option>
+                                    <option key={fw?.id || Math.random()} value={fw?.id}>{fw?.acronym || 'N/A'}: {fw?.name || 'N/A'}</option>
                                 ))}
                             </select>
                             <ChevronDownIcon className="absolute right-3 top-10 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </div>
                         <div className="border-t border-white/10 pt-4">
-                            <h3 className="text-lg font-bold text-teal-400">{referenceFramework.acronym}</h3>
-                            <p className="font-semibold text-gray-200">{referenceFramework.name}</p>
-                            <p className="text-sm text-gray-400 mt-2">{referenceFramework.description}</p>
-                            {referenceFramework.example && (
+                            <h3 className="text-lg font-bold text-teal-400">{referenceFramework?.acronym}</h3>
+                            <p className="font-semibold text-gray-200">{referenceFramework?.name}</p>
+                            <p className="text-sm text-gray-400 mt-2">{referenceFramework?.description}</p>
+                            {referenceFramework?.example && (
                                 <div className="mt-4">
                                     <h4 className="font-semibold text-teal-300 mb-2 text-sm">Ejemplo de Uso:</h4>
                                     <div className="bg-black/40 p-3 rounded-lg text-xs text-gray-300 whitespace-pre-wrap font-mono border border-white/5">

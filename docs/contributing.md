@@ -1,4 +1,4 @@
-# Guía de Contribución: v4.3.1
+# Guía de Contribución: v4.3.3
 
 ¡Gracias por tu interés en contribuir al **Laboratorio de Prompts 2026**! Estamos construyendo el estándar de facto para la Ingeniería de IA Multimodal, Orquestación de Agentes y Alquimia de Metodologías. Tu ayuda es fundamental para mantener este proyecto a la vanguardia.
 

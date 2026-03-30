@@ -109,7 +109,7 @@ const App: React.FC = () => {
     
     // Generated Output State (Lifted from WorkflowPanel)
     const [generatedPrompt, setGeneratedPrompt] = useState('');
-    const [selectedFrameworkAcronym, setSelectedFrameworkAcronym] = useState<string>(FRAMEWORKS[0].acronym);
+    const [selectedFrameworkAcronym, setSelectedFrameworkAcronym] = useState<string>(FRAMEWORKS?.[0]?.acronym || 'RACE');
     const [generatedSources, setGeneratedSources] = useState<any[]>([]);
 
     const { frameworkCounts, totalFrameworks } = useMemo(() => {
@@ -186,7 +186,7 @@ const App: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     // Tools
-    const [useGoogleSearch, setUseGoogleSearch] = useState(false);
+    const [useGoogleSearch, setUseGoogleSearch] = useState(true);
     const [isStructuredOutputEnabled, setIsStructuredOutputEnabled] = useState(false);
     const [responseSchema, setResponseSchema] = useState<string>(''); // JSON string representation
     const [isCodeExecutionEnabled, setIsCodeExecutionEnabled] = useState(false);
@@ -340,7 +340,27 @@ const App: React.FC = () => {
                     const previousPrompt = collection.versions[0]?.optimizedPrompt || "";
                     let changeSummary = isDraft ? "Borrador actualizado." : "Actualización manual.";
                     if (!isDraft && previousPrompt && previousPrompt !== finalOptimizedPrompt) {
-                         changeSummary = await summarizeChanges(previousPrompt, finalOptimizedPrompt, promptData.model);
+                         changeSummary = await summarizeChanges(previousPrompt, finalOptimizedPrompt, {
+                             selectedModel: promptData.model,
+                             temperature: temperature,
+                             topP: topP,
+                             topK: topK,
+                             frequencyPenalty: frequencyPenalty,
+                             presencePenalty: presencePenalty,
+                             maxOutputTokens: maxOutputTokens,
+                             systemInstruction: systemInstruction,
+                             systemInstructionFiles: systemInstructionFiles,
+                             stopSequences: stopSequences,
+                             seed: seed,
+                             thinkingBudget: thinkingBudget,
+                             isThinkingMode: isThinkingMode,
+                             useGoogleSearch: useGoogleSearch,
+                             isStructuredOutputEnabled: isStructuredOutputEnabled,
+                             responseSchema: responseSchema,
+                             isCodeExecutionEnabled: isCodeExecutionEnabled,
+                             isFunctionCallingEnabled: isFunctionCallingEnabled,
+                             safetySettings: safetySettings
+                         });
                     }
 
                     const newVersion: PromptVersion = { 
@@ -403,7 +423,27 @@ const App: React.FC = () => {
              try {
                  // Generate a short title in background
                  // We use the prompt generation logic to create a title
-                 const titleData = await generateSessionTitle(ideaText, selectedModel);
+                 const titleData = await generateSessionTitle(ideaText, {
+                     selectedModel: selectedModel,
+                     temperature: temperature,
+                     topP: topP,
+                     topK: topK,
+                     frequencyPenalty: frequencyPenalty,
+                     presencePenalty: presencePenalty,
+                     maxOutputTokens: maxOutputTokens,
+                     systemInstruction: systemInstruction,
+                     systemInstructionFiles: systemInstructionFiles,
+                     stopSequences: stopSequences,
+                     seed: seed,
+                     thinkingBudget: thinkingBudget,
+                     isThinkingMode: isThinkingMode,
+                     useGoogleSearch: useGoogleSearch,
+                     isStructuredOutputEnabled: isStructuredOutputEnabled,
+                     responseSchema: responseSchema,
+                     isCodeExecutionEnabled: isCodeExecutionEnabled,
+                     isFunctionCallingEnabled: isFunctionCallingEnabled,
+                     safetySettings: safetySettings
+                 });
                  sessionName = titleData.text;
              } catch (e) {
                  // Fallback to truncated text if generation fails or is too slow (though async await handles order)
@@ -624,7 +664,7 @@ const App: React.FC = () => {
         setSystemInstruction(tpl?.systemInstruction || '');
         setGeneratedPrompt('');
         setGeneratedSources([]);
-        setSelectedFrameworkAcronym(FRAMEWORKS[0].acronym);
+        setSelectedFrameworkAcronym(FRAMEWORKS?.[0]?.acronym || 'RACE');
         setUseCase(CATEGORIZED_USE_CASES[0].useCases[0]);
         setFiles([]);
         setPromptToIterateId(null);
@@ -1455,23 +1495,6 @@ const App: React.FC = () => {
                 isOpen={isCreateSessionModalOpen}
                 onClose={() => setIsCreateSessionModalOpen(false)}
                 onCreateSession={confirmCreateSession}
-            />
-
-            <ActionDashboardModal
-                isOpen={processDashboardState.isOpen}
-                onClose={() => setProcessDashboardState({ ...processDashboardState, isOpen: false })}
-                actionType={processDashboardState.actionType}
-                ideaText={ideaText}
-                modelSettings={allModelSettings}
-                onComplete={() => {}}
-                localAction={() => {
-                    if (processDashboardState.actionType === 'create_session') {
-                        handleCreateSession();
-                    } else if (processDashboardState.actionType === 'save') {
-                        const isDraft = !generatedPrompt;
-                        handleGlobalSave(false, undefined, isDraft);
-                    }
-                }}
             />
 
             <AnimatePresence>

@@ -1,12 +1,24 @@
 
-# Documento de Requisitos del Producto (PRD): v4.3.1
+# Documento de Requisitos del Producto (PRD): v4.3.3
 
 ## 1. Visión del Producto
 Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería de IA** completa y definitiva para 2026. El objetivo ya no es solo escribir prompts, sino arquitecturar sistemas de IA complejos, diseñar flujos de datos, evaluar el rendimiento de los modelos y definir estrategias de negocio asistidas por modelos SOTA (State of the Art) de Google.
 
 ## 2. Requisitos Funcionales (Q1-Q2 2026)
 
-### 2.0 Onboarding e Instrucción (v4.3.1)
+### 2.0 Optimización de Rendimiento y Streaming (v4.3.3)
+*   **Arquitectura de Streaming**: Implementación de respuestas en tiempo real para procesos largos (expansión de ideas, optimización y evolución de prompts) para eliminar tiempos de espera y mejorar la percepción de latencia.
+*   **Resiliencia de API**: Sistema robusto de reintentos automáticos con *exponential backoff* para manejar límites de cuota (HTTP 429) y errores de red de forma transparente.
+*   **Optimización de Utilidades (Fast Settings)**: Aceleración de funciones secundarias (sugerencias, formateo, refinamiento rápido) forzando el uso de modelos ligeros (`gemini-3-flash-preview`) y desactivando características pesadas (búsqueda, modo pensamiento) cuando no son estrictamente necesarias.
+*   **Resolución Dinámica de Modelos**: Capacidad de adaptar dinámicamente el modelo utilizado según la tarea, garantizando el mejor equilibrio entre velocidad y capacidad de razonamiento.
+
+### 2.1 Robustecimiento Estratégico (v4.3.2)
+*   **Motor de Expansión Conceptual**: Capacidad de transformar una idea inicial en una estructura robusta y detallada sin perder el hilo original, enfocándose en la arquitectura de la idea más que en la respuesta directa.
+*   **Sanitización de Datos (PII Scrubbing)**: Protección automática de la privacidad del usuario mediante la eliminación de información sensible antes del procesamiento por IA.
+*   **Entrada de Voz**: Integración de dictado por voz para capturar ideas de forma rápida y natural.
+*   **Análisis de Calidad de Idea**: Herramientas para evaluar la viabilidad y robustez de una idea antes de proceder a la optimización del prompt.
+
+### 2.1 Onboarding e Instrucción (v4.3.1)
 *   **Guía de Usuario Interactiva**: Dashboard multi-sección con navegación lateral que explica los flujos de trabajo clave (Prompting, RAG, Agentes, Evaluación).
 *   **Glosario de Ingeniería**: Centro de terminología para estandarizar el lenguaje de IA dentro de la plataforma.
 *   **Atajos de Productividad**: Documentación interactiva de comandos rápidos para acelerar el flujo de trabajo del ingeniero.

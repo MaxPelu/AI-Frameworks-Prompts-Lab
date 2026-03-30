@@ -29,32 +29,32 @@ const FrameworkCard: React.FC<FrameworkCardProps> = ({ framework, onBuild, onCom
                 {/* Tag */}
                 <div className="mb-3">
                     <span className="inline-block px-2 py-0.5 rounded-md bg-purple-500/20 border border-purple-500/30 text-[10px] font-bold text-purple-300 uppercase tracking-wider">
-                        {framework.category || 'PROMPTING'}
+                        {framework?.category || 'PROMPTING'}
                     </span>
                 </div>
 
                 {/* Title & Icon */}
                 <div className="flex justify-between items-start mb-1">
                     <h3 className="text-xl font-black text-white leading-tight tracking-tight group-hover:text-purple-200 transition-colors">
-                        {framework.acronym}
+                        {framework?.acronym}
                     </h3>
                     <ChevronDownIcon className={`w-5 h-5 text-gray-500 group-hover:text-white transition-all duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                 </div>
 
                 {/* Subtitle */}
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">
-                    {framework.name}
+                    {framework?.name}
                 </p>
 
                 {/* Description */}
                 <p className="text-xs text-gray-400 leading-relaxed line-clamp-3 group-hover:text-gray-300 transition-colors">
-                    {framework.description}
+                    {framework?.description}
                 </p>
             </div>
             
             {/* Expanded Content */}
             <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-96 mt-4 pt-4 border-t border-white/10' : 'max-h-0'}`}>
-                {framework.example && (
+                {framework?.example && (
                     <div className="animate-fade-in mb-4">
                     <h4 className="font-bold text-purple-300 mb-2 text-[10px] uppercase tracking-wider">Ejemplo: {framework.example.title}</h4>
                     <div className="bg-black/40 border border-white/5 p-3 rounded-lg text-xs text-gray-300 whitespace-pre-wrap font-mono shadow-inner">
@@ -62,7 +62,7 @@ const FrameworkCard: React.FC<FrameworkCardProps> = ({ framework, onBuild, onCom
                     </div>
                     </div>
                 )}
-                {framework.source && (
+                {framework?.source && (
                     <div className="animate-fade-in">
                     <a href={framework.source.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-gray-500 hover:text-purple-300 transition-colors group/link">
                         <BookOpenIcon className="w-3 h-3" />

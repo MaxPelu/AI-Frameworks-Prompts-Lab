@@ -156,7 +156,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         if (framework && idea && useCase) {
             const generateInitialPrompt = async () => {
                 setIsOptimizing(true);
-                setPrompt(`Optimizando con ${framework.acronym}...`);
+                setPrompt(`Optimizando con ${framework?.acronym || 'N/A'}...`);
                 try {
                     const result = await optimizePrompt(
                         idea, useCase, framework, [], 'default', 
@@ -168,7 +168,7 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
                         onTokenUsageReceived(result.usage);
                     }
                 } catch (e) {
-                    setPrompt(`Error al optimizar con ${framework.acronym}.`);
+                    setPrompt(`Error al optimizar con ${framework?.acronym || 'N/A'}.`);
                 } finally {
                     setIsOptimizing(false);
                 }
@@ -215,7 +215,27 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         setIsCritiquing(true);
         setCritiqueError('');
         try {
-            const critiqueResult = await critiqueResponse(prompt, result, activeModel);
+            const critiqueResult = await critiqueResponse(prompt, result, {
+                selectedModel: activeModel,
+                temperature: modelSettings.temperature,
+                topP: modelSettings.topP,
+                topK: modelSettings.topK,
+                frequencyPenalty: modelSettings.frequencyPenalty,
+                presencePenalty: modelSettings.presencePenalty,
+                maxOutputTokens: modelSettings.maxOutputTokens,
+                systemInstruction: modelSettings.systemInstruction,
+                systemInstructionFiles: modelSettings.systemInstructionFiles,
+                stopSequences: modelSettings.stopSequences,
+                seed: modelSettings.seed,
+                thinkingBudget: modelSettings.thinkingBudget,
+                isThinkingMode: modelSettings.isThinkingMode,
+                useGoogleSearch: modelSettings.useGoogleSearch,
+                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
+                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
+                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
+                safetySettings: modelSettings.safetySettings
+            });
             setCritique(critiqueResult);
             if (critiqueResult.usage && onTokenUsageReceived) onTokenUsageReceived(critiqueResult.usage);
         } catch (error) {
@@ -230,7 +250,27 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         if (!prompt) return;
         setIsFormatting(true);
         try {
-            const formattedResult = await formatText(prompt, formatType, activeModel);
+            const formattedResult = await formatText(prompt, formatType, {
+                selectedModel: activeModel,
+                temperature: modelSettings.temperature,
+                topP: modelSettings.topP,
+                topK: modelSettings.topK,
+                frequencyPenalty: modelSettings.frequencyPenalty,
+                presencePenalty: modelSettings.presencePenalty,
+                maxOutputTokens: modelSettings.maxOutputTokens,
+                systemInstruction: modelSettings.systemInstruction,
+                systemInstructionFiles: modelSettings.systemInstructionFiles,
+                stopSequences: modelSettings.stopSequences,
+                seed: modelSettings.seed,
+                thinkingBudget: modelSettings.thinkingBudget,
+                isThinkingMode: modelSettings.isThinkingMode,
+                useGoogleSearch: modelSettings.useGoogleSearch,
+                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
+                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
+                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
+                safetySettings: modelSettings.safetySettings
+            });
             setPrompt(formattedResult.text);
             if (formattedResult.usage && onTokenUsageReceived) onTokenUsageReceived(formattedResult.usage);
         } catch (error) {
@@ -244,7 +284,27 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         if (!prompt) return;
         setIsModifyingPromptLength(true);
         try {
-            const modifiedResult = await modifyContentLength(prompt, modifier, activeModel);
+            const modifiedResult = await modifyContentLength(prompt, modifier, {
+                selectedModel: activeModel,
+                temperature: modelSettings.temperature,
+                topP: modelSettings.topP,
+                topK: modelSettings.topK,
+                frequencyPenalty: modelSettings.frequencyPenalty,
+                presencePenalty: modelSettings.presencePenalty,
+                maxOutputTokens: modelSettings.maxOutputTokens,
+                systemInstruction: modelSettings.systemInstruction,
+                systemInstructionFiles: modelSettings.systemInstructionFiles,
+                stopSequences: modelSettings.stopSequences,
+                seed: modelSettings.seed,
+                thinkingBudget: modelSettings.thinkingBudget,
+                isThinkingMode: modelSettings.isThinkingMode,
+                useGoogleSearch: modelSettings.useGoogleSearch,
+                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
+                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
+                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
+                safetySettings: modelSettings.safetySettings
+            });
             setPrompt(modifiedResult.text);
             if (modifiedResult.usage && onTokenUsageReceived) onTokenUsageReceived(modifiedResult.usage);
         } catch (error) {
@@ -258,7 +318,27 @@ const ArenaPanel: React.FC<ArenaPanelProps> = ({
         if (!result) return;
         setIsModifyingResultLength(true);
         try {
-            const modifiedResult = await modifyContentLength(result, modifier, activeModel);
+            const modifiedResult = await modifyContentLength(result, modifier, {
+                selectedModel: activeModel,
+                temperature: modelSettings.temperature,
+                topP: modelSettings.topP,
+                topK: modelSettings.topK,
+                frequencyPenalty: modelSettings.frequencyPenalty,
+                presencePenalty: modelSettings.presencePenalty,
+                maxOutputTokens: modelSettings.maxOutputTokens,
+                systemInstruction: modelSettings.systemInstruction,
+                systemInstructionFiles: modelSettings.systemInstructionFiles,
+                stopSequences: modelSettings.stopSequences,
+                seed: modelSettings.seed,
+                thinkingBudget: modelSettings.thinkingBudget,
+                isThinkingMode: modelSettings.isThinkingMode,
+                useGoogleSearch: modelSettings.useGoogleSearch,
+                isStructuredOutputEnabled: modelSettings.isStructuredOutputEnabled,
+                responseSchema: modelSettings.responseSchema,
+                isCodeExecutionEnabled: modelSettings.isCodeExecutionEnabled,
+                isFunctionCallingEnabled: modelSettings.isFunctionCallingEnabled,
+                safetySettings: modelSettings.safetySettings
+            });
             setResult(modifiedResult.text);
             if (modifiedResult.usage && onTokenUsageReceived) onTokenUsageReceived(modifiedResult.usage);
         } catch (error) {
