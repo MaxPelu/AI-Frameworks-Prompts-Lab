@@ -85,7 +85,7 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                         <div className="space-y-4">
                             {[
                                 { title: 'Selección de Framework', desc: 'Navega por las categorías (Prompting, Coding, Business) para encontrar la estructura ideal. Cada framework añade "railes" cognitivos al modelo.' },
-                                { title: 'Configuración del Modelo', desc: 'Ajusta la Temperatura (Creatividad) y el Thinking Budget (Razonamiento). Un presupuesto alto es vital para tareas lógicas complejas.' },
+                                { title: 'Configuración Avanzada de Modelos', desc: 'Ajusta el Max Output Tokens (hasta 1,000,000) y la Temperatura. Para modelos compatibles (ej. Gemini 3.1 Pro, Thinking), configura el Thinking Budget. El sistema ajustará automáticamente el límite de tokens para garantizar que haya espacio suficiente para la respuesta final.' },
                                 { title: 'Iteración con IA', desc: 'Usa el botón "Mejorar" para que Gemini analice tu prompt y sugiera mejoras basadas en principios de ingeniería de contexto.' },
                                 { title: 'Control de Versiones', desc: 'Guarda versiones de tus prompts para comparar resultados en la Arena y evitar regresiones.' },
                             ].map((item, i) => (
@@ -153,7 +153,7 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                             </div>
                         </div>
 
-                        <div className="glass-panel p-8 rounded-[2.5rem] border-white/5">
+                        <div className="glass-panel p-8 rounded-[2.5rem] border-white/5 mb-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="text-center">
                                     <div className="text-2xl font-black text-white mb-2">1. Perfil</div>
@@ -167,6 +167,27 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                     <div className="text-2xl font-black text-white mb-2">3. Memoria</div>
                                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">Configura la retención de contexto</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="glass-panel p-6 rounded-3xl border-white/5">
+                                <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                    <SparklesIcon className="w-4 h-4 text-orange-400" />
+                                    Habilidades Generativas
+                                </h4>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Crea habilidades complejas usando el generador integrado. Ahora puedes asignar modelos con capacidad de razonamiento (Thinking Models) y ajustar su presupuesto de tokens para tareas que requieran planificación profunda.
+                                </p>
+                            </div>
+                            <div className="glass-panel p-6 rounded-3xl border-white/5">
+                                <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                    <CommandLineIcon className="w-4 h-4 text-orange-400" />
+                                    Acciones Rápidas
+                                </h4>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Ejecuta transformaciones, traducciones o análisis sobre tu prompt actual utilizando el Dashboard de Acciones, con soporte total para modelos avanzados y configuración de tokens de salida de hasta 1M.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -319,7 +340,7 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                 <div className="mt-auto p-4 bg-teal-500/5 rounded-2xl border border-teal-500/10">
                     <div className="text-[10px] font-black text-teal-400 uppercase tracking-widest mb-2">Tip del Día</div>
                     <p className="text-[10px] text-gray-500 leading-relaxed italic">
-                        "Usa la Arena para comparar Gemini 3.1 Pro contra Flash y encontrar el equilibrio perfecto entre costo y calidad."
+                        "Al usar modelos Thinking, el sistema ajustará automáticamente el Max Output Tokens para garantizar que el modelo tenga espacio para responder después de razonar."
                     </p>
                 </div>
             </div>

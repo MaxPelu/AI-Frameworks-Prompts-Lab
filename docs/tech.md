@@ -1,9 +1,15 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.3.3
+# Especificaciones Técnicas: Laboratorio de Prompts v4.3.4
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.3 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.4 del Laboratorio de Prompts.
 
-## 1. Módulo de Robustecimiento Estratégico (v4.3.2)
+## 1. Gestión Avanzada de Modelos Thinking (v4.3.4)
+Se ha refactorizado la arquitectura de configuración de modelos para soportar de manera robusta las capacidades de razonamiento (Chain of Thought):
+*   **Lógica Centralizada (`isThinkingSupported`)**: Se implementó una función pura en `geminiService.ts` que evalúa si un modelo seleccionado soporta el parámetro `thinkingConfig`. Esto elimina la duplicación de código y asegura consistencia en toda la UI.
+*   **Tokenomics Dinámicos**: El límite de `maxOutputTokens` se ha expandido a 1,000,000 para soportar contextos masivos. Además, el sistema ahora calcula dinámicamente el valor máximo permitido para el `thinkingBudget`, asegurando que siempre sea menor al `maxOutputTokens` (con un buffer de seguridad de 2048 tokens).
+*   **Auto-Corrección de API**: Antes de enviar la petición a la API de Gemini, el servicio verifica si el `thinkingBudget` excede o iguala el `maxOutputTokens`. Si es así, el sistema incrementa automáticamente el `maxOutputTokens` para evitar errores de validación de la API (`invalid_argument`).
+
+## 2. Módulo de Robustecimiento Estratégico (v4.3.2)
 Se ha implementado un nuevo motor de expansión conceptual (`expandIdea`) que introduce:
 *   **Prompt Engineering de Arquitectura**: El sistema utiliza directivas de sistema avanzadas que instruyen al modelo a actuar como un arquitecto de soluciones, desglosando la idea en componentes, capas y requisitos en lugar de simplemente responder al prompt.
 *   **Preservación de Contexto**: Implementación de un algoritmo de inyección de contexto que asegura que la expansión no pierda el hilo original de la idea del usuario.

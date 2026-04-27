@@ -1,12 +1,18 @@
 
-# Documento de Requisitos del Producto (PRD): v4.3.3
+# Documento de Requisitos del Producto (PRD): v4.3.4
 
 ## 1. Visión del Producto
 Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería de IA** completa y definitiva para 2026. El objetivo ya no es solo escribir prompts, sino arquitecturar sistemas de IA complejos, diseñar flujos de datos, evaluar el rendimiento de los modelos y definir estrategias de negocio asistidas por modelos SOTA (State of the Art) de Google.
 
 ## 2. Requisitos Funcionales (Q1-Q2 2026)
 
-### 2.0 Optimización de Rendimiento y Streaming (v4.3.3)
+### 2.0 Gestión Avanzada de Modelos Thinking (v4.3.4)
+*   **Lógica Centralizada de Modelos**: Implementación de un sistema unificado para detectar y gestionar modelos con capacidades de razonamiento (Chain of Thought), asegurando consistencia en toda la plataforma.
+*   **Tokenomics Escalables**: Soporte para contextos masivos mediante la ampliación del límite de `Max Output Tokens` a 1,000,000 en todas las interfaces de configuración.
+*   **Presupuesto de Pensamiento Dinámico**: Sistema de seguridad automatizado que calcula y limita el `Thinking Budget` basándose en el límite de tokens de salida, garantizando siempre un margen operativo (buffer) para la respuesta final del modelo.
+*   **Integración Transversal**: Disponibilidad de la configuración de razonamiento en herramientas críticas como el Dashboard de Acciones Rápidas, el Creador de Habilidades de Agentes y la Arena de Pruebas.
+
+### 2.1 Optimización de Rendimiento y Streaming (v4.3.3)
 *   **Arquitectura de Streaming**: Implementación de respuestas en tiempo real para procesos largos (expansión de ideas, optimización y evolución de prompts) para eliminar tiempos de espera y mejorar la percepción de latencia.
 *   **Resiliencia de API**: Sistema robusto de reintentos automáticos con *exponential backoff* para manejar límites de cuota (HTTP 429) y errores de red de forma transparente.
 *   **Optimización de Utilidades (Fast Settings)**: Aceleración de funciones secundarias (sugerencias, formateo, refinamiento rápido) forzando el uso de modelos ligeros (`gemini-3-flash-preview`) y desactivando características pesadas (búsqueda, modo pensamiento) cuando no son estrictamente necesarias.

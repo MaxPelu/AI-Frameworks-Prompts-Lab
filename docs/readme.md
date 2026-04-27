@@ -6,13 +6,21 @@
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
 ![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.3.3-purple)
+![Version](https://img.shields.io/badge/Version-4.3.4-purple)
 
 ## 🌟 Visión General
 
 **Laboratorio de Prompts 2026** evoluciona de una herramienta de redacción a una **plataforma de ingeniería integral**. Integra la potencia de los modelos **SOTA de Google** con una **Biblioteca de Conocimiento Masiva (+500 Frameworks)** que abarca desde la codificación de bajo nivel (DSPy, Unsloth) hasta la estrategia empresarial (Blue Ocean, Wardley Maps) y la orquestación de agentes (LangGraph, CrewAI).
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
+
+## 🚀 Características SOTA v4.3.4 (Advanced Thinking & Tokenomics Update) 🧠
+
+### 0. Gestión Avanzada de Modelos Thinking (v4.3.4) 🧠
+*   **Lógica Centralizada de Modelos**: Nueva arquitectura para la detección y gestión de modelos con capacidad de razonamiento (CoT) como Gemini 3.1 Pro y la familia Thinking.
+*   **Límites de Tokens Expandidos**: Aumento del límite de `Max Output Tokens` a **1,000,000** en todos los dashboards (Configuración Principal, Acciones Rápidas, Creador de Habilidades) para soportar tareas de generación masiva y análisis profundo.
+*   **Thinking Budget Dinámico**: El presupuesto de pensamiento (`Thinking Budget`) ahora se ajusta dinámicamente y de forma segura, garantizando que nunca supere el límite de tokens de salida y manteniendo un margen de seguridad (buffer de 2048 tokens) para asegurar que el modelo siempre tenga espacio para entregar la respuesta final.
+*   **Integración Omnipresente**: Soporte completo para la configuración de tokens de razonamiento en el Dashboard de Acciones Rápidas, el Creador de Habilidades de Agentes (Agent Skills) y la Arena de Pruebas.
 
 ## 🚀 Características SOTA v4.3.3 (Performance & Streaming Update) ⚡
 

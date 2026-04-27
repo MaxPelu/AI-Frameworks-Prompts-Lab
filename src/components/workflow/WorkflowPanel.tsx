@@ -1267,8 +1267,20 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                     title="Escribe aquí tu idea, tarea o borrador inicial que deseas optimizar."
                                 />
                                 
-                                {/* New Input Actions: Voice & PII */}
+                                {/* New Input Actions: Voice & PII & Clear */}
                                 <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+                                    {ideaText && (
+                                        <button
+                                            onClick={() => onIdeaChange('')}
+                                            disabled={anyLoading}
+                                            className="p-3 rounded-full backdrop-blur-md transition-all shadow-lg border border-white/10 bg-black/30 text-gray-400 hover:text-red-400 hover:bg-black/50"
+                                            title="Limpiar texto (Empezar desde 0)"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    )}
                                     <button
                                         onClick={toggleRecording}
                                         disabled={anyLoading}
@@ -1477,29 +1489,55 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
                                 </div>
                                  <div>
                                     <label htmlFor="key-info" className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 mb-2 ml-1"><CheckBadgeIcon className="w-3.5 h-3.5" /> Info Clave (a incluir)</label>
-                                    <textarea 
-                                        id="key-info" 
-                                        value={keyInfo} 
-                                        onChange={e => setKeyInfo(e.target.value)} 
-                                        rows={2} 
-                                        className="glass-input w-full text-xs rounded-lg p-3 text-gray-300 resize-y" 
-                                        placeholder="Ej: Mencionar el descuento del 20%..." 
-                                        disabled={anyLoading}
-                                        title="Detalles específicos que el prompt final DEBE incluir obligatoriamente."
-                                    ></textarea>
+                                    <div className="relative group">
+                                        <textarea 
+                                            id="key-info" 
+                                            value={keyInfo} 
+                                            onChange={e => setKeyInfo(e.target.value)} 
+                                            rows={2} 
+                                            className="glass-input w-full text-xs rounded-lg p-3 pr-8 text-gray-300 resize-y" 
+                                            placeholder="Ej: Mencionar el descuento del 20%..." 
+                                            disabled={anyLoading}
+                                            title="Detalles específicos que el prompt final DEBE incluir obligatoriamente."
+                                        ></textarea>
+                                        {keyInfo && (
+                                            <button 
+                                                onClick={() => setKeyInfo('')} 
+                                                title="Limpiar Info Clave" 
+                                                className="absolute top-2 right-2 p-1 bg-black/50 rounded text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label htmlFor="negative-constraints" className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 mb-2 ml-1"><NoSymbolIcon className="w-3.5 h-3.5" /> Restricciones (a evitar)</label>
-                                    <textarea 
-                                        id="negative-constraints" 
-                                        value={negativeConstraints} 
-                                        onChange={e => setNegativeConstraints(e.target.value)} 
-                                        rows={2} 
-                                        className="glass-input w-full text-xs rounded-lg p-3 text-gray-300 resize-y" 
-                                        placeholder="Ej: No usar un tono demasiado formal..." 
-                                        disabled={anyLoading}
-                                        title="Lo que el prompt final NO debe hacer o mencionar."
-                                    ></textarea>
+                                    <div className="relative group">
+                                        <textarea 
+                                            id="negative-constraints" 
+                                            value={negativeConstraints} 
+                                            onChange={e => setNegativeConstraints(e.target.value)} 
+                                            rows={2} 
+                                            className="glass-input w-full text-xs rounded-lg p-3 pr-8 text-gray-300 resize-y" 
+                                            placeholder="Ej: No usar un tono demasiado formal..." 
+                                            disabled={anyLoading}
+                                            title="Lo que el prompt final NO debe hacer o mencionar."
+                                        ></textarea>
+                                        {negativeConstraints && (
+                                            <button 
+                                                onClick={() => setNegativeConstraints('')} 
+                                                title="Limpiar Restricciones" 
+                                                className="absolute top-2 right-2 p-1 bg-black/50 rounded text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
