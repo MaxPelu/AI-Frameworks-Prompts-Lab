@@ -169,8 +169,8 @@ const App: React.FC = () => {
         isRenameMode: false
     });
 
-    // Centralized Model Settings - Updated to Gemini 3 Flash Default for Dec 2025
-    const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3-flash-preview');
+    // Centralized Model Settings - Updated to Gemini 3.5 Flash (Medium Thinking) Default for Google I/O 2026
+    const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3.5-flash-medium');
     const [temperature, setTemperature] = useState(0.8);
     const [topP, setTopP] = useState(0.95);
     const [topK, setTopK] = useState(40);
@@ -265,7 +265,7 @@ const App: React.FC = () => {
                 const parsedPrompts = JSON.parse(storedPrompts);
                 const migratedPrompts = parsedPrompts.map((p: any) => {
                     if (p.versions && Array.isArray(p.versions)) {
-                        p.versions = p.versions.map((v: any) => ({ ...v, model: v.model || 'gemini-3-flash-preview' }));
+                        p.versions = p.versions.map((v: any) => ({ ...v, model: v.model || 'gemini-3.5-flash-medium' }));
                         return p;
                     }
                     const version: PromptVersion = {
@@ -274,7 +274,7 @@ const App: React.FC = () => {
                         useCase: p.useCase,
                         frameworkAcronym: p.frameworkAcronym,
                         optimizedPrompt: p.optimizedPrompt,
-                        model: 'gemini-3-flash-preview',
+                        model: 'gemini-3.5-flash-medium',
                         createdAt: p.createdAt,
                         changeSummary: "Versión importada."
                     };
@@ -1139,7 +1139,7 @@ const App: React.FC = () => {
 
                                         <div className="flex gap-4 text-gray-400 font-mono text-xs shrink-0 hidden lg:flex">
                                             <span>LATENCIA: 42ms</span>
-                                            <span>MODELO: {selectedModel?.name?.toUpperCase() || 'GEMINI 3.1 FLASH'}</span>
+                                            <span>MODELO: {selectedModel?.toUpperCase() || 'GEMINI 3.5 FLASH'}</span>
                                             <span>TOKENS: ACTIVO</span>
                                         </div>
                                     </div>

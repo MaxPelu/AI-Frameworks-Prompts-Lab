@@ -1,20 +1,29 @@
 
-# Especificaciones Técnicas: Laboratorio de Prompts v4.3.4
+# Especificaciones Técnicas: Laboratorio de Prompts v4.4.0
 
-Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.3.4 del Laboratorio de Prompts.
+Este documento detalla las decisiones arquitectónicas y técnicas clave que sustentan la versión 4.4.0 del Laboratorio de Prompts.
 
-## 1. Gestión Avanzada de Modelos Thinking (v4.3.4)
-Se ha refactorizado la arquitectura de configuración de modelos para soportar de manera robusta las capacidades de razonamiento (Chain of Thought):
-*   **Lógica Centralizada (`isThinkingSupported`)**: Se implementó una función pura en `geminiService.ts` que evalúa si un modelo seleccionado soporta el parámetro `thinkingConfig`. Esto elimina la duplicación de código y asegura consistencia en toda la UI.
-*   **Tokenomics Dinámicos**: El límite de `maxOutputTokens` se ha expandido a 1,000,000 para soportar contextos masivos. Además, el sistema ahora calcula dinámicamente el valor máximo permitido para el `thinkingBudget`, asegurando que siempre sea menor al `maxOutputTokens` (con un buffer de seguridad de 2048 tokens).
-*   **Auto-Corrección de API**: Antes de enviar la petición a la API de Gemini, el servicio verifica si el `thinkingBudget` excede o iguala el `maxOutputTokens`. Si es así, el sistema incrementa automáticamente el `maxOutputTokens` para evitar errores de validación de la API (`invalid_argument`).
+## 1. Gestión Avanzada de Modelos SOTA & I/O 2026 (v4.4.0)
+Se ha refactorizado la arquitectura de enrutamiento y configuración de modelos para soportar la última generación de modelos de Google:
+*   **Lógica Centralizada (`isThinkingSupported`)**: Se expandió la función pura en `geminiService.ts` para evaluar si el modelo activo (incluyendo `gemini-3.5-flash`, `gemini-3.5-pro`, `gemini-omni`, `google-antigravity-engine`, etc.) soporta el parámetro `thinkingConfig`.
+*   **Integración de Presupuesto Adaptativo (Low, Medium, High, Super High)**: Se implementó un mapeo de sufijos de modelos (`settings.selectedModel.match(/-(low|medium|high|super-high)$/)`) que intercepta la selección del usuario y traduce automáticamente el nivel de razonamiento a la especificación nativa de la API de Gemini, inyectando buffers lógicos inteligentes.
+*   **Motor Predeterminado Seleccionado (`gemini-3.5-flash-medium`)**: Se estableció en el componente de estado global (`App.tsx`) y los parses de importación que la aplicación se inicie usando Gemini 3.5 Flash con capacidad de pensamiento medio, balanceando velocidad extrema con deducción CoT.
+*   **Suite de Verificación Automatizada (`test-models.js`)**: Entorno de validación local que revisa de forma estructurada que todos los tipos de la interfaz `GeminiModel`, las constantes en `ALL_GEMINI_MODELS` y las funciones de resolución lógica y de CoT mapeen perfectamente previniendo fallos en producción.
 
-## 2. Módulo de Robustecimiento Estratégico (v4.3.2)
-Se ha implementado un nuevo motor de expansión conceptual (`expandIdea`) que introduce:
-*   **Prompt Engineering de Arquitectura**: El sistema utiliza directivas de sistema avanzadas que instruyen al modelo a actuar como un arquitecto de soluciones, desglosando la idea en componentes, capas y requisitos en lugar de simplemente responder al prompt.
+## Update v4.4.0 (Models Update)
+Se ha integrado de manera profunda la nueva frontera de modelos de Google:
+*   Se añadieron modelos `gemini-3.5-pro`, `gemini-3.5-flash`, `gemini-3.5-flash-thinking` y el buque insignia multimodal `gemini-omni`.
+*   Se añadieron las variaciones de presupuesto de pensamiento de `gemini-3.5-flash` con sus diferentes configuraciones de "thinking_budget" (**low, medium, high, super-high**).
+*   Se incluyó de manera completa la familia **Gemma 4** (`gemma-4-27b-it`, `gemma-4-12b-it`, `gemma-4-4b-it`) en los selectores visuales y en los mapeos de servicio.
+
+## 2. Módulo de Robustecimiento Estratégico (v4.3.5)
+Se ha implementado un nuevo motor de expansión conceptual y optimización de prompts (`expandIdeaStream`, `optimizePromptStream`, `quickRefineStream`, `evolvePromptStream`) fuertemente alineado con las **Official Prompting Best Practices (Google/Anthropic/OpenAI)**:
+*   **XML Tagging**: El sistema instruye a la IA a encapsular secciones del análisis y la estructura del prompt en etiquetas XML (ej. `<context>`, `<instructions>`, `<persona>`), garantizando precisión y mitigando inyecciones.
+*   **Persona Assignment**: La IA asume un rol de "World-Class Prompt Engineer" hiper-específico para generar prompts listos para producción.
+*   **Chain of Thought Embebido**: Para tareas de refactorización y evolución de prompts, el sistema exige lógica de razonamiento paso a paso, integrando `<thinking>` blocks cuando la tarea o el modelo lo requieren.
 *   **Preservación de Contexto**: Implementación de un algoritmo de inyección de contexto que asegura que la expansión no pierda el hilo original de la idea del usuario.
-*   **PII Scrubbing Engine**: Un sistema de limpieza de datos personales (emails, teléfonos) basado en expresiones regulares optimizadas que se ejecuta en el cliente antes de enviar cualquier dato a la API de Gemini.
-*   **Voice-to-Text Integration**: Integración con la Web Speech API para permitir la entrada de ideas mediante dictado por voz, mejorando la accesibilidad y la velocidad de captura de ideas.
+*   **PII Scrubbing Engine**: Limpieza de datos personales en el cliente.
+*   **Voice-to-Text Integration**: Entrada de ideas por voz.
 
 ## 2. Módulo de Guía Interactiva (v4.3.1)
 Se ha implementado un nuevo sistema de instrucción integrado (`GuideDashboard.tsx`) que utiliza:
@@ -40,11 +49,11 @@ La lógica de espacios de trabajo se ha centralizado en `App.tsx` y se consume e
 El núcleo de la aplicación es la integración con la API de Google Gemini a través del SDK `@google/genai`.
 
 ### 1.1 Modelos y Capacidades SOTA
-El servicio soporta explícitamente la familia **Gemini 3.1** y modelos especializados:
-*   **Gemini 3.1 Pro**: Motor principal para tareas de razonamiento complejo, generación de código y evaluación de calidad.
-*   **Gemini 3.1 Flash**: Optimizado para tareas de alta velocidad y baja latencia.
-*   **Gemini 3.1 Flash Lite**: El modelo más eficiente de la serie 3.1, ideal para tareas rápidas y de bajo costo.
-*   **Thinking Config (Presupuesto de Pensamiento)**: Implementación nativa de `thinking_budget`. Para los modelos que lo soportan (ej. `gemini-3.1-pro-preview`, `gemini-3.1-flash-lite-preview`), se puede configurar el nivel de pensamiento con opciones de **Low**, **Medium**, **High** y **Super High**, permitiendo al modelo realizar cadenas de pensamiento ocultas antes de emitir la respuesta final. Esto es crucial para tareas de codificación y lógica matemática.
+El servicio soporta explícitamente la familia **Gemini 3.5**, **Omni** y modelos especializados:
+*   **Gemini 3.5 Pro**: Motor principal para tareas de razonamiento complejo, generación de código y evaluación de calidad con gran escala de parámetros.
+*   **Gemini 3.5 Flash / Flash Thinking**: Optimizado para tareas de alta velocidad y baja latencia, integrando presupuestos de razonamiento CoT eficientes.
+*   **Gemini Omni**: Flagship súper-multimodal para inferencias integradas.
+*   **Thinking Config (Presupuesto de Pensamiento)**: Implementación nativa de `thinking_budget`. Para los modelos de la serie Gemini 3.5 y 3.1 que lo soportan, se puede configurar el nivel de pensamiento con opciones de **Low**, **Medium**, **High** y **Super High**, permitiendo al modelo realizar cadenas de pensamiento ocultas antes de emitir la respuesta final. Esto es crucial para tareas de codificación y lógica matemática. El motor por defecto utiliza la variante `gemini-3.5-flash-medium` para excelente latencia e increíble profundidad analítica.
 
 ### 1.2 Motores de Investigación y Creación (Agentes)
 *   **Meta-Alquimia (`generateMetaFramework`)**: Utiliza `responseSchema` estricto (JSON Schema) para forzar al modelo a inventar un objeto JSON válido que represente un nuevo framework (Acrónimo, Pasos, Ejemplo). Esto garantiza que la salida sea directamente parseable y renderizable en la UI sin necesidad de expresiones regulares frágiles.

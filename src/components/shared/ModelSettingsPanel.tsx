@@ -794,14 +794,133 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                     icon={<SparklesIcon className="w-4 h-4" />}
                   />
 
+                  {/* GEMINI 3.5 & OMNI HERO SERIES */}
+                  <div className="mb-2 text-[10px] font-bold text-teal-400 uppercase tracking-widest pl-1 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></span>
+                    Gemini 3.5 & Omni (Google I/O 2026 flagships)
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                    <ModelButton
+                      id="gemini-3.5-flash"
+                      label="Gemini 3.5 Flash"
+                      sub="I/O 2026 Base"
+                      colorClass="bg-teal-500/20 border-teal-500/40 text-teal-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-thinking"
+                      label="3.5 Flash Thinking"
+                      sub="Deep CoT SOTA"
+                      colorClass="bg-indigo-500/20 border-indigo-500/40 text-indigo-400"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-pro"
+                      label="Gemini 3.5 Pro"
+                      sub="Reasoning SOTA"
+                      colorClass="bg-emerald-500/20 border-emerald-500/40 text-emerald-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-omni"
+                      label="Gemini Omni"
+                      sub="Multimodal Flagship"
+                      colorClass="bg-purple-500/20 border-purple-500/40 text-purple-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                  </div>
+
+                  {/* GEMINI 3.5 FLASH THINKING LEVELS */}
+                  <div className="mb-2 text-[10px] font-bold text-teal-500/80 uppercase tracking-widest pl-1">
+                    Gemini 3.5 Flash - Adaptive Thinking Budgets
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+                    <ModelButton
+                      id="gemini-3.5-flash-low"
+                      label="3.5 Flash Low"
+                      sub="Low Thinking"
+                      colorClass="bg-teal-500/10 border-teal-500/20 text-teal-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-medium"
+                      label="3.5 Flash Medium"
+                      sub="Med Thinking (Default)"
+                      colorClass="bg-teal-500/30 border-teal-400/60 text-teal-100"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-high"
+                      label="3.5 Flash High"
+                      sub="High Thinking"
+                      colorClass="bg-teal-600/20 border-teal-500/40 text-teal-200"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-super-high"
+                      label="3.5 Flash Super"
+                      sub="Max Thinking"
+                      colorClass="bg-indigo-600/20 border-indigo-500/40 text-teal-200"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                  </div>
+
                   {/* GEMINI 3.1 SERIES */}
                   <div className="mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">
                     Gemini 3.1 (New Frontier)
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
                     <ModelButton
-                      id="gemini-3.1-pro-preview"
+                      id="gemini-3.1-pro"
                       label="3.1 Pro"
+                      sub="Stable"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash"
+                      label="3.1 Flash"
+                      sub="Stable"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash-lite"
+                      label="3.1 Lite"
+                      sub="Stable"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-pro-preview"
+                      label="3.1 Pro Preview"
                       sub="Reasoning SOTA"
                       highlight
                       current={settings.selectedModel}
@@ -838,6 +957,52 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                     <ModelButton
                       id="gemini-3.1-pro-preview-super-high"
                       label="3.1 Pro (Super)"
+                      sub="Max Thinking"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    
+                    <ModelButton
+                      id="gemini-3.1-flash-preview"
+                      label="3.1 Flash Prev"
+                      sub="Speed SOTA"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash-preview-low"
+                      label="3.1 Flash (Low)"
+                      sub="Low Thinking"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash-preview-medium"
+                      label="3.1 Flash (Med)"
+                      sub="Med Thinking"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash-preview-high"
+                      label="3.1 Flash (High)"
+                      sub="High Thinking"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.1-flash-preview-super-high"
+                      label="3.1 Flash (Super)"
                       sub="Max Thinking"
                       highlight
                       current={settings.selectedModel}
@@ -1272,6 +1437,33 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                     Gemma & Specialized
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+                    <ModelButton
+                      id="gemma-4-27b-it"
+                      label="Gemma 4"
+                      sub="27B Instruct"
+                      colorClass="bg-emerald-500/80 border-emerald-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemma-4-12b-it"
+                      label="Gemma 4"
+                      sub="12B Instruct"
+                      colorClass="bg-emerald-500/80 border-emerald-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemma-4-4b-it"
+                      label="Gemma 4"
+                      sub="4B Instruct"
+                      colorClass="bg-emerald-500/80 border-emerald-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
                     <ModelButton
                       id="gemma-3-27b-it"
                       label="Gemma 3"

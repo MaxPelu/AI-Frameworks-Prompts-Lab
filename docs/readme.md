@@ -4,15 +4,21 @@
 **El Entorno de Desarrollo Integrado (IDE) definitivo para la Ingeniería de Prompts Avanzada, Orquestación de Agentes y Arquitectura de Datos.**
 
 ![Status](https://img.shields.io/badge/Status-SOTA%20Ready-teal)
-![IA](https://img.shields.io/badge/IA-Gemini%203.1%20%7C%20Flash%20Lite%20%7C%202.5%20%7C%20Gemma%203-indigo)
+![IA](https://img.shields.io/badge/IA-Gemini%203.5%20%7C%20Omni%20%7C%20Gemma%204-indigo)
 ![Toolkit](https://img.shields.io/badge/Toolkit-LLM%20Engineer-fuchsia)
-![Version](https://img.shields.io/badge/Version-4.3.4-purple)
+![Version](https://img.shields.io/badge/Version-4.4.0-purple)
 
 ## 🌟 Visión General
 
 **Laboratorio de Prompts 2026** evoluciona de una herramienta de redacción a una **plataforma de ingeniería integral**. Integra la potencia de los modelos **SOTA de Google** con una **Biblioteca de Conocimiento Masiva (+500 Frameworks)** que abarca desde la codificación de bajo nivel (DSPy, Unsloth) hasta la estrategia empresarial (Blue Ocean, Wardley Maps) y la orquestación de agentes (LangGraph, CrewAI).
 
 Esta plataforma está diseñada para ingenieros de IA, investigadores, arquitectos de datos y estrategas que buscan maximizar el rendimiento de los Modelos de Lenguaje Grande (LLMs) mediante técnicas estructuradas y metodologías probadas.
+
+## 🚀 Características SOTA v4.4.0 (Google I/O 2026 Models Update) 🚀
+*   **Alineación Gemini 3.5 & Omni**: Integración completa de los modelos insignia de Google anunciados en I/O 2026 (`gemini-3.5-flash`, `gemini-3.5-flash-thinking`, `gemini-3.5-pro` y `gemini-omni`).
+*   **Presupuestos de Pensamiento Adaptativos (Adaptive Thinking Budgets)**: Soporte experimental y robusto para configurar diferentes potencias de pensamiento en `gemini-3.5-flash`, exponiendo selectores directos para los niveles **Low**, **Medium**, **High**, y **Super High**.
+*   **Motor Predeterminado Optimizado**: Configuración completa de **Gemini 3.5 Flash (Medium Thinking)** (`gemini-3.5-flash-medium`) como el motor por defecto en toda la aplicación para garantizar una respuesta ultraveloz combinada con capacidades de deducción lógica avanzadas.
+*   **Validación Técnica Automatizada**: Introducción de un entorno de pruebas robusto para validar configuraciones de modelado, enrutamiento a la API y compatibilidad del budget de CoT en caliente.
 
 ## 🚀 Características SOTA v4.3.4 (Advanced Thinking & Tokenomics Update) 🧠
 
@@ -100,7 +106,9 @@ Implementación de lógica y estructuras derivadas del estado del arte en ingeni
 
 ### 4. Engine Room 2026 🧠
 Control total sobre la inferencia y el comportamiento del modelo:
-*   **Gemini 3.1 Series**: Pro (Razonamiento SOTA), Flash (Velocidad SOTA), Flash Lite (Eficiencia SOTA), Deep Think (Matemáticas/Código).
+*   **Gemini 3.5 & Omni Series**: Soporte para `gemini-3.5-flash`, `gemini-3.5-flash-thinking`, `gemini-3.5-pro` y el flagship multimodal `gemini-omni`.
+*   **Presupuestos de Pensamiento Adaptativos (Thinking Budgets)**: Opción de desplegar potencias graduales (**Low, Medium, High, Super High**) en el modelo de alta velocidad **Gemini 3.5 Flash** (por defecto configurado en *Medium*).
+*   **Gemini 3.1 Series**: Acceso alternativo a Pro (Razonamiento SOTA), Flash y Flash Lite.
 *   **Thinking Config**: Control granular del presupuesto de tokens de pensamiento con niveles preestablecidos (Low, Medium, High, Super High) para razonamiento complejo antes de la respuesta, permitiendo al modelo "pensar" antes de hablar.
 *   **Ajuste Fino de Parámetros**: Control granular sobre Temperatura, Top-P, Top-K, Penalización de Frecuencia y Presencia.
 

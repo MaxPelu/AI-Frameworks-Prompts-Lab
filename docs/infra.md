@@ -1,5 +1,5 @@
 
-# Infraestructura y Seguridad (v4.3.3)
+# Infraestructura y Seguridad (v4.4.0)
 
 ## Arquitectura del Sistema
 
@@ -26,9 +26,9 @@ Para garantizar la privacidad y la soberanía de los datos del usuario:
 
 ## Integración de Servicios Externos (SOTA)
 
-1.  **Google Gemini API (v3.1 / v2.5)**: El motor de inteligencia principal.
-    *   **Resolución Dinámica de Modelos**: El sistema selecciona automáticamente el modelo más adecuado. Utiliza `gemini-3.1-pro-preview` para tareas complejas de razonamiento y `gemini-3-flash-preview` para tareas rápidas (Fast Settings).
-    *   **Thinking Tokens**: La infraestructura soporta la configuración y recepción de tokens de pensamiento (razonamiento oculto) con niveles de intensidad (Low, Medium, High, Super High), crucial para tareas complejas.
+1.  **Google Gemini API (v3.5 / v3.1)**: El motor de inteligencia principal.
+    *   **Resolución Dinámica de Modelos**: El sistema selecciona automáticamente el modelo más adecuado. Utiliza **Gemini 3.5 Flash (Medium Thinking)** (`gemini-3.5-flash-medium`) de forma predeterminada para todos los refinamientos, optimizaciones e importaciones para garantizar máxima eficiencia y razonamiento. También soporta `gemini-3.5-pro` y `gemini-omni`.
+    *   **Thinking Tokens**: La infraestructura soporta la configuración y recepción de tokens de pensamiento (razonamiento oculto, CoT) con niveles de intensidad (**Low, Medium, High y Super High**), crucial para tareas lógicas complejas con el modelo `gemini-3.5-flash`.
     *   **Grounding (Google Search)**: Se utiliza la herramienta `googleSearch` nativa de la API para habilitar la función de "Deep Research", permitiendo al modelo acceder a información en tiempo real.
     *   **Fast Settings & Transformation Settings**: Perfiles de configuración predefinidos que desactivan características pesadas (como búsqueda o modo pensamiento) y fuerzan modelos rápidos para utilidades secundarias, minimizando la latencia.
 2.  **Mermaid.ink**: Servicio externo sin estado utilizado para renderizar diagramas de arquitectura basados en la sintaxis de Mermaid.js generada por la IA.

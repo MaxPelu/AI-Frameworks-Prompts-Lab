@@ -1,5 +1,13 @@
 
 export type GeminiModel = 
+    | 'gemini-3.5-flash'
+    | 'gemini-3.5-flash-low'
+    | 'gemini-3.5-flash-medium'
+    | 'gemini-3.5-flash-high'
+    | 'gemini-3.5-flash-super-high'
+    | 'gemini-3.5-flash-thinking'
+    | 'gemini-3.5-pro'
+    | 'gemini-omni'
     | 'gemini-3.1-pro-preview'
     | 'gemini-3.1-pro-preview-low'
     | 'gemini-3.1-pro-preview-medium'
@@ -50,10 +58,29 @@ export type GeminiModel =
     | 'gemma-3-27b-it'
     | 'gemma-3-12b-it'
     | 'gemma-3-4b-it'
+    | 'gemma-4-27b-it'
+    | 'gemma-4-12b-it'
+    | 'gemma-4-4b-it'
+    | 'gemini-3.1-flash'
+    | 'gemini-3.1-flash-lite'
+    | 'gemini-3.1-pro'
+    | 'gemini-3.1-flash-preview'
+    | 'gemini-3.1-flash-preview-low'
+    | 'gemini-3.1-flash-preview-medium'
+    | 'gemini-3.1-flash-preview-high'
+    | 'gemini-3.1-flash-preview-super-high'
     | 'gemini-agent'
     | 'google-antigravity-engine';
 
 export const ALL_GEMINI_MODELS: GeminiModel[] = [
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-low',
+    'gemini-3.5-flash-medium',
+    'gemini-3.5-flash-high',
+    'gemini-3.5-flash-super-high',
+    'gemini-3.5-flash-thinking',
+    'gemini-3.5-pro',
+    'gemini-omni',
     'gemini-3.1-pro-preview',
     'gemini-3.1-pro-preview-low',
     'gemini-3.1-pro-preview-medium',
@@ -104,6 +131,17 @@ export const ALL_GEMINI_MODELS: GeminiModel[] = [
     'gemma-3-27b-it',
     'gemma-3-12b-it',
     'gemma-3-4b-it',
+    'gemma-4-27b-it',
+    'gemma-4-12b-it',
+    'gemma-4-4b-it',
+    'gemini-3.1-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-3.1-pro',
+    'gemini-3.1-flash-preview',
+    'gemini-3.1-flash-preview-low',
+    'gemini-3.1-flash-preview-medium',
+    'gemini-3.1-flash-preview-high',
+    'gemini-3.1-flash-preview-super-high',
     'gemini-agent',
     'google-antigravity-engine'
 ];

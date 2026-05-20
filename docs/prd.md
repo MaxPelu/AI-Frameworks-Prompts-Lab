@@ -1,12 +1,15 @@
 
-# Documento de Requisitos del Producto (PRD): v4.3.4
+# Documento de Requisitos del Producto (PRD): v4.4.0 (Google I/O 2026 Edition)
 
 ## 1. Visión del Producto
 Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería de IA** completa y definitiva para 2026. El objetivo ya no es solo escribir prompts, sino arquitecturar sistemas de IA complejos, diseñar flujos de datos, evaluar el rendimiento de los modelos y definir estrategias de negocio asistidas por modelos SOTA (State of the Art) de Google.
 
 ## 2. Requisitos Funcionales (Q1-Q2 2026)
 
-### 2.0 Gestión Avanzada de Modelos Thinking (v4.3.4)
+### 2.0 Gestión Avanzada de Modelos SOTA e I/O 2026 Flagships (v4.4.0)
+*   **Alineación al Portafolio Gemini 3.5 & Omni**: Soporte nativo para los modelos de última generación de Google (`gemini-3.5-flash`, `gemini-3.5-flash-thinking`, `gemini-3.5-pro` y el buque insignia multimodal `gemini-omni`).
+*   **Presupuestos de Pensamiento Adaptativos (Adaptive Thinking Budgets)**: Soporte dinámico para ajustar granularmente el presupuesto de tokens de pensamiento (CoT) mediante niveles definidos en el cliente (**Low**, **Medium**, **High**, **Super High**) específicamente integrados para `gemini-3.5-flash`.
+*   **Motor Predeterminado Seleccionado para Alta Eficiencia**: Integrar `gemini-3.5-flash-medium` (Gemini 3.5 Flash con Presupuesto de Pensamiento Medio) como el motor por defecto para toda la suite de refinamiento y optimización, garantizando el mejor equilibrio costo/velocidad y capacidad lógica disponible.
 *   **Lógica Centralizada de Modelos**: Implementación de un sistema unificado para detectar y gestionar modelos con capacidades de razonamiento (Chain of Thought), asegurando consistencia en toda la plataforma.
 *   **Tokenomics Escalables**: Soporte para contextos masivos mediante la ampliación del límite de `Max Output Tokens` a 1,000,000 en todas las interfaces de configuración.
 *   **Presupuesto de Pensamiento Dinámico**: Sistema de seguridad automatizado que calcula y limita el `Thinking Budget` basándose en el límite de tokens de salida, garantizando siempre un margen operativo (buffer) para la respuesta final del modelo.
@@ -18,7 +21,9 @@ Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería
 *   **Optimización de Utilidades (Fast Settings)**: Aceleración de funciones secundarias (sugerencias, formateo, refinamiento rápido) forzando el uso de modelos ligeros (`gemini-3-flash-preview`) y desactivando características pesadas (búsqueda, modo pensamiento) cuando no son estrictamente necesarias.
 *   **Resolución Dinámica de Modelos**: Capacidad de adaptar dinámicamente el modelo utilizado según la tarea, garantizando el mejor equilibrio entre velocidad y capacidad de razonamiento.
 
-### 2.1 Robustecimiento Estratégico (v4.3.2)
+### 2.1 Robustecimiento Estratégico (v4.3.5)
+*   **Motor de Optimización SOTA**: Refactorización de todos los motores de generación de prompts (Mejorar, Robustecer, Corregir, Evolucionar) para apegarse estrictamente a las guías oficiales de Google, Anthropic y OpenAI. Incorporación de XML Tags, Personas expertas y Chain of Thought.
+*   **Gestión de Contexto Mejorada**: Los módulos de Acción inyectan reglas estructurales que exigen una separación clara entre instrucciones, datos de contexto y restricciones.
 *   **Motor de Expansión Conceptual**: Capacidad de transformar una idea inicial en una estructura robusta y detallada sin perder el hilo original, enfocándose en la arquitectura de la idea más que en la respuesta directa.
 *   **Sanitización de Datos (PII Scrubbing)**: Protección automática de la privacidad del usuario mediante la eliminación de información sensible antes del procesamiento por IA.
 *   **Entrada de Voz**: Integración de dictado por voz para capturar ideas de forma rápida y natural.
@@ -58,8 +63,9 @@ Convertir el Laboratorio de Prompts en una **Estación de Trabajo de Ingeniería
 *   **Agente de Investigación (Deep Research)**: Uso de la herramienta `googleSearch` de Gemini para buscar papers recientes (2025-2026), repositorios y artículos técnicos, y convertirlos automáticamente en tarjetas de framework usables en la biblioteca.
 
 ### 2.4 Engine Room & Tokenomics
-*   **Soporte Gemini 3.1 Series**: Configuración nativa para aprovechar las capacidades de razonamiento profundo de `gemini-3.1-pro-preview`, la velocidad de `gemini-3-flash-preview` y la eficiencia de `gemini-3.1-flash-lite-preview`.
-*   **Thinking Budget Control**: Interfaz de usuario para ajustar el presupuesto de tokens de pensamiento (Thinking Tokens) con niveles preestablecidos (Low, Medium, High, Super High), permitiendo al usuario decidir cuánta "reflexión" debe hacer el modelo antes de responder.
+*   **Soporte Gemini 3.5, Omni & Gemma 4**: Configuración nativa para aprovechar las capacidades de razonamiento profundo de `gemini-3.5-pro` e `omni`, y la velocidad de `gemini-3.5-flash` con presupuestos configurados.
+*   **Soporte Gemini 3.1 Series**: Acceso alternativo a `gemini-3.1-pro` y `gemini-3.1-flash`.
+*   **Thinking Budget Control**: Interfaz de usuario para ajustar el presupuesto de tokens de pensamiento (Thinking Tokens) con niveles preestablecidos (Low, Medium, High, Super High) para Gemini 3.5 Flash, permitiendo al usuario decidir cuánta "reflexión" debe hacer el modelo antes de responder.
 *   **Contabilidad de Tokens y Costos**: Dashboard detallado que diferencie entre tokens de entrada, salida, caché y pensamiento, calculando un costo estimado por sesión.
 
 ### 2.5 Generative UI (GenUI) y Visualización

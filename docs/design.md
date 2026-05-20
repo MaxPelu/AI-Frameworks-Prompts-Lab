@@ -1,8 +1,8 @@
 
-# Especificaciones de Diseño (UI/UX): Liquid Glass v4.3.3
+# Especificaciones de Diseño (UI/UX): Liquid Glass v4.4.0 (Google I/O 2026 Edition)
 
 ## Concepto Visual: "Omni-Forge"
-La interfaz se expande para acomodar múltiples dominios de conocimiento sin perder la coherencia estética. El diseño "Liquid Glass" busca transmitir una sensación de tecnología avanzada, limpieza y enfoque profesional, utilizando transparencias, desenfoques de fondo (backdrop-blur) y bordes sutiles.
+La interfaz se expande para acomodar múltiples dominios de conocimiento sin perder la coherencia estética. El diseño "Liquid Glass" busca transmitir una sensación de tecnología avanzada, limpieza y enfoque profesional, utilizando transparencias, desenfoques de fondo (backdrop-blur) y bordes sutiles con plena compatibilidad para la familia de modelos Gemini 3.5 e interfaces de CoT (Chain of Thought).
 
 ### Sistema de Colores por Dominio & Dashboard
 Para facilitar la navegación rápida y el reconocimiento cognitivo, se han asignado colores temáticos a los nuevos dashboards:

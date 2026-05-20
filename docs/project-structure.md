@@ -1,5 +1,5 @@
 
-# Estructura del Proyecto: Laboratorio de Prompts v4.3.3
+# Estructura del Proyecto: Laboratorio de Prompts v4.4.0
 
 La arquitectura del proyecto está diseñada para ser escalable, modular y fácil de mantener, separando claramente la interfaz de usuario, la lógica de negocio (IA) y la base de conocimiento estática.
 
@@ -42,6 +42,7 @@ La arquitectura del proyecto está diseñada para ser escalable, modular y fáci
 │       └── index.ts          # Tipos globales compartidos en toda la aplicación
 ├── index.html                # Plantilla HTML principal
 ├── package.json              # Dependencias y scripts del proyecto
+├── test-models.js            # Suite de tests automáticos de modelos Google I/O 2026
 ├── tsconfig.json             # Configuración del compilador TypeScript
 └── vite.config.ts            # Configuración del bundler Vite
 ```

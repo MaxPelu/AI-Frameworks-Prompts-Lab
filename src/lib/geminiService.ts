@@ -35,6 +35,7 @@ export const isThinkingSupported = (modelId: string): boolean => {
     modelId.includes("gemini-2.5") ||
     modelId.includes("thinking") ||
     modelId.includes("pro") ||
+    modelId.includes("omni") ||
     modelId === "gemini-agent" ||
     modelId === "google-antigravity-engine"
   );
@@ -62,10 +63,18 @@ const getErrorMessage = (feature: string) =>
 
 const resolveModel = (model: string): string => {
   const modelMap: Record<string, string> = {
-    "gemini-agent": "gemini-3-pro-preview",
-    "google-antigravity-engine": "gemini-3-pro-preview",
-    "gemini-3-deep-think-preview": "gemini-3-pro-preview",
-    "gemini-3-visual-layout": "gemini-3-flash-preview",
+    "gemini-agent": "gemini-3.5-pro",
+    "google-antigravity-engine": "gemini-3.5-pro",
+    "gemini-3-deep-think-preview": "gemini-3.5-flash-thinking",
+    "gemini-3-visual-layout": "gemini-3.5-flash",
+    "gemini-3.5-flash": "gemini-3.5-flash",
+    "gemini-3.5-flash-low": "gemini-3.5-flash",
+    "gemini-3.5-flash-medium": "gemini-3.5-flash",
+    "gemini-3.5-flash-high": "gemini-3.5-flash",
+    "gemini-3.5-flash-super-high": "gemini-3.5-flash",
+    "gemini-3.5-flash-thinking": "gemini-3.5-flash-thinking",
+    "gemini-3.5-pro": "gemini-3.5-pro",
+    "gemini-omni": "gemini-omni",
     "gemini-3.1-pro-preview": "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-low": "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-medium": "gemini-3.1-pro-preview",
@@ -94,6 +103,17 @@ const resolveModel = (model: string): string => {
     "gemma-3-27b-it": "gemma-3-27b-it",
     "gemma-3-12b-it": "gemma-3-12b-it",
     "gemma-3-4b-it": "gemma-3-4b-it",
+    "gemma-4-27b-it": "gemma-4-27b-it",
+    "gemma-4-12b-it": "gemma-4-12b-it",
+    "gemma-4-4b-it": "gemma-4-4b-it",
+    "gemini-3.1-flash": "gemini-3.1-flash",
+    "gemini-3.1-flash-lite": "gemini-3.1-flash-lite",
+    "gemini-3.1-pro": "gemini-3.1-pro",
+    "gemini-3.1-flash-preview": "gemini-3.1-flash-preview",
+    "gemini-3.1-flash-preview-low": "gemini-3.1-flash-preview",
+    "gemini-3.1-flash-preview-medium": "gemini-3.1-flash-preview",
+    "gemini-3.1-flash-preview-high": "gemini-3.1-flash-preview",
+    "gemini-3.1-flash-preview-super-high": "gemini-3.1-flash-preview",
     "imagen-4.0-generate-001": "imagen-4.0-generate-001",
     "veo-3.1-generate-preview": "veo-3.1-generate-preview",
     "gemini-flash": "gemini-3-flash-preview",
@@ -114,7 +134,7 @@ const fileToPart = (file: UploadedFile): Part => {
 // --- RETRY WRAPPER ---
 const getFastSettings = (settings: ModelSettings): ModelSettings => ({
   ...settings,
-  selectedModel: "gemini-3-flash-preview",
+  selectedModel: "gemini-3.5-flash",
   useGoogleSearch: false,
   isThinkingMode: false,
   temperature: 0.1,
@@ -378,9 +398,12 @@ const buildConfig = (
       config.maxOutputTokens = config.thinkingConfig.thinkingBudget + 2048; // Ensure buffer
     }
   } else if (settings.selectedModel.match(/-(low|medium|high|super-high)$/)) {
+    const modelLower = settings.selectedModel.toLowerCase();
     config.thinkingConfig = {
-      thinkingLevel: settings.selectedModel.endsWith("-low")
+      thinkingLevel: modelLower.endsWith("-low")
         ? ThinkingLevel.LOW
+        : modelLower.endsWith("-medium")
+        ? ThinkingLevel.MEDIUM
         : ThinkingLevel.HIGH,
     };
   }
@@ -505,7 +528,7 @@ export const generateSessionTitle = async (
   settings: ModelSettings,
 ): Promise<{ text: string }> => {
   if (!ai) return { text: "Sesión sin Título" };
-  const fastModel = "gemini-3-flash-preview";
+  const fastModel = "gemini-3.5-flash";
   const prompt = `Tarea: Genera un TÍTULO corto (3-5 palabras) para este texto. Solo el título, sin comillas ni intro. Texto: "${text.substring(0, 500)}"`;
 
   try {
@@ -532,8 +555,11 @@ export const quickRefine = async (
   let instruction = "";
   switch (action) {
     case "magic":
-      instruction =
-        "Goal: Elevate the writing. Make it clear, impactful, and professional while keeping the original intent.";
+      instruction = `**GOAL**: You are an Expert Prompt Engineer (SOTA level). Elevate the user's raw idea into a highly effective, production-ready AI prompt. Apply Official Promting Best Practices (Google/Anthropic/OpenAI):
+1. **XML Tags**: Structure elements cleanly (e.g., <system>, <context>, <instructions>, <output_format>).
+2. **Actionable Steps**: Break goals into numbered tasks.
+3. **Chain of Thought**: Request step-by-step reasoning where applicable.
+Return ONLY the upgraded, ready-to-use prompt text.`;
       break;
     case "fix":
       instruction =
@@ -580,8 +606,11 @@ export const quickRefineStream = async (
   let instruction = "";
   switch (action) {
     case "magic":
-      instruction =
-        "Goal: Elevate the writing. Make it clear, impactful, and professional while keeping the original intent.";
+      instruction = `**GOAL**: You are an Expert Prompt Engineer (SOTA level). Elevate the user's raw idea into a highly effective, production-ready AI prompt. Apply Official Promting Best Practices (Google/Anthropic/OpenAI):
+1. **XML Tags**: Structure elements cleanly (e.g., <system>, <context>, <instructions>, <output_format>).
+2. **Actionable Steps**: Break goals into numbered tasks.
+3. **Chain of Thought**: Request step-by-step reasoning where applicable.
+Return ONLY the upgraded, ready-to-use prompt text.`;
       break;
     case "fix":
       instruction =
@@ -658,15 +687,20 @@ export const optimizePrompt = async (
     "Apply general prompt engineering principles like clarity, specificity, and context.";
 
   const systemInstruction = `
-  **TASK: PROMPT ENGINEERING OPTIMIZATION**
+  **TASK: SOTA PROMPT ENGINEERING OPTIMIZATION**
   
-  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea.
+  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea, and strictly adhere to the following **Official Prompting Best Practices (Google/Anthropic/OpenAI)**:
+  
+  1. **XML Tags**: Structure elements cleanly (e.g., <system_instructions>, <context>, <task>, <output_format>).
+  2. **Persona**: Always assign a specific, highly capable AI persona.
+  3. **Clarity & Sequence**: Break complex directives into numbered steps. Request <thinking> blocks for reasoning tasks.
+  4. **Strict Constraints**: Apply both positive requirements and negative constraints explicitly.
   
   **FRAMEWORK INSTRUCTION:**
   ${frameworkDescription}
   
   **OUTPUT INSTRUCTION:**
-  Generate ONLY the optimized prompt. No preamble. Ensure the result is ready to use.
+  Generate ONLY the final optimized AI prompt ready to be copy-pasted. Do not include introductory text, meta-commentary, or conversational fillers.
   `;
 
   let promptContent = `
@@ -750,12 +784,19 @@ export const optimizePromptStream = async (
     "Apply general prompt engineering principles like clarity, specificity, and context.";
 
   const systemInstruction = `
-  **TASK: PROMPT ENGINEERING OPTIMIZATION**
-  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea.
+  **TASK: SOTA PROMPT ENGINEERING OPTIMIZATION**
+  Act as a World-Class Prompt Engineer. Apply the ${frameworkName} (${frameworkAcronym}) framework to the user's idea, and strictly adhere to the following **Official Prompting Best Practices (Google/Anthropic/OpenAI)**:
+  
+  1. **XML Tags**: Structure elements cleanly (e.g., <system_instructions>, <context>, <task>, <output_format>).
+  2. **Persona**: Always assign a specific, highly capable AI persona.
+  3. **Clarity & Sequence**: Break complex directives into numbered steps. Request <thinking> blocks for reasoning tasks.
+  4. **Strict Constraints**: Apply both positive requirements and negative constraints explicitly.
+  
   **FRAMEWORK INSTRUCTION:**
   ${frameworkDescription}
+  
   **OUTPUT INSTRUCTION:**
-  Generate ONLY the optimized prompt. No preamble. Ensure the result is ready to use.
+  Generate ONLY the final optimized AI prompt ready to be copy-pasted. Do not include introductory text, meta-commentary, or conversational fillers.
   `;
 
   let promptContent = `
@@ -828,30 +869,29 @@ export const expandIdea = async (
     .join("\n\n");
 
   const systemInstruction = `
-        **TASK: ADVANCED CONCEPTUAL EXPANSION & ROBUST ENRICHMENT**
+        **TASK: ADVANCED SOTA CONCEPTUAL EXPANSION**
         
-        You are a World-Class Strategy Architect and Concept Engineer. Your goal is to take a seed idea and transform it into a robust, multi-dimensional, and highly detailed conceptual framework.
+        You are a World-Class Strategy Architect and Expert Prompt Engineer. Your goal is to take a seed idea and expand it into a robust, multi-dimensional framework employing **Official SOTA Prompting Practices (Google/Anthropic/OpenAI)**.
         
-        **CORE DIRECTIVES:**
-        1. **DO NOT ANSWER THE PROMPT**: If the user's idea is a question or a task, do not perform the task yet. Instead, expand on the *concept* of the task, its implications, requirements, and potential branches.
-        2. **ROBUSTNESS & DEPTH**: Identify the hidden layers of the idea. What are the edge cases? What are the advanced components? What is the underlying logic?
-        3. **PRESERVE THE THREAD**: Stay strictly aligned with the original intent. Do not deviate into unrelated topics.
-        4. **STRUCTURAL EXCELLENCE**: Use Markdown with a clear hierarchy (H1, H2, H3). Use tables for comparisons or data structures. Use bullet points for high-density information.
+        **CORE SOTA DIRECTIVES:**
+        1. **XML Tagging**: Organize the expanded reasoning using clear XML blocks (e.g., <analysis>, <architecture>, <edge_cases>, <strategic_implications>).
+        2. **Breakdown**: Identify the hidden layers, logical branches, and advanced components of the seed idea.
+        3. **DO NOT ANSWER THE PROMPT**: Expand on the *concept* of the prompt itself. Do not execute the user's ultimate task. Prepare the ground for it.
+        4. **Structural Excellence**: Employ structured, step-by-step thinking. If relevant, include a <thinking> phase inside the output.
         
         **EXPANSION MODULES (Apply where relevant):**
-        - **Contextual Anchoring**: Why does this idea matter? What is the current landscape?
-        - **Technical Blueprint**: What are the components, variables, or steps involved?
-        - **Strategic Implications**: What are the short-term and long-term consequences?
-        - **Advanced Nuances**: What are the subtle details that a novice would miss?
+        - <context>: Why does this matter?
+        - <blueprint>: Variables, components, or steps.
+        - <nuances>: Edge cases and subtle details.
         
         ${
           framework
-            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || "N/A"} structure to organize this expansion.`
-            : `**AUTO-FRAMEWORK:** Select the most robust structure from the following list to organize the content: \n${availableFrameworksList.substring(0, 500)}...`
+            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || "N/A"} structure inside your output tags.`
+            : `**AUTO-FRAMEWORK:** Recommend and apply the most robust structure from this list: \n${availableFrameworksList.substring(0, 500)}...`
         }
 
         **OUTPUT:**
-        Produce a FINAL, high-density, professional document that makes the original idea 10x more robust.
+        Produce a high-density, heavily structured SOTA document making the original idea 10x more robust.
     `;
 
   const textPart = {
@@ -914,29 +954,28 @@ export const expandIdeaStream = async (
     .join("\n\n");
 
   const systemInstruction = `
-        **TASK: ADVANCED CONCEPTUAL EXPANSION & ROBUST ENRICHMENT**
-        You are a World-Class Strategy Architect and Concept Engineer. Your goal is to take a seed idea and transform it into a robust, multi-dimensional, and highly detailed conceptual framework.
+        **TASK: ADVANCED SOTA CONCEPTUAL EXPANSION**
+        You are a World-Class Strategy Architect and Expert Prompt Engineer. Your goal is to take a seed idea and expand it into a robust, multi-dimensional framework employing **Official SOTA Prompting Practices (Google/Anthropic/OpenAI)**.
         
-        **CORE DIRECTIVES:**
-        1. **DO NOT ANSWER THE PROMPT**: If the user's idea is a question or a task, do not perform the task yet. Instead, expand on the *concept* of the task, its implications, requirements, and potential branches.
-        2. **ROBUSTNESS & DEPTH**: Identify the hidden layers of the idea. What are the edge cases? What are the advanced components? What is the underlying logic?
-        3. **PRESERVE THE THREAD**: Stay strictly aligned with the original intent. Do not deviate into unrelated topics.
-        4. **STRUCTURAL EXCELLENCE**: Use Markdown with a clear hierarchy (H1, H2, H3). Use tables for comparisons or data structures. Use bullet points for high-density information.
+        **CORE SOTA DIRECTIVES:**
+        1. **XML Tagging**: Organize the expanded reasoning using clear XML blocks (e.g., <analysis>, <architecture>, <edge_cases>, <strategic_implications>).
+        2. **Breakdown**: Identify the hidden layers, logical branches, and advanced components of the seed idea.
+        3. **DO NOT ANSWER THE PROMPT**: Expand on the *concept* of the prompt itself. Do not execute the user's ultimate task. Prepare the ground for it.
+        4. **Structural Excellence**: Employ structured, step-by-step thinking. If relevant, include a <thinking> phase inside the output.
         
         **EXPANSION MODULES (Apply where relevant):**
-        - **Contextual Anchoring**: Why does this idea matter? What is the current landscape?
-        - **Technical Blueprint**: What are the components, variables, or steps involved?
-        - **Strategic Implications**: What are the short-term and long-term consequences?
-        - **Advanced Nuances**: What are the subtle details that a novice would miss?
+        - <context>: Why does this matter?
+        - <blueprint>: Variables, components, or steps.
+        - <nuances>: Edge cases and subtle details.
         
         ${
           framework
-            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || "N/A"} structure to organize this expansion.`
-            : `**AUTO-FRAMEWORK:** Select the most robust structure from the following list to organize the content: \n${availableFrameworksList.substring(0, 500)}...`
+            ? `**MANDATORY FRAMEWORK:** Apply the ${framework?.acronym || "N/A"} structure inside your output tags.`
+            : `**AUTO-FRAMEWORK:** Recommend and apply the most robust structure from this list: \n${availableFrameworksList.substring(0, 500)}...`
         }
 
         **OUTPUT:**
-        Produce a FINAL, high-density, professional document that makes the original idea 10x more robust.
+        Produce a high-density, heavily structured SOTA document making the original idea 10x more robust.
     `;
 
   const textPart = {
@@ -1617,12 +1656,20 @@ export const evolvePrompt = async (
   currentPrompt: string,
   settings: ModelSettings,
 ) => {
-  const metaPrompt = `Actúa como un optimizador de prompts experto.
-    Analiza el siguiente prompt y mejóralo aplicando técnicas avanzadas (CoT, delimitadores, especificidad).
-    Devuelve SOLO el prompt mejorado.
-    
-    Prompt Original:
-    "${currentPrompt}"`;
+  const metaPrompt = `**TASK**: SOTA PROMPT EVOLUTION
+You are a Master Prompt Engineer. Analyze and upgrade the following prompt using **Official SOTA Techniques (Google/Anthropic/OpenAI)**.
+
+**SOTA MANDATES**:
+1. Use strict XML Delimiters (e.g., <persona>, <instructions>, <context>, <format>).
+2. Establish a clear, expert persona.
+3. Apply structural clarity (numbered steps).
+4. Integrate Chain of Thought logic if the task is complex.
+
+**OUTPUT**:
+Return ONLY the upgraded prompt text. No preamble, no meta-commentary.
+
+**ORIGINAL PROMPT**:
+"${currentPrompt}"`;
 
   const transformSettings = getTransformationSettings(settings);
   const config = buildConfig(transformSettings, true);
@@ -1648,12 +1695,20 @@ export const evolvePromptStream = async (
   settings: ModelSettings,
   onChunk: (chunk: string) => void,
 ) => {
-  const metaPrompt = `Actúa como un optimizador de prompts experto.
-    Analiza el siguiente prompt y mejóralo aplicando técnicas avanzadas (CoT, delimitadores, especificidad).
-    Devuelve SOLO el prompt mejorado.
-    
-    Prompt Original:
-    "${currentPrompt}"`;
+  const metaPrompt = `**TASK**: SOTA PROMPT EVOLUTION
+You are a Master Prompt Engineer. Analyze and upgrade the following prompt using **Official SOTA Techniques (Google/Anthropic/OpenAI)**.
+
+**SOTA MANDATES**:
+1. Use strict XML Delimiters (e.g., <persona>, <instructions>, <context>, <format>).
+2. Establish a clear, expert persona.
+3. Apply structural clarity (numbered steps).
+4. Integrate Chain of Thought logic if the task is complex.
+
+**OUTPUT**:
+Return ONLY the upgraded prompt text. No preamble, no meta-commentary.
+
+**ORIGINAL PROMPT**:
+"${currentPrompt}"`;
 
   const transformSettings = getTransformationSettings(settings);
   const config = buildConfig(transformSettings, true);
