@@ -120,17 +120,20 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
   // Custom Parameters State
   const [customInstructions, setCustomInstructions] = useState("");
   const [targetLang, setTargetLang] = useState(outputLanguage || "Inglés");
-  const [temperature, setTemperature] = useState(modelSettings.temperature);
-  const [selectedModel, setSelectedModel] = useState<GeminiModel>(
-    modelSettings.selectedModel,
+  const [temperature, setTemperature] = useState(() =>
+    actionType === "expand" ? 1.0 : modelSettings.temperature
+  );
+  const [selectedModel, setSelectedModel] = useState<GeminiModel>(() =>
+    actionType === "expand" ? "gemini-3.5-flash-thinking" : modelSettings.selectedModel
   );
   const [selectedTone, setSelectedTone] = useState<string>("neutral");
-  const [maxOutputTokens, setMaxOutputTokens] = useState(
-    modelSettings.maxOutputTokens || 8192,
+  const [maxOutputTokens, setMaxOutputTokens] = useState(() =>
+    actionType === "expand" ? 16384 : (modelSettings.maxOutputTokens || 8192)
   );
-  const [thinkingBudget, setThinkingBudget] = useState(
-    modelSettings.thinkingBudget || 1024,
+  const [thinkingBudget, setThinkingBudget] = useState(() =>
+    actionType === "expand" ? 8192 : (modelSettings.thinkingBudget || 1024)
   );
+  const [isPendingAutoRun, setIsPendingAutoRun] = useState(false);
 
   const isThinkingModel = isThinkingSupported(selectedModel);
 
@@ -164,9 +167,44 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
 
   const MODELS: GeminiModel[] = ALL_GEMINI_MODELS;
 
+  const lastTriggerRef = useRef<{ isOpen: boolean; actionType: string | null }>({
+    isOpen: false,
+    actionType: null,
+  });
+
   const addLog = (message: string, type: LogEntry["type"] = "info") => {
     setLogs((prev) => [...prev, { timestamp: new Date(), message, type }]);
   };
+
+  // Reset state and run automatically when the modal is opened
+  useEffect(() => {
+    const wasOpen = lastTriggerRef.current.isOpen;
+    const lastActionType = lastTriggerRef.current.actionType;
+    
+    // Update ref
+    lastTriggerRef.current = { isOpen, actionType };
+
+    if (isOpen && (!wasOpen || lastActionType !== actionType)) {
+      setStatus("idle");
+      setResult("");
+      setLogs([]);
+      
+      if (actionType === "expand") {
+        setSelectedModel("gemini-3.5-flash-thinking");
+        setMaxOutputTokens(16384);
+        setThinkingBudget(8192);
+        setTemperature(1.0);
+      } else {
+        setSelectedModel(modelSettings.selectedModel);
+        setMaxOutputTokens(modelSettings.maxOutputTokens || 8192);
+        setThinkingBudget(modelSettings.thinkingBudget || 1024);
+        setTemperature(modelSettings.temperature);
+      }
+      setIsPendingAutoRun(true);
+    } else if (!isOpen) {
+      setIsPendingAutoRun(false);
+    }
+  }, [isOpen, actionType, modelSettings]);
 
   useEffect(() => {
     if (logsEndRef.current) {
@@ -181,10 +219,11 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
   }, [result, status]);
 
   useEffect(() => {
-    if (isOpen && status === "idle") {
+    if (isOpen && status === "idle" && isPendingAutoRun) {
+      setIsPendingAutoRun(false);
       runProcess();
     }
-  }, [isOpen, status]);
+  }, [isOpen, status, isPendingAutoRun, selectedModel, temperature, maxOutputTokens, thinkingBudget]);
 
   const getActionDetails = () => {
     switch (actionType) {

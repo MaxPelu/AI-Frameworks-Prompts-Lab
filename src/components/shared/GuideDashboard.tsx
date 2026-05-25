@@ -44,28 +44,44 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="relative p-8 rounded-[2.5rem] bg-gradient-to-br from-teal-500/10 to-blue-500/10 border border-teal-500/20 overflow-hidden">
                             <div className="relative z-10">
+                                <span className="bg-teal-400/20 text-teal-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-teal-500/30 uppercase tracking-widest inline-block mb-3">
+                                    Google I/O 2026 Core Flagships Active
+                                </span>
                                 <h3 className="text-3xl font-black text-white mb-4 tracking-tight">BIENVENIDO AL HUB DE INGENIERÍA</h3>
                                 <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">
-                                    Esta plataforma está diseñada para transformar ideas abstractas en sistemas de IA deterministas y potentes. Sigue estos flujos para dominar el arte de la orquestación.
+                                    Esta plataforma está diseñada para transformar ideas abstractas en sistemas de IA deterministas, optimizados y altamente estructurados. Domina el arte de la orquestación a través de flujos automáticos e interactivos.
                                 </p>
                             </div>
                             <RocketLaunchIcon className="absolute -right-8 -bottom-8 w-64 h-64 text-teal-500/5 -rotate-12" />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[
-                                { title: '1. La Idea', desc: 'Escribe tu requerimiento en lenguaje natural. No te preocupes por el formato inicial.', icon: LightBulbIcon, color: 'bg-yellow-500/20 text-yellow-400' },
-                                { title: '2. El Framework', desc: 'Aplica una estructura de la biblioteca (ej. Chain of Thought) para dar lógica al modelo.', icon: BookOpenIcon, color: 'bg-teal-500/20 text-teal-400' },
-                                { title: '3. El Refinado', desc: 'Usa las herramientas de IA para expandir, corregir o mejorar el prompt generado.', icon: WrenchScrewdriverIcon, color: 'bg-blue-500/20 text-blue-400' },
-                            ].map((step, i) => (
-                                <div key={i} className="glass-panel p-6 rounded-3xl border-white/5 hover:border-white/10 transition-all group">
-                                    <div className={`w-12 h-12 rounded-2xl ${step.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                        <step.icon className="w-6 h-6" />
+                        <div>
+                            <h4 className="text-[10px] font-bold text-teal-400 uppercase tracking-widest pl-1 mb-4">El Flujo de Construcción Interactiva</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {[
+                                    { title: '1. Biblioteca Estructurada', desc: 'Selecciona una metodología en el catálogo (ej. Chain of Thought) y cárgala con un clic al lienzo de edición.', icon: LightBulbIcon, color: 'bg-yellow-500/20 text-yellow-400' },
+                                    { title: '2. Enrutadores CoT & Budgets', desc: 'Configura el modelo y calibra los Presupuestos Adaptativos de Pensamiento (Low, Medium, High o Super High). El default es 3.5 Flash Medium.', icon: CpuChipIcon, color: 'bg-teal-500/20 text-teal-400' },
+                                    { title: '3. Red Teaming & Arena', desc: 'Simula ataques de inyección adversa en el simulador de vulnerabilidades o lanza batallas mano a mano en la Arena.', icon: ShieldCheckIcon, color: 'bg-blue-500/20 text-blue-400' },
+                                ].map((step, i) => (
+                                    <div key={i} className="glass-panel p-6 rounded-3xl border-white/5 hover:border-white/10 transition-all group">
+                                        <div className={`w-12 h-12 rounded-2xl ${step.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                                            <step.icon className="w-6 h-6" />
+                                        </div>
+                                        <h4 className="text-white font-bold mb-2 text-sm">{step.title}</h4>
+                                        <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
                                     </div>
-                                    <h4 className="text-white font-bold mb-2">{step.title}</h4>
-                                    <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="glass-panel p-6 rounded-3xl border-white/5 bg-white/5">
+                            <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <SparklesIcon className="w-4 h-4 text-yellow-400" />
+                                Novedad: Modelos Estrella de Google I/O 2026
+                            </h4>
+                            <p className="text-xs text-gray-500 leading-relaxed">
+                                Soporte para el portafolio de Google insignia: <strong>Gemini 3.5 Flash</strong> (con presupuestos de razonamiento CoT), <strong>Gemini 3.5 Pro</strong> (para la máxima escala analítica) y <strong>Gemini Omni</strong> (inferencia integrada multimodal avanzada).
+                            </p>
                         </div>
                     </div>
                 );
@@ -77,17 +93,29 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                 <SparklesIcon className="w-8 h-8 text-purple-400" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">INGENIERÍA DE PROMPTS</h3>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Flujo de diseño estructurado</p>
+                                <h3 className="text-2xl font-black text-white tracking-tight">INGENIERÍA & MOTORES CoT</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">Alineamiento de Pensamiento & Inferencia</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             {[
-                                { title: 'Selección de Framework', desc: 'Navega por las categorías (Prompting, Coding, Business) para encontrar la estructura ideal. Cada framework añade "railes" cognitivos al modelo.' },
-                                { title: 'Configuración Avanzada de Modelos', desc: 'Ajusta el Max Output Tokens (hasta 1,000,000) y la Temperatura. Para modelos compatibles (ej. Gemini 3.1 Pro, Thinking), configura el Thinking Budget. El sistema ajustará automáticamente el límite de tokens para garantizar que haya espacio suficiente para la respuesta final.' },
-                                { title: 'Iteración con IA', desc: 'Usa el botón "Mejorar" para que Gemini analice tu prompt y sugiera mejoras basadas en principios de ingeniería de contexto.' },
-                                { title: 'Control de Versiones', desc: 'Guarda versiones de tus prompts para comparar resultados en la Arena y evitar regresiones.' },
+                                { 
+                                    title: 'Selección de Framework en Biblioteca', 
+                                    desc: 'Escoge entre más de 40 metodologías especializadas. Al pulsar sobre cualquier tarjeta del panel, el prompt de esa metodología se importa instantáneamente al editor activo.' 
+                                },
+                                { 
+                                    title: 'Presupuestos de Pensamiento Adaptativos (Thinking Budgets)', 
+                                    desc: 'Asignados especialmente a Gemini 3.5 Flash. Tienes botones dedicados en el panel de control: Low (pensamiento rápido), Medium (el predeterminado balanceado), High (razonamiento analítico profundo) y Super High (máxima deducción analítica).' 
+                                },
+                                { 
+                                    title: 'Alineación Inteligente de Tokens', 
+                                    desc: 'Cuando seleccionas motores que requieren CoT, la app incrementa automáticamente de forma virtual el buffer del límite máximo (+2048 tokens de salida) al límite parametrizado. Esto previene de forma automatizada los errores "Invalid Argument" nativos de la API de Google, dando una ejecución completamente blindada.' 
+                                },
+                                { 
+                                    title: 'Tuning de Parámetros Técnicos', 
+                                    desc: 'Personaliza todos los valores clave del motor: Temperatura (coeficiente lúdico), Top-P (núcleo probabilístico), Top-K (filtro léxico), Penalización de Frecuencia y Presencia para influir con máxima precisión.' 
+                                }
                             ].map((item, i) => (
                                 <div key={i} className="flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group">
                                     <div className="text-purple-500 font-mono text-lg font-black opacity-30 group-hover:opacity-100 transition-opacity">0{i+1}</div>
@@ -108,8 +136,8 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                 <CircleStackIcon className="w-8 h-8 text-blue-400" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">RAG & GESTIÓN DE DATOS</h3>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Conecta tu conocimiento externo</p>
+                                <h3 className="text-2xl font-black text-white tracking-tight">BIBLIOTECA & NAVEGACIÓN SEMÁNTICA</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">Alineamiento y Filtros Rápidos de Frameworks</p>
                             </div>
                         </div>
 
@@ -117,12 +145,12 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                             <div className="glass-panel p-6 rounded-3xl border-white/5">
                                 <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                                     <AcademicCapIcon className="w-4 h-4 text-blue-400" />
-                                    Flujo de Ingesta
+                                    Categorías de Conocimiento
                                 </h4>
                                 <ul className="space-y-3">
-                                    {['Carga de archivos (PDF, MD, TXT)', 'Segmentación (Chunking)', 'Generación de Embeddings', 'Indexación en Vector DB'].map((step, i) => (
+                                    {['Software Architecture (Hexagonal o Limpios)', 'TDD y Calidad (RGR-Cycle, Mutation, Mutation, Contract Tests)', 'Estrategias Agile, Scrum Avanzado y WSJF', 'Orquestación de Agentes Multi-Rol'].map((step, i) => (
                                         <li key={i} className="flex items-center gap-3 text-xs text-gray-500">
-                                            <div className="w-1 h-1 rounded-full bg-blue-500" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                             {step}
                                         </li>
                                     ))}
@@ -131,10 +159,10 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                             <div className="glass-panel p-6 rounded-3xl border-white/5">
                                 <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                                     <WrenchScrewdriverIcon className="w-4 h-4 text-blue-400" />
-                                    Optimización RAG
+                                    Acciones del Panel de Frameworks
                                 </h4>
                                 <p className="text-xs text-gray-500 leading-relaxed">
-                                    Ajusta el tamaño de los fragmentos y el solapamiento para mejorar la precisión de la recuperación. Usa el dashboard de Datos para monitorear el estado de tu base de conocimiento.
+                                    Puedes filtrar de inmediato todas las fórmulas SOTA, ver la descripción técnica, abrir la URL de la especificación científica en un clic, o inyectar el prompt base estructurado al editor principal usando los botones dedicados.
                                 </p>
                             </div>
                         </div>
@@ -148,24 +176,24 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                 <CpuChipIcon className="w-8 h-8 text-orange-400" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">AGENTES AI</h3>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Orquestación de sistemas autónomos</p>
+                                <h3 className="text-2xl font-black text-white tracking-tight">AGENTES & SESIONES DE TRABAJO</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">Orquestación Colaborativa Multi-Agente</p>
                             </div>
                         </div>
 
                         <div className="glass-panel p-8 rounded-[2.5rem] border-white/5 mb-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="text-center">
-                                    <div className="text-2xl font-black text-white mb-2">1. Perfil</div>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Define el rol y el system prompt</p>
+                                    <div className="text-xl font-black text-white mb-2">1. Instanciar Perfil</div>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Crea un perfil Senior o SRE</p>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-black text-white mb-2">2. Tools</div>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Asigna funciones y APIs externas</p>
+                                    <div className="text-xl font-black text-white mb-2">2. Asignar Motor</div>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Equipa con Gemini 3.5 Flash</p>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-black text-white mb-2">3. Memoria</div>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Configura la retención de contexto</p>
+                                    <div className="text-xl font-black text-white mb-2">3. Chat & Iteración</div>
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Interactúa para obtener código pulido</p>
                                 </div>
                             </div>
                         </div>
@@ -177,16 +205,16 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                     Habilidades Generativas
                                 </h4>
                                 <p className="text-xs text-gray-500 leading-relaxed">
-                                    Crea habilidades complejas usando el generador integrado. Ahora puedes asignar modelos con capacidad de razonamiento (Thinking Models) y ajustar su presupuesto de tokens para tareas que requieran planificación profunda.
+                                    Establece flujos interactivos para que el modelo actúe con directivas de sistema avanzadas (por ejemplo, el de SRE L3 para diagnosticar problemas o el frontend centrado en buenas prácticas).
                                 </p>
                             </div>
                             <div className="glass-panel p-6 rounded-3xl border-white/5">
                                 <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                                     <CommandLineIcon className="w-4 h-4 text-orange-400" />
-                                    Acciones Rápidas
+                                    Batallas en la Arena SOTA
                                 </h4>
                                 <p className="text-xs text-gray-500 leading-relaxed">
-                                    Ejecuta transformaciones, traducciones o análisis sobre tu prompt actual utilizando el Dashboard de Acciones, con soporte total para modelos avanzados y configuración de tokens de salida de hasta 1M.
+                                    Compara en paralelo el rendimiento de Variante A vs Variante B, o pon a prueba las diferencias entre Gemini 3.5 Pro y Gemini 3.5 Flash en términos de precisión lógica y velocidad de respuesta.
                                 </p>
                             </div>
                         </div>
@@ -197,27 +225,27 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="flex items-center gap-4 mb-8">
                             <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                                <ScaleIcon className="w-8 h-8 text-emerald-400" />
+                                <ShieldCheckIcon className="w-8 h-8 text-emerald-400" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">EVALUACIÓN & SEGURIDAD</h3>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Garantiza la calidad y protección</p>
+                                <h3 className="text-2xl font-black text-white tracking-tight">RED TEAMING & SEGURIDAD</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">Protección Activa de Directivas contra Inyecciones</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
-                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">Métricas de Calidad</h4>
+                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">Simulación Automatizada</h4>
                                 <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
-                                    <div className="text-xs font-bold text-emerald-400 mb-2">LLM-as-a-Judge</div>
-                                    <p className="text-[11px] text-gray-500 leading-relaxed">Usa modelos superiores para evaluar la fidelidad, relevancia y tono de las respuestas generadas.</p>
+                                    <div className="text-xs font-bold text-emerald-400 mb-2">Simulador de Vulnerabilidades</div>
+                                    <p className="text-[11px] text-gray-500 leading-relaxed">Ejecuta las pruebas contra vectores de inyección clásicos y avanzados para medir el blindaje de tus instrucciones.</p>
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">Guardrails</h4>
+                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">Vectores de Pruebas</h4>
                                 <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
-                                    <div className="text-xs font-bold text-red-400 mb-2">Protección Activa</div>
-                                    <p className="text-[11px] text-gray-500 leading-relaxed">Activa filtros de PII y políticas anti-jailbreak para asegurar que tu IA sea segura para producción.</p>
+                                    <div className="text-xs font-bold text-red-400 mb-2">Ataques Simulados</div>
+                                    <p className="text-[11px] text-gray-500 leading-relaxed">Analiza la resiliencia instructiva sobre: Prompt Injection (DAN), Jailbreak / Bypass, Filtración de Datos Sensibles y Sufijos Adversarios.</p>
                                 </div>
                             </div>
                         </div>
@@ -231,23 +259,23 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                 <FolderIcon className="w-8 h-8 text-indigo-400" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">ESPACIOS DE TRABAJO</h3>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">Organización profesional de proyectos</p>
+                                <h3 className="text-2xl font-black text-white tracking-tight">ESPACIOS DE TRABAJO & EXPORTER</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">Organización de Contextos e Integración Multilingüe</p>
                             </div>
                         </div>
 
                         <div className="glass-panel p-6 rounded-3xl border-white/5">
                             <p className="text-sm text-gray-400 leading-relaxed mb-6">
-                                Los espacios de trabajo te permiten aislar contextos. Cada espacio tiene su propio historial, notas, archivos y configuración de agentes.
+                                Los espacios de trabajo en el panel izquierdo (con selectores y control de cambios) dividen de forma estricta los contextos de tu proyecto. El historial de versiones guarda detalles del modelo utilizado.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="p-4 bg-white/5 rounded-2xl">
-                                    <div className="text-xs font-bold text-white mb-1">Aislamiento de Datos</div>
-                                    <p className="text-[10px] text-gray-500">Las notas y prompts de un espacio no son visibles en otros.</p>
+                                    <div className="text-xs font-bold text-white mb-1">Avisos de Exportación SOTA</div>
+                                    <p className="text-[10px] text-gray-500">Genera código listo para producción en Python (Google GenAI SDK), Node.js (con JavaScript moderno), o la estructura directa en formato JSON.</p>
                                 </div>
                                 <div className="p-4 bg-white/5 rounded-2xl">
-                                    <div className="text-xs font-bold text-white mb-1">Exportación Rápida</div>
-                                    <p className="text-[10px] text-gray-500">Descarga todo el contexto de tu proyecto en un solo clic.</p>
+                                    <div className="text-xs font-bold text-white mb-1 font-mono">test-models.js Suite</div>
+                                    <p className="text-[10px] text-gray-500">Contamos con un motor de test automático local que comprueba que todos los presupuestos de CoT de Gemini 3.5 funcionen con el SDK sin riesgo de caída.</p>
                                 </div>
                             </div>
                         </div>
@@ -282,12 +310,13 @@ const GuideDashboard: React.FC<GuideDashboardProps> = ({ isOpen, onClose, inline
                                         { cmd: 'Abrir Arena', action: 'Compara modelos en paralelo.', shortcut: '⌘ + A' },
                                         { cmd: 'Guardar Versión', action: 'Crea un punto de restauración.', shortcut: '⌘ + S' },
                                         { cmd: 'Buscar Framework', action: 'Abre la biblioteca de conocimiento.', shortcut: '⌘ + F' },
+                                        { cmd: 'Limpiar Consola', action: 'Limpia el buffer temporal del lienzo.', shortcut: '⌘ + L' },
                                         { cmd: 'Cerrar Todo', action: 'Vuelve a la vista principal.', shortcut: 'ESC' },
                                     ].map((item, i) => (
                                         <tr key={i} className="hover:bg-white/5 transition-colors">
                                             <td className="px-6 py-4 font-bold text-gray-200">{item.cmd}</td>
-                                            <td className="px-6 py-4 text-gray-500">{item.action}</td>
-                                            <td className="px-6 py-4 text-gray-400 font-mono text-[10px]">{item.shortcut}</td>
+                                            <td className="px-6 py-4 text-gray-400">{item.action}</td>
+                                            <td className="px-6 py-4 text-teal-400 font-mono text-[10px]">{item.shortcut}</td>
                                         </tr>
                                     ))}
                                 </tbody>
