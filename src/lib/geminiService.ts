@@ -63,6 +63,17 @@ const getErrorMessage = (feature: string) =>
 
 const resolveModel = (model: string): string => {
   const modelMap: Record<string, string> = {
+    "gemini-3.6-flash": "gemini-3.6-flash",
+    "gemini-3.6-flash-low": "gemini-3.6-flash",
+    "gemini-3.6-flash-medium": "gemini-3.6-flash",
+    "gemini-3.6-flash-high": "gemini-3.6-flash",
+    "gemini-3.6-flash-super-high": "gemini-3.6-flash",
+    "gemini-3.6-flash-thinking": "gemini-3.6-flash",
+    "gemini-3.5-flash-light": "gemini-3.5-flash-light",
+    "gemini-3.5-flash-light-low": "gemini-3.5-flash-light",
+    "gemini-3.5-flash-light-medium": "gemini-3.5-flash-light",
+    "gemini-3.5-flash-light-high": "gemini-3.5-flash-light",
+    "gemini-3.5-flash-light-super-high": "gemini-3.5-flash-light",
     "gemini-agent": "gemini-3.5-flash",
     "google-antigravity-engine": "gemini-3.5-flash",
     "gemini-3-deep-think-preview": "gemini-3.5-flash",
@@ -73,7 +84,7 @@ const resolveModel = (model: string): string => {
     "gemini-3.5-flash-high": "gemini-3.5-flash",
     "gemini-3.5-flash-super-high": "gemini-3.5-flash",
     "gemini-3.5-flash-thinking": "gemini-3.5-flash",
-    "gemini-3.5-pro": "gemini-3.5-flash",
+    "gemini-3.5-pro": "gemini-3.5-pro",
     "gemini-omni": "gemini-3.5-flash",
     "gemini-3.1-pro-preview": "gemini-3.1-pro-preview",
     "gemini-3.1-pro-preview-low": "gemini-3.1-pro-preview",
@@ -134,7 +145,7 @@ const fileToPart = (file: UploadedFile): Part => {
 // --- RETRY WRAPPER ---
 const getFastSettings = (settings: ModelSettings): ModelSettings => ({
   ...settings,
-  selectedModel: "gemini-3.5-flash",
+  selectedModel: "gemini-3.6-flash-high",
   useGoogleSearch: false,
   isThinkingMode: false,
   temperature: 0.1,

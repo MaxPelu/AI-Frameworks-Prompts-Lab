@@ -169,8 +169,8 @@ const App: React.FC = () => {
         isRenameMode: false
     });
 
-    // Centralized Model Settings - Updated to Gemini 3.5 Flash (Medium Thinking) Default for Google I/O 2026
-    const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3.5-flash-medium');
+    // Centralized Model Settings - Updated to Gemini 3.6 Flash (High Thinking) Default
+    const [selectedModel, setSelectedModel] = useState<GeminiModel>('gemini-3.6-flash-high');
     const [temperature, setTemperature] = useState(0.8);
     const [topP, setTopP] = useState(0.95);
     const [topK, setTopK] = useState(40);
@@ -265,7 +265,7 @@ const App: React.FC = () => {
                 const parsedPrompts = JSON.parse(storedPrompts);
                 const migratedPrompts = parsedPrompts.map((p: any) => {
                     if (p.versions && Array.isArray(p.versions)) {
-                        p.versions = p.versions.map((v: any) => ({ ...v, model: v.model || 'gemini-3.5-flash-medium' }));
+                        p.versions = p.versions.map((v: any) => ({ ...v, model: v.model || 'gemini-3.6-flash-high' }));
                         return p;
                     }
                     const version: PromptVersion = {
@@ -274,7 +274,7 @@ const App: React.FC = () => {
                         useCase: p.useCase,
                         frameworkAcronym: p.frameworkAcronym,
                         optimizedPrompt: p.optimizedPrompt,
-                        model: 'gemini-3.5-flash-medium',
+                        model: 'gemini-3.6-flash-high',
                         createdAt: p.createdAt,
                         changeSummary: "Versión importada."
                     };

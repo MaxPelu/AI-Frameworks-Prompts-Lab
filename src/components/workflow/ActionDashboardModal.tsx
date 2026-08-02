@@ -124,7 +124,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
     actionType === "expand" ? 1.0 : modelSettings.temperature
   );
   const [selectedModel, setSelectedModel] = useState<GeminiModel>(() =>
-    actionType === "expand" ? "gemini-3.5-flash-thinking" : modelSettings.selectedModel
+    actionType === "expand" ? "gemini-3.6-flash-high" : modelSettings.selectedModel
   );
   const [selectedTone, setSelectedTone] = useState<string>("neutral");
   const [maxOutputTokens, setMaxOutputTokens] = useState(() =>
@@ -190,7 +190,7 @@ const ActionDashboardModal: React.FC<ActionDashboardModalProps> = ({
       setLogs([]);
       
       if (actionType === "expand") {
-        setSelectedModel("gemini-3.5-flash-thinking");
+        setSelectedModel("gemini-3.6-flash-high");
         setMaxOutputTokens(16384);
         setThinkingBudget(8192);
         setTemperature(1.0);

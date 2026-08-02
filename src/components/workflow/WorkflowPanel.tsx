@@ -863,7 +863,7 @@ const WorkflowPanel: React.FC<WorkflowPanelProps> = (props) => {
         if (!generatedPrompt.trim()) return;
         onModelBattle({
             prompt: generatedPrompt,
-            models: ['gemini-3.5-pro', 'gemini-3.5-flash', 'gemini-3.5-flash-thinking', 'gemini-omni']
+            models: ['gemini-3.6-flash-high', 'gemini-3.5-pro', 'gemini-3.5-flash', 'gemini-3.5-flash-thinking', 'gemini-omni']
         });
     };
     

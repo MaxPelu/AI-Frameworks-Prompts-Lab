@@ -1,5 +1,16 @@
 
 export type GeminiModel = 
+    | 'gemini-3.6-flash'
+    | 'gemini-3.6-flash-low'
+    | 'gemini-3.6-flash-medium'
+    | 'gemini-3.6-flash-high'
+    | 'gemini-3.6-flash-super-high'
+    | 'gemini-3.6-flash-thinking'
+    | 'gemini-3.5-flash-light'
+    | 'gemini-3.5-flash-light-low'
+    | 'gemini-3.5-flash-light-medium'
+    | 'gemini-3.5-flash-light-high'
+    | 'gemini-3.5-flash-light-super-high'
     | 'gemini-3.5-flash'
     | 'gemini-3.5-flash-low'
     | 'gemini-3.5-flash-medium'
@@ -73,6 +84,17 @@ export type GeminiModel =
     | 'google-antigravity-engine';
 
 export const ALL_GEMINI_MODELS: GeminiModel[] = [
+    'gemini-3.6-flash',
+    'gemini-3.6-flash-low',
+    'gemini-3.6-flash-medium',
+    'gemini-3.6-flash-high',
+    'gemini-3.6-flash-super-high',
+    'gemini-3.6-flash-thinking',
+    'gemini-3.5-flash-light',
+    'gemini-3.5-flash-light-low',
+    'gemini-3.5-flash-light-medium',
+    'gemini-3.5-flash-light-high',
+    'gemini-3.5-flash-light-super-high',
     'gemini-3.5-flash',
     'gemini-3.5-flash-low',
     'gemini-3.5-flash-medium',

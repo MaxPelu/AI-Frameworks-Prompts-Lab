@@ -514,7 +514,7 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
     settings.onSeedChange(defaultSettings.seed);
     settings.onThinkingBudgetChange(defaultSettings.thinkingBudget);
     settings.onIsThinkingModeChange(defaultSettings.isThinkingMode);
-    settings.onModelChange("gemini-3-flash-preview");
+    settings.onModelChange("gemini-3.6-flash-high");
     settings.onUseGoogleSearchChange(defaultSettings.useGoogleSearch);
     settings.onIsStructuredOutputEnabledChange(
       defaultSettings.isStructuredOutputEnabled,
@@ -793,6 +793,131 @@ const ModelSettingsPanel: React.FC<ModelSettingsPanelProps> = (props) => {
                     title="Model Selection"
                     icon={<SparklesIcon className="w-4 h-4" />}
                   />
+
+                  {/* GEMINI 3.6 & FLASH LIGHT 3.5 SERIES (NEW PRODUCTION RELEASE) */}
+                  <div className="mb-2 text-[10px] font-bold text-amber-400 uppercase tracking-widest pl-1 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>
+                    Gemini 3.6 & Flash Light 3.5 (New production flagships)
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                    <ModelButton
+                      id="gemini-3.6-flash"
+                      label="Gemini 3.6 Flash"
+                      sub="New flagship base"
+                      colorClass="bg-amber-500/20 border-amber-500/40 text-amber-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.6-flash-thinking"
+                      label="3.6 Flash Thinking"
+                      sub="SOTA reasoning CoT"
+                      colorClass="bg-orange-500/20 border-orange-500/40 text-orange-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-light"
+                      label="Gemini 3.5 Light"
+                      sub="Production light base"
+                      colorClass="bg-rose-500/20 border-rose-500/40 text-rose-200"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                  </div>
+
+                  {/* GEMINI 3.6 FLASH - ADAPTIVE THINKING LEVELS */}
+                  <div className="mb-2 text-[10px] font-bold text-amber-500/80 uppercase tracking-widest pl-1">
+                    Gemini 3.6 Flash - Adaptive Thinking Budgets
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                    <ModelButton
+                      id="gemini-3.6-flash-low"
+                      label="3.6 Flash Low"
+                      sub="Low Thinking"
+                      colorClass="bg-amber-500/10 border-amber-500/20 text-amber-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.6-flash-medium"
+                      label="3.6 Flash Medium"
+                      sub="Med Thinking"
+                      colorClass="bg-amber-500/20 border-amber-400/40 text-amber-100"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.6-flash-high"
+                      label="3.6 Flash High"
+                      sub="High (New Default)"
+                      colorClass="bg-orange-600/30 border-orange-400/60 text-orange-100"
+                      highlight
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.6-flash-super-high"
+                      label="3.6 Flash Super"
+                      sub="Max Thinking"
+                      colorClass="bg-red-600/20 border-red-500/40 text-red-200"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                  </div>
+
+                  {/* GEMINI 3.5 FLASH LIGHT - ADAPTIVE THINKING LEVELS */}
+                  <div className="mb-2 text-[10px] font-bold text-rose-500/80 uppercase tracking-widest pl-1">
+                    Gemini 3.5 Flash Light - Adaptive Thinking Budgets
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+                    <ModelButton
+                      id="gemini-3.5-flash-light-low"
+                      label="3.5 Light Low"
+                      sub="Low Thinking"
+                      colorClass="bg-rose-500/10 border-rose-500/20 text-rose-300"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-light-medium"
+                      label="3.5 Light Med"
+                      sub="Med Thinking"
+                      colorClass="bg-rose-500/20 border-rose-400/40 text-rose-100"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-light-high"
+                      label="3.5 Light High"
+                      sub="High Thinking"
+                      colorClass="bg-rose-600/25 border-rose-500/40 text-rose-200"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                    <ModelButton
+                      id="gemini-3.5-flash-light-super-high"
+                      label="3.5 Light Super"
+                      sub="Max Thinking"
+                      colorClass="bg-pink-600/20 border-pink-500/40 text-pink-200"
+                      current={settings.selectedModel}
+                      onClick={handleModelSelect}
+                      disabled={disabled}
+                    />
+                  </div>
 
                   {/* GEMINI 3.5 & OMNI HERO SERIES */}
                   <div className="mb-2 text-[10px] font-bold text-teal-400 uppercase tracking-widest pl-1 flex items-center gap-2">
